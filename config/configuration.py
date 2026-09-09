@@ -36,6 +36,9 @@ class parameters:
     CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)
     EDGE_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
     CLOUD_PROCESSING_FREQ_RANGE = (30, 60)  # MIPS
+    # Fixed backlog-time normalization scale, unit: seconds.
+    # Approximately one representative Edge task service time.
+    BACKLOG_TIME_SCALE_SEC = 4.0
 
     # ======================================================================
     # RL hyperparameters

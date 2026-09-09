@@ -78,16 +78,23 @@ class Task:
 
         
         Q_time= self.env.now
+        self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
+        self.env_state.register_waiting_replica(
+            self.primaryNode.server_id, self, "primary", self.primary_service_time
+        )
         with self.primaryNode.queue.request(priority=1) as req:
             yield req  # Queueing time in server
             Q_time= self.env.now - Q_time
-            self.env_state.assign_task_to_server(self.primaryNode.server_id, self, "primary")# assign a task to a server as primary run
-            # Calculate service time on primaryNode
-            self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
-            #print("service_time", service_time , "for task",self.id,"in server " , self.primaryNode.server_id )
+            self.env_state.start_replica_execution(
+                self.primaryNode.server_id, self, "primary",
+                self.primary_service_time, self.env.now
+            )
             failure_rate=self.set_failure_rate(self.primaryNode)
             # Simulate execution either success or failed
             yield self.env.timeout(self.primary_service_time)
+            self.env_state.complete_replica_execution(
+                self.primaryNode.server_id, self, "primary"
+            )
             
         # Probability that at least one transient server fault occurs during
         # this primary replica's execution interval.
@@ -118,21 +125,39 @@ class Task:
         # negligible recovery time in this model.
         if self.backupNode == self.primaryNode: # Retry strategy
             # no inpDelay
-            with self.backupNode.queue.request(priority=0) as req: #high priority
-                yield req  
-                self.env_state.assign_task_to_server(self.backupNode.server_id, self, "backup") 
-                backup_service_time = self.primary_service_time # as primary
+            backup_service_time = self.primary_service_time # as primary
+            self.env_state.register_waiting_replica(
+                self.backupNode.server_id, self, "backup", backup_service_time
+            )
+            with self.backupNode.queue.request(priority=0) as req: # high priority
+                yield req
+                self.env_state.start_replica_execution(
+                    self.backupNode.server_id, self, "backup",
+                    backup_service_time, self.env.now
+                )
                 failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
+                self.env_state.complete_replica_execution(
+                    self.backupNode.server_id, self, "backup"
+                )
 
         else: # recovery block or first result strategy
             yield self.env.timeout(inpDelay)
+            backup_service_time = self.computation_demand / self.backupNode.processing_frequency # may differ from primary according to frequency of backup server
+            self.env_state.register_waiting_replica(
+                self.backupNode.server_id, self, "backup", backup_service_time
+            )
             with self.backupNode.queue.request(priority=1) as req:
-                yield req 
-                self.env_state.assign_task_to_server(self.backupNode.server_id, self, "backup") 
-                backup_service_time = self.computation_demand / self.backupNode.processing_frequency # may differ from primary according to frequency of backup server
+                yield req
+                self.env_state.start_replica_execution(
+                    self.backupNode.server_id, self, "backup",
+                    backup_service_time, self.env.now
+                )
                 failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
+                self.env_state.complete_replica_execution(
+                    self.backupNode.server_id, self, "backup"
+                )
 
             
         

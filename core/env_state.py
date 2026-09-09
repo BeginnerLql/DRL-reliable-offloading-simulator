@@ -8,7 +8,7 @@ from config.params import params
 
 class EnvironmentState:
     def __init__(self):
-        self.servers = {}  # Server objects and current load state.
+        self.servers = {}  # Server objects and CPU backlog metadata.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
         self.num_completed_tasks = 0  # Number of completed tasks at all servers
 
@@ -18,26 +18,80 @@ class EnvironmentState:
         #print(f"Adding server with ID {server_id}")
         self.servers[server_id] = {
             'server_object': server_object,
-            'tasks_assigned': [],  # List of task objects assigned to this server
-            'load': 0  # Initialize load for the server (sum of computation demands of tasks assigned to it)
+            'waiting_replicas': [],
+            'running_replica': None
         }
 
-    def assign_task_to_server(self, server_id, task, selection):
-        """Assign a task object to a server based on the selection (primary or backup)."""
-              
-        self.servers[server_id]['tasks_assigned'].append({'task': task, 'selection': selection})
+    def register_waiting_replica(self, server_id, task, selection, service_time):
+        """Register a replica waiting for CPU service on a server."""
+        server_info = self.servers[server_id]
+        identity = (task.id, selection)
+        if any((item['task'].id, item['selection']) == identity
+               for item in server_info['waiting_replicas']):
+            raise RuntimeError(f"Replica {identity} is already waiting on server {server_id}")
+        if (server_info['running_replica'] is not None
+                and (server_info['running_replica']['task'].id,
+                     server_info['running_replica']['selection']) == identity):
+            raise RuntimeError(f"Replica {identity} is already running on server {server_id}")
+        server_info['waiting_replicas'].append({
+            'task': task,
+            'selection': selection,
+            'service_time': float(service_time),
+        })
 
-        # Update 'load'
-        self.servers[server_id]['load'] += task.computation_demand
+    def start_replica_execution(self, server_id, task, selection, service_time, service_start_time):
+        """Move a waiting replica to running metadata after CPU acquisition."""
+        server_info = self.servers[server_id]
+        identity = (task.id, selection)
+        waiting = server_info['waiting_replicas']
+        match = next((item for item in waiting
+                      if (item['task'].id, item['selection']) == identity), None)
+        if match is None:
+            raise RuntimeError(f"Replica {identity} is not registered on server {server_id}")
+        waiting.remove(match)
+        if server_info['running_replica'] is not None:
+            raise RuntimeError(f"Server {server_id} already has a running replica")
+        server_info['running_replica'] = {
+            'task': task,
+            'selection': selection,
+            'service_time': float(service_time),
+            'service_start_time': float(service_start_time),
+        }
+
+    def complete_replica_execution(self, server_id, task, selection):
+        """Clear running metadata when CPU service completes."""
+        running = self.servers[server_id]['running_replica']
+        identity = (task.id, selection)
+        if running is None or (running['task'].id, running['selection']) != identity:
+            raise RuntimeError(f"Replica {identity} is not running on server {server_id}")
+        self.servers[server_id]['running_replica'] = None
+
+    def get_server_backlog_time(self, server_id, current_time=None):
+        """Return running remaining service plus waiting service time in seconds."""
+        server_info = self.servers[server_id]
+        running = server_info['running_replica']
+        waiting = server_info['waiting_replicas']
+        if current_time is None:
+            if running is not None:
+                current_time = running['task'].env.now
+            elif waiting:
+                current_time = waiting[0]['task'].env.now
+            else:
+                current_time = 0.0
+
+        running_remaining_time = 0.0
+        if running is not None:
+            elapsed = max(float(current_time) - running['service_start_time'], 0.0)
+            running_remaining_time = max(running['service_time'] - elapsed, 0.0)
+        waiting_service_time = sum(max(item['service_time'], 0.0)
+                                   for item in waiting)
+        backlog_time = max(running_remaining_time + waiting_service_time, 0.0)
+        assert backlog_time >= -1e-8
+        return backlog_time
 
     def complete_task(self, server_id, task, selection, execute_time):
-        """Update load after a primary or backup replica execution completes."""
-        tasks_assigned = self.servers[server_id]['tasks_assigned']
-        for assigned_task in tasks_assigned:
-            if assigned_task['task'] == task and assigned_task['selection'] == selection:
-                self.servers[server_id]['load'] -= task.computation_demand
-                self.num_completed_tasks += 1
-                break
+        """Record a completed replica without changing CPU backlog metadata."""
+        self.num_completed_tasks += 1
 
     def get_server_by_id(self, server_id):
         """Get a server object by its ID."""
@@ -94,15 +148,16 @@ class EnvironmentState:
     def get_state(self, task):
         failure_rates = []
         frequencies = []
-        loads = []
+        backlog_times = []
 
-        for server_info in self.servers.values():
+        for server_id, server_info in self.servers.items():
             server_object = server_info['server_object']
             failure_rates.append(server_object.failure_rate)
             frequencies.append(server_object.processing_frequency)
-            loads.append(server_info['load'])
+            backlog_times.append(
+                self.get_server_backlog_time(server_id, task.env.now)
+            )
 
-        # One observable server-level reliability feature per node.
         min_failure_rate = min(
             params.EDGE_FAILURE_RATE_RANGE[0],
             params.CLOUD_FAILURE_RATE_RANGE[0]
@@ -111,34 +166,32 @@ class EnvironmentState:
             params.EDGE_FAILURE_RATE_RANGE[1],
             params.CLOUD_FAILURE_RATE_RANGE[1]
         )
-        norm_failure = self.normalize(
+        normalized_failure_rates = self.normalize(
             np.array(failure_rates), min_failure_rate, max_failure_rate
         )
-        norm_frequency = self.normalize(
+        normalized_processing_frequencies = self.normalize(
             np.array(frequencies),
             params.EDGE_PROCESSING_FREQ_RANGE[0],
             params.CLOUD_PROCESSING_FREQ_RANGE[1]
         )
+        normalized_backlog_times = np.array([
+            backlog_time / (backlog_time + params.BACKLOG_TIME_SCALE_SEC)
+            for backlog_time in backlog_times
+        ], dtype=np.float32)
 
-        max_local_load = max(loads) if loads else 1
-        norm_load = (
-            np.array(loads, dtype=np.float32) / max_local_load
-            if max_local_load > 0
-            else np.zeros_like(loads, dtype=np.float32)
-        )
-
-        norm_task_size = self.normalize(
+        normalized_task_size = self.normalize(
             task.task_size, params.TASK_SIZE_RANGE[0], params.TASK_SIZE_RANGE[1]
         )
-        norm_demand = self.normalize(
+        normalized_computation_demand = self.normalize(
             task.computation_demand, params.Low_demand, params.High_demand
         )
 
-        normalized_arr = np.concatenate(
-            [norm_failure, norm_frequency, norm_load,
-             [norm_task_size, norm_demand]],
-            dtype=np.float32
-        )
+        normalized_arr = np.concatenate([
+            normalized_failure_rates,
+            normalized_processing_frequencies,
+            normalized_backlog_times,
+            [normalized_task_size, normalized_computation_demand]
+        ], dtype=np.float32)
         assert len(normalized_arr) == params.num_states
         return normalized_arr
 

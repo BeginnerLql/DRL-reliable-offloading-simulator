@@ -136,14 +136,26 @@ Each server contributes three normalized state features:
 
 1. its observable estimated base transient fault arrival rate `lambda_n`;
 2. its processing frequency;
-3. its current load.
+3. its current backlog service time.
+
+The backlog time of server `n` is the remaining service time of its currently
+executing replica plus the service times of all replicas waiting in its CPU queue:
+
+```text
+B_n(t) = R_n(t) + sum(C_q / f_n)
+```
+
+It is normalized with the fixed scale `BACKLOG_TIME_SCALE_SEC = 4.0`:
+
+```text
+normalized_backlog_time = B_n(t) / (B_n(t) + 4.0)
+```
 
 The current task contributes normalized task size and computation demand. The
-state is ordered as `[failure_rates, frequencies, loads, task_size, demand]`, so
-its dimension is `3N + 2`. With the current eight servers, PPO receives 26
-state features. The failure-rate feature is the same server-level observable
-estimated base transient fault arrival rate used by the simulator. Historical
-primary/backup replica failure ratios are not separate state features.
+state is ordered as `[failure_rates, frequencies, backlog_times, task_size, demand]`,
+so its dimension remains `3N + 2`. With the current eight servers, PPO receives
+26 state features. Backlog time represents CPU service backlog only; network
+input/output delay is not included.
 
 ## Transient server-fault model
 

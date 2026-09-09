@@ -35,9 +35,10 @@ class params:
     # Fixed base failure rates (1/s)
     EDGE_FAILURE_RATE_RANGE = parameters.EDGE_FAILURE_RATE_RANGE
     CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
+    BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC
 
     # RL hyperparameters
-    num_states = 3 * serverNo + 2  # observable failure rate, frequency, load per server + task profile
+    num_states = 3 * serverNo + 2  # observable failure rate, frequency, backlog time per server + task profile
     num_actions = (serverNo*serverNo)+(serverNo*(serverNo-1))//2 # 92 actions for 8 servers
     
     # ----------- DDPG ----------------
