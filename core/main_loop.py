@@ -56,6 +56,7 @@ class MainLoop:
         self.ppo_last_decision_state = None
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
+        self.ppo_last_resolved_outcome_time = None
 
 
     # ---------------------------
@@ -73,6 +74,7 @@ class MainLoop:
             self.ppo_last_decision_state = None
             self.ppo_last_decision_action = None
             self.ppo_last_decision_time = None
+            self.ppo_last_resolved_outcome_time = None
 
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
@@ -183,7 +185,7 @@ class MainLoop:
             # Close the final arrival-to-terminal interval explicitly.
             if self.ppo_last_decision_state is not None:
                 terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
-                terminal_time = float(self.env.now)
+                terminal_time = self._get_ppo_terminal_time()
                 delta_t = terminal_time - self.ppo_last_decision_time
                 if delta_t < -1e-8:
                     raise ValueError(f"Negative PPO terminal interval: {delta_t}")
@@ -234,14 +236,105 @@ class MainLoop:
         self.pendingList.remove(task_counter)
         self.env_state.remove_task(task_counter)
 
+    def _get_task_outcome_time(self, task):
+        """Return the timestamp when ``task`` became finally resolved."""
+        primary_stat = task.primaryStat
+        backup_stat = task.backupStat
+        primary_finished = task.primaryFinished
+        backup_finished = task.backupFinished
+
+        if task.z == 0:
+            if (
+                primary_stat == "success"
+                and backup_stat is None
+                and primary_finished is not None
+            ):
+                return float(primary_finished)
+            if (
+                primary_stat == "failure"
+                and backup_stat == "success"
+                and backup_finished is not None
+            ):
+                return float(backup_finished)
+            if (
+                primary_stat == "failure"
+                and backup_stat == "failure"
+                and backup_finished is not None
+            ):
+                return float(backup_finished)
+            return None
+
+        # Parallel first-result mode: one successful replica resolves the
+        # task immediately, while two failures require both timestamps.
+        if (
+            primary_stat == "success"
+            and backup_stat == "success"
+            and primary_finished is not None
+            and backup_finished is not None
+        ):
+            return float(min(primary_finished, backup_finished))
+        if (
+            primary_stat == "success"
+            and backup_stat == "failure"
+            and primary_finished is not None
+        ):
+            return float(primary_finished)
+        if (
+            primary_stat == "failure"
+            and backup_stat == "success"
+            and backup_finished is not None
+        ):
+            return float(backup_finished)
+        if (
+            primary_stat == "failure"
+            and backup_stat == "failure"
+            and primary_finished is not None
+            and backup_finished is not None
+        ):
+            return float(max(primary_finished, backup_finished))
+        if (
+            primary_stat == "success"
+            and backup_stat is None
+            and primary_finished is not None
+        ):
+            return float(primary_finished)
+        if (
+            primary_stat is None
+            and backup_stat == "success"
+            and backup_finished is not None
+        ):
+            return float(backup_finished)
+        return None
+
+    def _get_ppo_terminal_time(self):
+        """Use the latest actual outcome timestamp for PPO terminal timing."""
+        decision_time = float(self.ppo_last_decision_time)
+        if self.ppo_last_resolved_outcome_time is None:
+            return decision_time
+        return max(decision_time, float(self.ppo_last_resolved_outcome_time))
+
     def _collect_resolved_task_outcomes(self):
         """Accumulate completed task rewards into the current PPO interval."""
         for task_counter in list(self.pendingList):
-            reward, delay = self.calcReward(task_counter)
-            if reward is None:
+            task = self.env_state.get_task_by_id(task_counter)
+            task_reward, delay = self.calcReward(task_counter)
+            if task_reward is None:
                 continue
-            self.ppo_interval_reward += reward
-            self._finalize_resolved_task(task_counter, reward, delay)
+
+            task_outcome_time = self._get_task_outcome_time(task)
+            if task_outcome_time is None:
+                raise RuntimeError(
+                    "Resolved PPO task has no valid outcome timestamp"
+                )
+
+            self.ppo_interval_reward += task_reward
+            if self.ppo_last_resolved_outcome_time is None:
+                self.ppo_last_resolved_outcome_time = task_outcome_time
+            else:
+                self.ppo_last_resolved_outcome_time = max(
+                    self.ppo_last_resolved_outcome_time, task_outcome_time
+                )
+            self._finalize_resolved_task(task_counter, task_reward, delay)
 
     # ---------------------------
     # REWARD CALCULATION (unchanged)
