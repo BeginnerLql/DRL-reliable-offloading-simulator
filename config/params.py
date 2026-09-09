@@ -14,9 +14,6 @@ class params:
 
     # experiment setting
     model_summary = parameters.model_summary  # Options: "dqn", "ppo", "ddpg"
-    # Scenario metadata
-    SCENARIO_TYPE = parameters.SCENARIO_TYPE  # e.g., "heterogeneous" / "homogeneous"
-    FAILURE_STATE = parameters.FAILURE_STATE  # e.g., "low" / "med" / "high"
     total_episodes = parameters.total_episodes
 
     # Infrastructure: servers
@@ -35,10 +32,9 @@ class params:
     # Server capabilities
     EDGE_PROCESSING_FREQ_RANGE = parameters.EDGE_PROCESSING_FREQ_RANGE
     CLOUD_PROCESSING_FREQ_RANGE = parameters.CLOUD_PROCESSING_FREQ_RANGE
-    # Failure/load model parameters
-    Alpha = parameters.compute_Alpha()  # Precomputed Alpha tables (edge/cloud, scenario/state)
-    alpha_edge = (None, None)  # Will be set at runtime based on SCENARIO_TYPE and FAILURE_STATE
-    alpha_cloud = (None, None)  # Will be set at runtime based on SCENARIO_TYPE and FAILURE_STATE
+    # Fixed base failure rates (1/s)
+    EDGE_FAILURE_RATE_RANGE = parameters.EDGE_FAILURE_RATE_RANGE
+    CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
 
     # RL hyperparameters
     num_states = 4 * serverNo + 2  #  for each server: load (x), frequency of server(x), primary Failure Rate(x), backup Failure Rate(x) + task profile: task_size + computation demand (2)

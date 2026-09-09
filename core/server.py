@@ -11,5 +11,5 @@ class Server:
         self.queue = simpy.PriorityResource(env, capacity=1)
 
         self.processing_frequency = processing_frequency  # fn(t)
-        self.failure_rate = failure_rate  # λ_n (t)
+        self.failure_rate = failure_rate  # Fixed λ_n, unit: 1/s
 

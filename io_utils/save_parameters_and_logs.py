@@ -1,8 +1,8 @@
 # save_parameters_and_logs.py
-# - state-based, fixed local paths only
+# - Fixed base failure rates, fixed local paths only
 # - No Permutation_Number
 # - Reads Excel input files ONLY from data/
-# - Writes results per (scenario, state, model)
+# - Writes results per model
 # - Creates Excel-native charts (no PNG files)
 # - Adds Summary.AVG_Failure (rolling mean over last 40 episodes) + ONLY line chart in Summary
 
@@ -19,34 +19,21 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
     # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
 
-    scenario = getattr(params, "SCENARIO_TYPE", "heterogeneous")
-    failure_state = getattr(params, "FAILURE_STATE", "high")
     model_name = str(getattr(params, "model_summary", "model")).strip().lower()
 
     # ---------------------------
     # Results folder + filename
     # ---------------------------
-    results_dir = os.path.join(RESULTS_DIR, f"{scenario}_{failure_state}_results")
+    results_dir = os.path.join(RESULTS_DIR, "fixed_rate_results")
     os.makedirs(results_dir, exist_ok=True)
 
-    filename = os.path.join(results_dir, f"{model_name}_{scenario}_{failure_state}.xlsx")
+    filename = os.path.join(results_dir, f"{model_name}_results.xlsx")
 
     # ---------------------------
     # Load Servers (from data/)
     # ---------------------------
-    servers_xlsx_name = "homogeneous_server_info.xlsx" if scenario == "homogeneous" else "heterogeneous_server_info.xlsx"
-    servers_path = os.path.join(DATA_DIR, servers_xlsx_name)
-    if not os.path.exists(servers_path):
-        raise FileNotFoundError(f"File not found: {servers_path}")
-
-    server_sheet = f"{scenario.capitalize()}_state_{failure_state}"
-    try:
-        server_info = pd.read_excel(servers_path, sheet_name=server_sheet)
-    except ValueError as e:
-        raise ValueError(
-            f"Sheet '{server_sheet}' not found in '{servers_path}'. "
-            f"Check your generator output sheet names."
-        ) from e
+    servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
+    server_info = pd.read_excel(servers_path)
 
     # ---------------------------
     # Load Tasks (from data/)

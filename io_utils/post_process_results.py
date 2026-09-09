@@ -8,7 +8,6 @@
 #     * compares Avg Reward and AVG_Failure across models (line charts)
 
 import os
-import re
 import zipfile
 import pandas as pd
 from openpyxl import load_workbook, Workbook
@@ -188,7 +187,7 @@ def process_one_result_file(xlsx_path: str):
 # ----------------------------
 
 def model_label_from_filename(filename: str) -> str:
-    # ddpg_heterogeneous_high.xlsx -> ddpg
+    # ddpg_results.xlsx -> ddpg
     base = os.path.splitext(filename)[0]
     parts = base.split("_")
     return parts[0].strip().lower() if parts else base.strip().lower()
@@ -366,7 +365,7 @@ def build_final_result_all(root_dir: str, folder_payloads: dict):
 # ----------------------------
 
 def is_results_folder(name: str) -> bool:
-    return bool(re.fullmatch(r"(homogeneous|heterogeneous)_(low|med|high)_results", name))
+    return name == "fixed_rate_results"
 
 
 def is_result_xlsx(name: str) -> bool:

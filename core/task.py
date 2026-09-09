@@ -84,12 +84,12 @@ class Task:
             # Calculate service time on primaryNode
             self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
             #print("service_time", service_time , "for task",self.id,"in server " , self.primaryNode.server_id )
-            failure_rate_adjusted=self.set_failure_rate(self.primaryNode)
+            failure_rate=self.set_failure_rate(self.primaryNode)
             # Simulate execution either success or failed
             yield self.env.timeout(self.primary_service_time)
             
         # Generate the next failure probability            
-        fault_prob= 1-math.exp(-failure_rate_adjusted * self.primary_service_time)
+        fault_prob= 1-math.exp(-failure_rate * self.primary_service_time)
         r=random.uniform(0, 1)
         if(r<fault_prob):
             self.primaryStat = "failure"
@@ -116,7 +116,7 @@ class Task:
                 yield req  
                 self.env_state.assign_task_to_server(self.backupNode.server_id, self, "backup") 
                 backup_service_time = self.primary_service_time # as primary
-                failure_rate_adjusted=self.set_failure_rate(self.backupNode)
+                failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
 
         else: # recovery block or first result strategy
@@ -125,13 +125,13 @@ class Task:
                 yield req 
                 self.env_state.assign_task_to_server(self.backupNode.server_id, self, "backup") 
                 backup_service_time = self.computation_demand / self.backupNode.processing_frequency # may differ from primary according to frequency of backup server
-                failure_rate_adjusted=self.set_failure_rate(self.backupNode)
+                failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
 
             
         
         
-        fault_prob= 1-math.exp(-failure_rate_adjusted * backup_service_time)
+        fault_prob= 1-math.exp(-failure_rate * backup_service_time)
         r=random.uniform(0, 1)
         if(r<fault_prob):
             self.backupStat = "failure"
@@ -160,16 +160,5 @@ class Task:
     
     
     def set_failure_rate(self, server_object):
-            
-            if (server_object.server_type=="Edge"):
-                failure_rate_adjusted = server_object.failure_rate + params.alpha_edge[0] * len(server_object.queue.queue)
-                if failure_rate_adjusted>params.alpha_edge[1]:
-                    failure_rate_adjusted=params.alpha_edge[1]
-
-            else:
-                failure_rate_adjusted = server_object.failure_rate + params.alpha_cloud[0] * len(server_object.queue.queue)
-                if failure_rate_adjusted>params.alpha_cloud[1]:
-                    failure_rate_adjusted=params.alpha_cloud[1]
-
-            return failure_rate_adjusted
-            
+        """Return the server's fixed base failure rate (1/s)."""
+        return server_object.failure_rate

@@ -123,8 +123,10 @@ class EnvironmentState:
             load.append(server_info['load'])
 
         # normalization
-        norm_primary = self.normalize(np.array(primary_failure_rate), params.alpha_cloud[0], params.alpha_edge[1])
-        norm_backup = self.normalize(np.array(backup_failure_rate), params.alpha_cloud[0], params.alpha_edge[1])
+        min_failure_rate = min(params.EDGE_FAILURE_RATE_RANGE[0], params.CLOUD_FAILURE_RATE_RANGE[0])
+        max_failure_rate = max(params.EDGE_FAILURE_RATE_RANGE[1], params.CLOUD_FAILURE_RATE_RANGE[1])
+        norm_primary = self.normalize(np.array(primary_failure_rate), min_failure_rate, max_failure_rate)
+        norm_backup = self.normalize(np.array(backup_failure_rate), min_failure_rate, max_failure_rate)
         norm_frequency = self.normalize(np.array(frequency), params.EDGE_PROCESSING_FREQ_RANGE[0], params.CLOUD_PROCESSING_FREQ_RANGE[1])
 
         max_local_load = max(load) if load else 1

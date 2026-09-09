@@ -51,8 +51,6 @@ class MainLoop:
         self.log_data = []
         self.task_Assignments_info = []
 
-        self.SCENARIO_TYPE = getattr(params, "SCENARIO_TYPE", "heterogeneous")
-        self.FAILURE_STATE = getattr(params, "FAILURE_STATE", "high")  # low / med / high
 
     # ---------------------------
     # EPISODE LOOP
@@ -275,11 +273,8 @@ class MainLoop:
     # SERVERS 
     # ---------------------------
     def setServers(self):
-        excel_file = "homogeneous_server_info.xlsx" if self.SCENARIO_TYPE == "homogeneous" else "heterogeneous_server_info.xlsx"
-        excel_file = os.path.join(DATA_DIR, excel_file)
-        sheet_name = f"{self.SCENARIO_TYPE.capitalize()}_state_{self.FAILURE_STATE}"
-
-        server_info_df = pd.read_excel(excel_file, sheet_name=sheet_name)
+        excel_file = os.path.join(DATA_DIR, "server_info.xlsx")
+        server_info_df = pd.read_excel(excel_file)
 
         for _, row in server_info_df.iterrows():
             server_id = int(row["Server_ID"])

@@ -105,14 +105,6 @@ def run_simulation():
 
 
 def main():
-    scenario_type = params.SCENARIO_TYPE
-    failure_state = params.FAILURE_STATE
-    print(f"#####   Running simulation for {scenario_type} scenario, state {failure_state}  #######")
-
-    # Set alpha bounds for the selected scenario/state
-    params.alpha_edge = params.Alpha["edge"][scenario_type][failure_state]
-    params.alpha_cloud = params.Alpha["cloud"][scenario_type][failure_state]
-
     run_simulation()
 
 

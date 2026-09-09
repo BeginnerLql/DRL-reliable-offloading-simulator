@@ -24,7 +24,7 @@ written to a dedicated results directory.
 
 - `config/`  
   Experiment configuration and centralized paths:
-  - `configuration.py` – scenario type, failure state, agent selection, hyperparameters  
+  - `configuration.py` – fixed failure-rate ranges, agent selection, hyperparameters
   - `params.py` – unified parameter object  
   - `paths.py` – single source of truth for project paths (project root, `data`, `results`)
 
@@ -44,7 +44,7 @@ written to a dedicated results directory.
   Input Excel files generated during the pre-processing step.
 
 - `results/`  
-  Output Excel files generated per scenario, failure state, and model.
+  Output Excel files generated per model.
 
 ---
 
@@ -89,7 +89,7 @@ python Project_main.py
 Simulation results are automatically written to:
 
 ```
-results/<scenario>_<state>_results/<model>_<scenario>_<state>.xlsx
+results/fixed_rate_results/<model>_results.xlsx
 ```
 
 ---
@@ -107,7 +107,7 @@ a global aggregated file (e.g., `Final_Result_All.xlsx`) inside the `results/` d
 
 ## Switching DRL agents and experiment setup
 
-The learning algorithm and reliability scenario are controlled via
+The learning algorithm and base failure-rate ranges are controlled via
 `config/configuration.py`, which serves as the main experiment configuration file.
 
 Key parameters include:
@@ -116,15 +116,19 @@ Key parameters include:
   Selects the DRL algorithm used for decision making. The corresponding agent
   implementation is instantiated from the `agents/` directory.
 
-- `SCENARIO_TYPE = "homogeneous" | "heterogeneous"`  
-  Specifies how failure probabilities are distributed across computing nodes.
+- `EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)` (1/s).
+- `CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)` (1/s).
 
-- `FAILURE_STATE = "low" | "med" | "high"`  
-  Defines the base reliability level of the system and directly affects the
-  failure-rate values loaded from the input Excel files.
+Pre-processing generates `data/server_info.xlsx` with one `Servers` sheet and
+`data/task_parameters.xlsx`. Each server's base failure rate is sampled uniformly
+from its type's range, then remains fixed throughout execution. Episodes load the
+same server parameters. Regenerate inputs after changing the ranges.
 
-By modifying these parameters, different experimental scenarios can be executed
-without any changes to the simulation core.
+Primary and backup use their respective server's rate with execution time
+`computation_demand / processing_frequency`: failure probability is
+`1 - exp(-failure_rate * service_time)`, followed by uniform random sampling.
+Queue length does not adjust this rate. The default algorithm remains PPO.
+The result workbook's `Servers` sheet records the rates used in the simulation.
 
 ---
 

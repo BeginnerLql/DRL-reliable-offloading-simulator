@@ -1,8 +1,7 @@
 # generate_server_and_task_parameters.py
 # Generates:
-# 1) homogeneous_server_info.xlsx  -> 3 sheets: low/high/med
-# 2) heterogeneous_server_info.xlsx -> 3 sheets: low/high/med
-# 3) task_parameters.xlsx
+# 1) server_info.xlsx -> one sheet: Servers
+# 2) task_parameters.xlsx
 
 import os
 import pandas as pd
@@ -28,56 +27,22 @@ def generate_processing_frequencies(number_of_server: int, server_type: str):
         raise ValueError("server_type must be 'edge' or 'cloud'")
 
 
-def generate_server_info_per_state(scenario_type: str, filename: str):
-    """
-    Create one Excel file with exactly 3 sheets (low/high/med) for the given scenario_type.
-    Each sheet includes both Edge servers and Cloud servers.
+def generate_server_info(filename: str):
+    """Write one sheet of servers with fixed base failure rates (1/s)."""
+    server_info = []
+    for server_type, count, rate_range in (
+        ("Edge", NUM_EDGE_SERVERS, parameters.EDGE_FAILURE_RATE_RANGE),
+        ("Cloud", NUM_CLOUD_SERVERS, parameters.CLOUD_FAILURE_RATE_RANGE),
+    ):
+        frequencies = generate_processing_frequencies(count, server_type)
+        for frequency in frequencies:
+            failure_rate = random.uniform(*rate_range)
+            server_info.append([len(server_info) + 1, server_type, frequency, failure_rate])
 
-    Sheet columns:
-      Server_ID, Server_Type, Processing_Frequency, Failure_Rate
-    """
-    failure_rates = parameters.compute_failure_rates()
-    state_types = ["low", "high", "med"]  # order like your sample
-
-    for idx, state_type in enumerate(state_types):
-        server_counter = 1
-        server_info = []
-        columns = ["Server_ID", "Server_Type", "Processing_Frequency", "Failure_Rate"]
-
-        # -------- Edge servers --------
-        edge_freqs = generate_processing_frequencies(NUM_EDGE_SERVERS, "edge")
-        for i in range(NUM_EDGE_SERVERS):
-            interval = failure_rates["edge"][scenario_type][state_type]
-            failure_rate = round(random.uniform(*interval), 6)
-
-            server_info.append([
-                server_counter,
-                "Edge",
-                edge_freqs[i],
-                failure_rate
-            ])
-            server_counter += 1
-
-        # -------- Cloud servers --------
-        cloud_freqs = generate_processing_frequencies(NUM_CLOUD_SERVERS, "cloud")
-        for i in range(NUM_CLOUD_SERVERS):
-            interval = failure_rates["cloud"][scenario_type][state_type]
-            failure_rate = round(random.uniform(*interval), 6)
-
-            server_info.append([
-                server_counter,
-                "Cloud",
-                cloud_freqs[i],
-                failure_rate
-            ])
-            server_counter += 1
-
-        df = pd.DataFrame(server_info, columns=columns)
-
-        sheet_name = f"{scenario_type.capitalize()}_state_{state_type}"
-        mode = "w" if idx == 0 else "a"
-        with pd.ExcelWriter(filename, engine="openpyxl", mode=mode) as writer:
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
+    df = pd.DataFrame(server_info, columns=[
+        "Server_ID", "Server_Type", "Processing_Frequency", "Failure_Rate"
+    ])
+    df.to_excel(filename, sheet_name="Servers", index=False)
 
 
 def generate_task_params(filename: str = "task_parameters.xlsx"):
@@ -111,12 +76,10 @@ def main():
     """Write all Excel parameter files into data/... (not project root)."""
     ensure_dirs()
 
-    homogeneous_path = os.path.join(DATA_DIR, "homogeneous_server_info.xlsx")
-    heterogeneous_path = os.path.join(DATA_DIR, "heterogeneous_server_info.xlsx")
+    servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
     tasks_path = os.path.join(DATA_DIR, "task_parameters.xlsx")
 
-    generate_server_info_per_state("homogeneous", homogeneous_path)
-    generate_server_info_per_state("heterogeneous", heterogeneous_path)
+    generate_server_info(servers_path)
     generate_task_params(tasks_path)
     print("Parameters defined in Excel files!")
 

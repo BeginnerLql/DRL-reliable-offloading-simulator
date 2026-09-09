@@ -2,8 +2,7 @@
 """
 Pre-process launcher (run from project root).
 Generates input Excel files into data/:
-- homogeneous_server_info.xlsx
-- heterogeneous_server_info.xlsx
+- server_info.xlsx
 - task_parameters.xlsx
 """
 
