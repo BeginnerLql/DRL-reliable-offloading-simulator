@@ -40,7 +40,7 @@ class MainLoop:
         self.episodic_reward = 0
         self.episodic_delay = 0
 
-        # tempbuffer[taskCounter] = (s, a, r, s')
+        # Legacy DQN/DDPG buffer: tempbuffer[taskCounter] = (s, a, r, s')
         self.tempbuffer = {}
         self.taskCounter = 1
         self.pendingList = []
@@ -340,9 +340,6 @@ class MainLoop:
             elif self.model_name == "dqn":
                 self.model.store_transition((s, int(a), r, s_))
                 self.model.train_step()
-
-            elif self.model_name == "ppo":
-                self.model.store_transition(s, int(a), r, s_, done=False)
 
             removeList.append(task_counter)
 
