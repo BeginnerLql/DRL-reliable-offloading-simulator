@@ -51,6 +51,12 @@ class MainLoop:
         self.log_data = []
         self.task_Assignments_info = []
 
+        # PPO-only arrival-driven SMDP bookkeeping.
+        self.ppo_interval_reward = 0.0
+        self.ppo_last_decision_state = None
+        self.ppo_last_decision_action = None
+        self.ppo_last_decision_time = None
+
 
     # ---------------------------
     # EPISODE LOOP
@@ -63,6 +69,10 @@ class MainLoop:
             self.tempbuffer = {}
             self.taskCounter = 1
             self.pendingList = []
+            self.ppo_interval_reward = 0.0
+            self.ppo_last_decision_state = None
+            self.ppo_last_decision_action = None
+            self.ppo_last_decision_time = None
 
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
@@ -91,15 +101,35 @@ class MainLoop:
     def Iteration(self):
         while self.taskCounter <= self.maxTask:
             yield self.env.timeout(np.random.poisson(1 / params.TASK_ARRIVAL_RATE))
+            current_time = float(self.env.now)
+
+            # PPO closes the previous arrival-to-arrival interval before
+            # observing the new task. Other algorithms keep their original
+            # task-centric bookkeeping path below.
+            if self.model_name == "ppo":
+                self._collect_resolved_task_outcomes()
 
             task = Task(self.env, self.env_state, self.taskCounter)
             self.env_state.add_task(task)
-
-            # build state vector
             self.G_state = self.env_state.get_state(task)
 
-            # complete s' for previous transition and train on any resolved tasks
-            if self.taskCounter > 1:
+            if self.model_name == "ppo":
+                if self.ppo_last_decision_state is not None:
+                    delta_t = current_time - self.ppo_last_decision_time
+                    if delta_t < -1e-8:
+                        raise ValueError(f"Negative PPO decision interval: {delta_t}")
+                    self.model.store_transition(
+                        self.ppo_last_decision_state,
+                        self.ppo_last_decision_action,
+                        self.ppo_interval_reward,
+                        self.G_state,
+                        delta_t=max(float(delta_t), 0.0),
+                        done=False,
+                    )
+                    self.ppo_interval_reward = 0.0
+            elif self.taskCounter > 1:
+                # Complete s' for the previous transition and train on any
+                # resolved tasks using the legacy DQN/DDPG path.
                 prev = list(self.tempbuffer[self.taskCounter - 1])
                 prev[3] = self.G_state
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
@@ -107,42 +137,66 @@ class MainLoop:
 
             # -------- action selection --------
             if self.model_name == "ddpg":
-                # DDPG outputs continuous scores over actions
-                action_scores = self.model.policy(self.G_state)  # torch tensor (CPU)
+                # DDPG outputs continuous scores over actions.
+                action_scores = self.model.policy(self.G_state)
                 self.G_action = action_scores.numpy().tolist()
-                self.G_action = self.model.addNoise(self.G_action, self.this_episode, self.total_episodes)
-
+                self.G_action = self.model.addNoise(
+                    self.G_action, self.this_episode, self.total_episodes
+                )
                 X, Y, Z = self.extract_parameters_from_action(self.G_action)
-
             else:
-                # DQN/PPO output a discrete action index
+                # DQN/PPO output a discrete action index.
                 eps = self.get_epsilon(self.this_episode)
                 action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
-
                 X, Y, Z = self.extract_parameters_from_index(self.G_action)
 
-            # store pending transition (reward filled later)
-            self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
+            if self.model_name == "ppo":
+                self.ppo_last_decision_state = self.G_state
+                self.ppo_last_decision_action = self.G_action
+                self.ppo_last_decision_time = current_time
+            else:
+                # Store the legacy task-centric transition for DQN/DDPG.
+                self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
+
             self.env.process(task.execute_task(X, Y, Z))
             self.pendingList.append(self.taskCounter)
-
             self.taskCounter += 1
 
-        # finalize last transition next-state placeholder
-        if self.taskCounter > 1:
-            last = list(self.tempbuffer[self.taskCounter - 1])
-            last[3] = self.G_state
-            self.tempbuffer[self.taskCounter - 1] = tuple(last)
+        if self.model_name != "ppo":
+            # Preserve the legacy final next-state placeholder for DQN/DDPG.
+            if self.taskCounter > 1:
+                last = list(self.tempbuffer[self.taskCounter - 1])
+                last[3] = self.G_state
+                self.tempbuffer[self.taskCounter - 1] = tuple(last)
 
-        # drain pending tasks until all rewards resolved
+        # Drain pending tasks until all task outcomes are resolved.
         while len(self.pendingList) > 0:
             yield_time = self.env_state.get_min_computation_demand()
             yield self.env.timeout(yield_time)
-            self.add_train()
+            if self.model_name == "ppo":
+                self._collect_resolved_task_outcomes()
+            else:
+                self.add_train()
 
-        # PPO: update policy at end of episode (on-policy)
         if self.model_name == "ppo":
+            # Close the final arrival-to-terminal interval explicitly.
+            if self.ppo_last_decision_state is not None:
+                terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
+                terminal_time = float(self.env.now)
+                delta_t = terminal_time - self.ppo_last_decision_time
+                if delta_t < -1e-8:
+                    raise ValueError(f"Negative PPO terminal interval: {delta_t}")
+                self.model.store_transition(
+                    self.ppo_last_decision_state,
+                    self.ppo_last_decision_action,
+                    self.ppo_interval_reward,
+                    terminal_next_state,
+                    delta_t=max(float(delta_t), 0.0),
+                    done=True,
+                )
+                self.ppo_interval_reward = 0.0
+            # PPO remains on-policy and updates once after the episode.
             self.model.train_step()
 
         # episode logs
@@ -155,6 +209,39 @@ class MainLoop:
         self.avg_reward_list.append(avg_reward)
 
         print(f"Episode {self.this_episode} | Avg Reward: {avg_reward:.3f} | This Episode: {self.episodic_reward:.3f}")
+
+    def _finalize_resolved_task(self, task_counter, reward, delay):
+        """Record common episode metrics and remove one resolved task."""
+        task = self.env_state.get_task_by_id(task_counter)
+        self.episodic_reward += reward
+        self.episodic_delay += delay
+        self.rewardsAll.append(reward)
+        self.task_Assignments_info.append(
+            (
+                self.this_episode,
+                task.id,
+                task.primaryNode.server_id,
+                task.primaryStarted,
+                task.primaryFinished,
+                task.primaryStat,
+                task.backupNode.server_id,
+                task.backupStarted,
+                task.backupFinished,
+                task.backupStat,
+                task.z,
+            )
+        )
+        self.pendingList.remove(task_counter)
+        self.env_state.remove_task(task_counter)
+
+    def _collect_resolved_task_outcomes(self):
+        """Accumulate completed task rewards into the current PPO interval."""
+        for task_counter in list(self.pendingList):
+            reward, delay = self.calcReward(task_counter)
+            if reward is None:
+                continue
+            self.ppo_interval_reward += reward
+            self._finalize_resolved_task(task_counter, reward, delay)
 
     # ---------------------------
     # REWARD CALCULATION (unchanged)
@@ -222,6 +309,10 @@ class MainLoop:
     # TRAINING (multi-model)
     # ---------------------------
     def add_train(self):
+        if self.model_name == "ppo":
+            self._collect_resolved_task_outcomes()
+            return
+
         removeList = []
 
         for task_counter in list(self.pendingList):

@@ -66,6 +66,7 @@ class params:
     af_ppo = parameters.af_ppo
     actor_lr_ppo = parameters.actor_lr_ppo
     critic_lr_ppo = parameters.critic_lr_ppo
+    # Per-second discount base for event-driven PPO/SMDP.
     gamma_ppo = parameters.gamma_ppo
     clip_eps_ppo = parameters.clip_eps_ppo
     k_epochs_ppo = parameters.k_epochs_ppo

@@ -68,6 +68,8 @@ class parameters:
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4
     critic_lr_ppo = 5e-4
+    # Per-second discount base for event-driven PPO/SMDP.
+    # Transition-specific discount: gamma_k = gamma_ppo ** delta_t_seconds.
     gamma_ppo = 0.90
     clip_eps_ppo = 0.2
     k_epochs_ppo = 2

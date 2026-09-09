@@ -157,6 +157,34 @@ so its dimension remains `3N + 2`. With the current eight servers, PPO receives
 26 state features. Backlog time represents CPU service backlog only; network
 input/output delay is not included.
 
+## Event-driven PPO/SMDP semantics
+
+PPO makes one decision when each task arrives. If task `k` arrives at time
+`t_k`, the next decision interval is `delta_t_k = t_(k+1) - t_k`. PPO stores
+transitions in task-arrival order:
+
+```text
+(s_k, a_k, r_k_interval, s_(k+1), delta_t_k, done_k)
+```
+
+`r_k_interval` is the sum of final task outcome rewards that become resolved
+during `[t_k, t_(k+1))`. Individual task rewards still use the unchanged
+`calcReward` formula; completion order does not reorder the PPO rollout. The
+last arrival closes an explicit terminal interval after all pending replicas
+are drained.
+
+For PPO, `gamma_ppo = 0.90` is a per-second discount base. Each transition uses
+`gamma_k = gamma_ppo ** delta_t_k`, so a zero-length interval has discount 1.
+Advantages use ordered variable-discount GAE:
+
+```text
+delta_k = r_k_interval + gamma_k * V(s_(k+1)) * (1 - done_k) - V(s_k)
+A_k = delta_k + gamma_k * gae_lambda * (1 - done_k) * A_(k+1)
+```
+
+GAE is computed before PPO minibatch shuffling. DQN and DDPG retain their
+existing transition and discount behavior.
+
 ## Transient server-fault model
 
 Each Edge or Cloud server has a fixed transient fault arrival rate, `lambda_n`,
