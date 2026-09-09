@@ -11,5 +11,8 @@ class Server:
         self.queue = simpy.PriorityResource(env, capacity=1)
 
         self.processing_frequency = processing_frequency  # fn(t)
-        self.failure_rate = failure_rate  # Fixed λ_n, unit: 1/s
+        # Transient server-fault arrival rate λ_n, unit: 1/s.
+        # A transient fault can fail the current task replica without
+        # permanently disabling this server.
+        self.failure_rate = failure_rate
 

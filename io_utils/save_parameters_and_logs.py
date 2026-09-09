@@ -85,6 +85,8 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
     )
 
     if not df_task_Assignments.empty:
+        # Final task failure means all required replica executions failed;
+        # it does not indicate that the selected servers became unavailable.
         df_task_Assignments["Final_status"] = df_task_Assignments.apply(
             lambda row: "failure"
             if row["Primary_Status"] == "failure" and row["Backup_Status"] == "failure"

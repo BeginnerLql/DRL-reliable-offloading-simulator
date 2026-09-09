@@ -8,7 +8,7 @@ from config.params import params
 
 class EnvironmentState:
     def __init__(self):
-        self.servers = {}  # Dictionary to store server objects {server_id: server_object, 'failure_rate': failure_rate, 'load': load}
+        self.servers = {}  # Server objects and replica-failure statistics.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
         self.num_completed_tasks = 0  # Number of completed tasks at all servers
 
@@ -19,8 +19,10 @@ class EnvironmentState:
         self.servers[server_id] = {
             'server_object': server_object,
             'tasks_assigned': [],  # List of task objects assigned to this server
-            'primary_failure_time': 1000000 * server_object.failure_rate,  # Initialize failure time for the server if it is selected as primary
-            'backup_failure_time': 1000000 * server_object.failure_rate,  # Initialize failure time for the server if it is selected as backup
+            # Legacy empirical statistics for observed primary/backup replica
+            # execution failures; these are not server downtime measures.
+            'primary_failure_time': 1000000 * server_object.failure_rate,
+            'backup_failure_time': 1000000 * server_object.failure_rate,
             'primary_executed_time': 1000000,  # Initialize executed tasks time for the server if it is selected as primary
             'backup_executed_time': 1000000,  # Initialize executed tasks time for the server if it is selected as backup
             'load': 0  # Initialize load for the server (sum of computation demands of tasks assigned to it)
@@ -46,7 +48,7 @@ class EnvironmentState:
                     # Update 'primary_executed_tasks'
                     self.servers[server_id]['primary_executed_time'] += execute_time
                     if task.primaryStat == "failure":
-                        # Update 'primary_failure_time'
+                        # Record the observed primary replica execution failure.
                         self.servers[server_id]['primary_failure_time'] += execute_time
                     
 
@@ -54,7 +56,7 @@ class EnvironmentState:
                     # Update 'backup_executed_tasks'
                     self.servers[server_id]['backup_executed_time'] += execute_time
                     if task.backupStat == "failure":
-                        # Update 'backup_failure_time'
+                        # Record the observed backup replica execution failure.
                         self.servers[server_id]['backup_failure_time'] += execute_time
 
                 

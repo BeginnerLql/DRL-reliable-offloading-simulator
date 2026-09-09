@@ -130,6 +130,34 @@ Primary and backup use their respective server's rate with execution time
 Queue length does not adjust this rate. The default algorithm remains PPO.
 The result workbook's `Servers` sheet records the rates used in the simulation.
 
+## Transient server-fault model
+
+Each Edge or Cloud server has a fixed transient fault arrival rate, `lambda_n`,
+measured in `1/s`. The ranges are configured by
+`EDGE_FAILURE_RATE_RANGE` and `CLOUD_FAILURE_RATE_RANGE` and are sampled once
+when `data/server_info.xlsx` is generated.
+
+For a task replica with computation demand `C_i` running on a server with
+processing frequency `f_n`, the execution interval is:
+
+```text
+t_i,n = C_i / f_n
+```
+
+The probability that at least one transient server fault occurs during that
+interval is:
+
+```text
+P(replica failure) = 1 - exp(-lambda_n * t_i,n)
+```
+
+The simulator samples this probability independently for the primary and backup
+replicas. A `failure` status means that the current replica execution failed due
+to a transient fault. The server does not enter a permanent DOWN state, and the
+fault recovery interval is treated as negligible. Therefore later tasks and a
+retry on the same server remain allowed. A task-level failure means that all
+required replicas failed. Correlated or common-cause faults are not modeled.
+
 ---
 
 ## Agent interface contract

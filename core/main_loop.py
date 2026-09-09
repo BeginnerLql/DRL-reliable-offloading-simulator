@@ -160,6 +160,12 @@ class MainLoop:
     # REWARD CALCULATION (unchanged)
     # ---------------------------
     def calcReward(self, taskID):
+        """Reward completed replica executions and task-level outcomes.
+
+        A ``failure`` status means the corresponding replica execution was
+        defeated by a transient fault. It does not mean that a server is down.
+        A final failure means that all required replicas failed.
+        """
         task = self.env_state.get_task_by_id(taskID)
         z = task.z
         primaryStat = task.primaryStat

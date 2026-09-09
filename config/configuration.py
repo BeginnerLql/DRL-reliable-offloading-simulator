@@ -30,8 +30,10 @@ class parameters:
     # ======================================================================
     # Reliability model parameters (Edge vs Cloud)
     # ======================================================================
-    EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)    # failure rate, unit: 1/s
-    CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)  # failure rate, unit: 1/s
+    # Transient server-fault arrival-rate range, unit: 1/s.
+    EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)
+    # Transient server-fault arrival-rate range, unit: 1/s.
+    CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)
     EDGE_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
     CLOUD_PROCESSING_FREQ_RANGE = (30, 60)  # MIPS
 

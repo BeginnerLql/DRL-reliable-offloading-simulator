@@ -56,7 +56,8 @@ class Task:
         if self.z == 0:
             self.primaryStarted = self.env.now
             yield self.env.process(self.primary())
-            # teta
+            # Retry/failover follows a primary replica execution failure.
+            # The fault is transient, so the selected server remains usable.
             if self.primaryStat == "failure":
 
                 yield self.env.timeout(max(self.teta - (self.primaryFinished - self.primaryStarted), 0))
@@ -88,10 +89,13 @@ class Task:
             # Simulate execution either success or failed
             yield self.env.timeout(self.primary_service_time)
             
-        # Generate the next failure probability            
+        # Probability that at least one transient server fault occurs during
+        # this primary replica's execution interval.
         fault_prob= 1-math.exp(-failure_rate * self.primary_service_time)
         r=random.uniform(0, 1)
         if(r<fault_prob):
+            # This is a primary replica execution failure, not a permanent
+            # failure of the selected server.
             self.primaryStat = "failure"
             
         else:
@@ -109,8 +113,10 @@ class Task:
 
         inpDelay , outDelay = self.calc_input_output_delay(self.backupNode)
 
-        # Use PriorityRequest if backupNode is the same as primaryNode
-        if self.backupNode == self.primaryNode: # Retry sterategy
+        # Use PriorityRequest if backupNode is the same as primaryNode.
+        # Retry is allowed because the preceding fault is transient and has
+        # negligible recovery time in this model.
+        if self.backupNode == self.primaryNode: # Retry strategy
             # no inpDelay
             with self.backupNode.queue.request(priority=0) as req: #high priority
                 yield req  
@@ -131,9 +137,13 @@ class Task:
             
         
         
+        # Probability that at least one transient server fault occurs during
+        # this backup replica's execution interval.
         fault_prob= 1-math.exp(-failure_rate * backup_service_time)
         r=random.uniform(0, 1)
         if(r<fault_prob):
+            # This is a backup replica execution failure; the server remains
+            # available for later tasks and retries.
             self.backupStat = "failure"
         else:
             yield self.env.timeout(outDelay)
@@ -160,5 +170,5 @@ class Task:
     
     
     def set_failure_rate(self, server_object):
-        """Return the server's fixed base failure rate (1/s)."""
+        """Return the server's fixed transient fault arrival rate (1/s)."""
         return server_object.failure_rate
