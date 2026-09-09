@@ -170,5 +170,5 @@ class Task:
     
     
     def set_failure_rate(self, server_object):
-        """Return the server's fixed transient fault arrival rate (1/s)."""
+        """Return the server's observable estimated transient fault arrival rate (1/s)."""
         return server_object.failure_rate

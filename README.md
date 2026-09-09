@@ -130,6 +130,21 @@ Primary and backup use their respective server's rate with execution time
 Queue length does not adjust this rate. The default algorithm remains PPO.
 The result workbook's `Servers` sheet records the rates used in the simulation.
 
+## PPO/MDP state representation
+
+Each server contributes three normalized state features:
+
+1. its observable estimated base transient fault arrival rate `lambda_n`;
+2. its processing frequency;
+3. its current load.
+
+The current task contributes normalized task size and computation demand. The
+state is ordered as `[failure_rates, frequencies, loads, task_size, demand]`, so
+its dimension is `3N + 2`. With the current eight servers, PPO receives 26
+state features. The failure-rate feature is the same server-level observable
+estimated base transient fault arrival rate used by the simulator. Historical
+primary/backup replica failure ratios are not separate state features.
+
 ## Transient server-fault model
 
 Each Edge or Cloud server has a fixed transient fault arrival rate, `lambda_n`,

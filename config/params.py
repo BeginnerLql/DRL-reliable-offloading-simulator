@@ -37,8 +37,8 @@ class params:
     CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
 
     # RL hyperparameters
-    num_states = 4 * serverNo + 2  #  for each server: load (x), frequency of server(x), primary Failure Rate(x), backup Failure Rate(x) + task profile: task_size + computation demand (2)
-    num_actions = (serverNo*serverNo)+(serverNo*(serverNo-1))//2 # 145
+    num_states = 3 * serverNo + 2  # observable failure rate, frequency, load per server + task profile
+    num_actions = (serverNo*serverNo)+(serverNo*(serverNo-1))//2 # 92 actions for 8 servers
     
     # ----------- DDPG ----------------
     std_dev_ddpg = parameters.std_dev_ddpg

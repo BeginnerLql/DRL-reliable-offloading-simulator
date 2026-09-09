@@ -8,7 +8,7 @@ from config.params import params
 
 class EnvironmentState:
     def __init__(self):
-        self.servers = {}  # Server objects and replica-failure statistics.
+        self.servers = {}  # Server objects and current load state.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
         self.num_completed_tasks = 0  # Number of completed tasks at all servers
 
@@ -19,12 +19,6 @@ class EnvironmentState:
         self.servers[server_id] = {
             'server_object': server_object,
             'tasks_assigned': [],  # List of task objects assigned to this server
-            # Legacy empirical statistics for observed primary/backup replica
-            # execution failures; these are not server downtime measures.
-            'primary_failure_time': 1000000 * server_object.failure_rate,
-            'backup_failure_time': 1000000 * server_object.failure_rate,
-            'primary_executed_time': 1000000,  # Initialize executed tasks time for the server if it is selected as primary
-            'backup_executed_time': 1000000,  # Initialize executed tasks time for the server if it is selected as backup
             'load': 0  # Initialize load for the server (sum of computation demands of tasks assigned to it)
         }
 
@@ -37,29 +31,11 @@ class EnvironmentState:
         self.servers[server_id]['load'] += task.computation_demand
 
     def complete_task(self, server_id, task, selection, execute_time):
-        """Set parameters about completed task in the environment state."""
+        """Update load after a primary or backup replica execution completes."""
         tasks_assigned = self.servers[server_id]['tasks_assigned']
         for assigned_task in tasks_assigned:
             if assigned_task['task'] == task and assigned_task['selection'] == selection:
-                # Update 'load'
                 self.servers[server_id]['load'] -= task.computation_demand
-
-                if selection == "primary" :
-                    # Update 'primary_executed_tasks'
-                    self.servers[server_id]['primary_executed_time'] += execute_time
-                    if task.primaryStat == "failure":
-                        # Record the observed primary replica execution failure.
-                        self.servers[server_id]['primary_failure_time'] += execute_time
-                    
-
-                elif selection == "backup": 
-                    # Update 'backup_executed_tasks'
-                    self.servers[server_id]['backup_executed_time'] += execute_time
-                    if task.backupStat == "failure":
-                        # Record the observed backup replica execution failure.
-                        self.servers[server_id]['backup_failure_time'] += execute_time
-
-                
                 self.num_completed_tasks += 1
                 break
 
@@ -108,39 +84,62 @@ class EnvironmentState:
         self.num_completed_tasks = 0
 
     def normalize(self, val, min_val, max_val):
-        return (val - min_val) / (max_val - min_val + 1e-8)
+        denominator = max_val - min_val
+        if denominator == 0:
+            if isinstance(val, np.ndarray):
+                return np.zeros_like(val, dtype=np.float32)
+            return 0.0
+        return (val - min_val) / denominator
 
     def get_state(self, task):
-        primary_failure_rate = []
-        backup_failure_rate = []
-        frequency = []
-        load = []
+        failure_rates = []
+        frequencies = []
+        loads = []
 
-        for server_id, server_info in self.servers.items():
+        for server_info in self.servers.values():
             server_object = server_info['server_object']
+            failure_rates.append(server_object.failure_rate)
+            frequencies.append(server_object.processing_frequency)
+            loads.append(server_info['load'])
 
-            primary_failure_rate.append(server_info['primary_failure_time'] / (server_info['primary_executed_time'] + 1e-8))
-            backup_failure_rate.append(server_info['backup_failure_time'] / (server_info['backup_executed_time'] + 1e-8))
-            frequency.append(server_object.processing_frequency)
-            load.append(server_info['load'])
+        # One observable server-level reliability feature per node.
+        min_failure_rate = min(
+            params.EDGE_FAILURE_RATE_RANGE[0],
+            params.CLOUD_FAILURE_RATE_RANGE[0]
+        )
+        max_failure_rate = max(
+            params.EDGE_FAILURE_RATE_RANGE[1],
+            params.CLOUD_FAILURE_RATE_RANGE[1]
+        )
+        norm_failure = self.normalize(
+            np.array(failure_rates), min_failure_rate, max_failure_rate
+        )
+        norm_frequency = self.normalize(
+            np.array(frequencies),
+            params.EDGE_PROCESSING_FREQ_RANGE[0],
+            params.CLOUD_PROCESSING_FREQ_RANGE[1]
+        )
 
-        # normalization
-        min_failure_rate = min(params.EDGE_FAILURE_RATE_RANGE[0], params.CLOUD_FAILURE_RATE_RANGE[0])
-        max_failure_rate = max(params.EDGE_FAILURE_RATE_RANGE[1], params.CLOUD_FAILURE_RATE_RANGE[1])
-        norm_primary = self.normalize(np.array(primary_failure_rate), min_failure_rate, max_failure_rate)
-        norm_backup = self.normalize(np.array(backup_failure_rate), min_failure_rate, max_failure_rate)
-        norm_frequency = self.normalize(np.array(frequency), params.EDGE_PROCESSING_FREQ_RANGE[0], params.CLOUD_PROCESSING_FREQ_RANGE[1])
+        max_local_load = max(loads) if loads else 1
+        norm_load = (
+            np.array(loads, dtype=np.float32) / max_local_load
+            if max_local_load > 0
+            else np.zeros_like(loads, dtype=np.float32)
+        )
 
-        max_local_load = max(load) if load else 1
-        norm_load = np.array(load, dtype=np.float32) / max_local_load if max_local_load > 0 else np.zeros_like(load, dtype=np.float32)
-
-        norm_task_size = self.normalize(task.task_size, params.TASK_SIZE_RANGE[0], params.TASK_SIZE_RANGE[1])
-        norm_demand = self.normalize(task.computation_demand, params.Low_demand, params.High_demand)
+        norm_task_size = self.normalize(
+            task.task_size, params.TASK_SIZE_RANGE[0], params.TASK_SIZE_RANGE[1]
+        )
+        norm_demand = self.normalize(
+            task.computation_demand, params.Low_demand, params.High_demand
+        )
 
         normalized_arr = np.concatenate(
-            [norm_primary, norm_backup, norm_frequency, norm_load, [norm_task_size, norm_demand]],
+            [norm_failure, norm_frequency, norm_load,
+             [norm_task_size, norm_demand]],
             dtype=np.float32
         )
+        assert len(normalized_arr) == params.num_states
         return normalized_arr
 
 
