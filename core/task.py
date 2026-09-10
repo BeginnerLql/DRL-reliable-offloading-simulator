@@ -66,7 +66,7 @@ class Task:
             # The fault is transient, so the selected server remains usable.
             if self.primaryStat == "failure":
 
-                yield self.env.timeout(max(self.teta - (self.primaryFinished - self.primaryStarted), 0))
+                yield self.env.timeout(0)
                 self.backupStarted = self.env.now
                 self.env.process(self.backup())
             
