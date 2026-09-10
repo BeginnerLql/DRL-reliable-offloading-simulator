@@ -85,6 +85,17 @@ class MainLoop:
             self.env.run()
 
 
+    def _sample_interarrival_time(self):
+        """Sample one inter-arrival time for the common Poisson workload."""
+        arrival_rate = float(params.TASK_ARRIVAL_RATE)
+        if arrival_rate <= 0:
+            raise ValueError(
+                "TASK_ARRIVAL_RATE must be positive and measured in tasks/s"
+            )
+        return float(
+            np.random.exponential(scale=1.0 / arrival_rate)
+        )
+
     # ---------------------------
     # epsilon schedule (DQN only; PPO ignores epsilon in its select_action signature)
     # ---------------------------
@@ -102,7 +113,7 @@ class MainLoop:
     # ---------------------------
     def Iteration(self):
         while self.taskCounter <= self.maxTask:
-            yield self.env.timeout(np.random.poisson(1 / params.TASK_ARRIVAL_RATE))
+            yield self.env.timeout(self._sample_interarrival_time())
             current_time = float(self.env.now)
 
             # PPO closes the previous arrival-to-arrival interval before

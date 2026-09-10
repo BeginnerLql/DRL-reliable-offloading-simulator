@@ -16,7 +16,7 @@ class parameters:
     # ======================================================================
     # Workload: tasks
     # ======================================================================
-    TASK_ARRIVAL_RATE = 0.5 # Task arrival time, 0.1, 0.2
+    TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (10, 100)  # heter
     Low_demand, High_demand = 1, 100 # MI (Normal(mean=50, std=16) implied)
     taskno = 200

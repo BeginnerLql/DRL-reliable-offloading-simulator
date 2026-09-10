@@ -157,6 +157,22 @@ so its dimension remains `3N + 2`. With the current eight servers, PPO receives
 26 state features. Backlog time represents CPU service backlog only; network
 input/output delay is not included.
 
+## Task arrival process
+
+Tasks arrive according to a Poisson process with rate `lambda_a =
+TASK_ARRIVAL_RATE`, measured in tasks/s. Therefore, each inter-arrival time is
+exponentially distributed:
+
+```text
+Delta_T_k ~ Exp(lambda_a)
+E[Delta_T_k] = 1 / lambda_a
+```
+
+The simulator samples each interval with
+`np.random.exponential(scale=1.0 / TASK_ARRIVAL_RATE)` and keeps the resulting
+floating-point value. With the current `TASK_ARRIVAL_RATE = 0.5` tasks/s, the
+mean inter-arrival time is 2.0 seconds.
+
 ## Event-driven PPO/SMDP semantics
 
 PPO makes one decision when each task arrives. If task `k` arrives at time

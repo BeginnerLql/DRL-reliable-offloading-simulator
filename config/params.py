@@ -25,6 +25,7 @@ class params:
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
     Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
     taskno = parameters.taskno
+    # Poisson task-arrival rate, unit: tasks/s
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
     # Network model
     rsu_to_cloud_bandwidth = parameters.rsu_to_cloud_bandwidth
