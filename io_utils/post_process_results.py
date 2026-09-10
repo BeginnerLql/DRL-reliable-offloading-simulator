@@ -2,7 +2,7 @@
 # - NO average_distribution.xlsx
 # - Enriches each result .xlsx by adding:
 #     * "Task Distribution" sheet + chart
-#     * "Recovery Strategy Distribution" sheet + chart
+#     * "Strategy Selection Distribution" sheet + chart
 # - Creates ONE root-level Final_Result_All.xlsx
 #     * one sheet per results folder
 #     * compares Avg Reward and AVG_Failure across models (line charts)
@@ -69,7 +69,7 @@ def add_task_dist_chart(ws, df):
     ws.add_chart(chart, "H1")
 
 
-def add_recovery_strategy_chart(ws, df):
+def add_strategy_selection_chart(ws, df):
     """
     df columns: Strategy, Percentage
     """
@@ -79,9 +79,9 @@ def add_recovery_strategy_chart(ws, df):
     chart = BarChart()
     chart.type = "col"
     chart.style = 18
-    chart.title = "Recovery Strategy Distribution (Last Episode)"
+    chart.title = "Strategy Selection Distribution (Last Episode)"
     chart.y_axis.title = "Percentage of Tasks"
-    chart.x_axis.title = "Recovery Strategy"
+    chart.x_axis.title = "Strategy Selection"
 
     chart.add_data(data, titles_from_data=True)
     chart.set_categories(categories)
@@ -101,7 +101,7 @@ def read_required_sheets(xlsx_path: str):
 def compute_distributions(servers_df: pd.DataFrame, tasks_df: pd.DataFrame):
     """
     Returns:
-      task_distribution_df, recovery_strategy_df
+      task_distribution_df, strategy_selection_df
     """
     server_ids = sorted(servers_df["Server_ID"].astype(int).tolist())
     server_types = servers_df.set_index("Server_ID").loc[server_ids]["Server_Type"]
@@ -137,13 +137,18 @@ def compute_distributions(servers_df: pd.DataFrame, tasks_df: pd.DataFrame):
         "Backup_Tasks_Percentage": backup_pct
     })
 
-    # --- Recovery strategy distribution ---
-    df2 = episode_backup_df
-    retry_count = len(df2[(df2["Primary"] == df2["Backup"]) & (df2["Z"] == 0)])
-    recovery_block_count = len(df2[(df2["Primary"] != df2["Backup"]) & (df2["Z"] == 0)])
-    first_result_count = len(df2[df2["Z"] == 1])
+    # --- Strategy selection distribution ---
+    # Strategy selection is defined for every task-level decision, including
+    # Z=0 tasks whose backup did not actually start.
+    retry_count = len(
+        episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] == episode_df["Backup"])]
+    )
+    recovery_block_count = len(
+        episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] != episode_df["Backup"])]
+    )
+    first_result_count = len(episode_df[episode_df["Z"] == 1])
 
-    total = len(df2)
+    total = len(episode_df)
     if total <= 0:
         retry_pct = recovery_block_pct = first_result_pct = 0
     else:
@@ -151,12 +156,12 @@ def compute_distributions(servers_df: pd.DataFrame, tasks_df: pd.DataFrame):
         recovery_block_pct = (recovery_block_count / total) * 100
         first_result_pct = (first_result_count / total) * 100
 
-    recovery_strategy_df = pd.DataFrame({
+    strategy_selection_df = pd.DataFrame({
         "Strategy": ["Retry", "Recovery Block", "First Result"],
         "Percentage": [retry_pct, recovery_block_pct, first_result_pct]
     })
 
-    return task_distribution_df, recovery_strategy_df
+    return task_distribution_df, strategy_selection_df
 
 
 def process_one_result_file(xlsx_path: str):
@@ -164,7 +169,7 @@ def process_one_result_file(xlsx_path: str):
         raise ValueError("Not a valid Excel file.")
 
     servers_df, tasks_df = read_required_sheets(xlsx_path)
-    task_dist_df, recov_df = compute_distributions(servers_df, tasks_df)
+    task_dist_df, strategy_selection_df = compute_distributions(servers_df, tasks_df)
 
     wb = load_workbook(xlsx_path)
 
@@ -173,10 +178,12 @@ def process_one_result_file(xlsx_path: str):
     write_df_to_sheet(ws1, task_dist_df)
     add_task_dist_chart(ws1, task_dist_df)
 
+    # Remove both names so reprocessing older result files does not leave a stale sheet.
     safe_sheet_delete(wb, "Recovery Strategy Distribution")
-    ws2 = wb.create_sheet("Recovery Strategy Distribution")
-    write_df_to_sheet(ws2, recov_df)
-    add_recovery_strategy_chart(ws2, recov_df)
+    safe_sheet_delete(wb, "Strategy Selection Distribution")
+    ws2 = wb.create_sheet("Strategy Selection Distribution")
+    write_df_to_sheet(ws2, strategy_selection_df)
+    add_strategy_selection_chart(ws2, strategy_selection_df)
 
     wb.save(xlsx_path)
     return True
