@@ -187,9 +187,10 @@ transitions in task-arrival order:
 during `[t_k, t_(k+1))`. Individual task rewards still use the unchanged
 `calcReward` formula; completion order does not reorder the PPO rollout. The
 last arrival closes an explicit terminal interval after all pending replicas
-are drained. For this final interval, elapsed time is measured to the actual
-timestamp of the last resolved task outcome, rather than to a later polling
-wake-up time.
+are drained. The drain waits on task-level resolution events instead of using a
+computation-demand value as a simulation-time polling timeout. For this final
+interval, elapsed time is measured to the actual timestamp of the last resolved
+task outcome, rather than to a later polling wake-up time.
 
 For PPO, `gamma_ppo = 0.90` is a per-second discount base. Each transition uses
 `gamma_k = gamma_ppo ** delta_t_k`, so a zero-length interval has discount 1.

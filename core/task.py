@@ -35,7 +35,13 @@ class Task:
         self.primary_service_time = None
         self.backupStarted = None
         self.backupFinished = None
-        self.backupStat = None         
+        self.backupStat = None
+
+        # Task-level event used by the episode drain. This is triggered once
+        # when the current primary/backup semantics produce a final outcome;
+        # it is not a replica CPU-completion event.
+        self.resolution_event = self.env.event()
+
         # Resolve params_file:
         # - If an absolute path is passed, use it.
         # - If only a filename is passed, read it from data/.
@@ -114,7 +120,8 @@ class Task:
         #print(f"Task {self.id} {'succeeded' if self.primaryStat == 'success' else 'failed'} on primary server {self.primaryNode.server_id}")
         self.env_state.complete_task(self.primaryNode.server_id, self, 'primary', self.primary_service_time)
         
-        self.teta= 1.5 * (self.primary_service_time + inpDelay + outDelay + Q_time) 
+        self.teta= 1.5 * (self.primary_service_time + inpDelay + outDelay + Q_time)
+        self._signal_resolution_if_ready()
 
     def backup(self):
 
@@ -178,6 +185,48 @@ class Task:
         
         #print(f"Task {self.id} {'succeeded' if self.backupStat == 'success' else 'failed'} on backup server {self.backupNode.server_id}")
         self.env_state.complete_task(self.backupNode.server_id, self, "backup", backup_service_time)
+        self._signal_resolution_if_ready()
+
+    def _is_resolved(self):
+        """Match MainLoop.calcReward() final-outcome conditions."""
+        if self.z == 0:
+            return (
+                (
+                    self.primaryStat == "success"
+                    and self.primaryFinished is not None
+                    and self.backupStat is None
+                )
+                or (
+                    self.primaryStat == "failure"
+                    and self.backupStat == "success"
+                    and self.backupFinished is not None
+                )
+                or (
+                    self.primaryStat == "failure"
+                    and self.backupStat == "failure"
+                    and self.backupFinished is not None
+                )
+            )
+
+        # Parallel first-result semantics: one success resolves immediately;
+        # two failures require both replica timestamps.
+        return (
+            (self.primaryStat == "success" and self.primaryFinished is not None)
+            or (self.backupStat == "success" and self.backupFinished is not None)
+            or (
+                self.primaryStat == "failure"
+                and self.backupStat == "failure"
+                and self.primaryFinished is not None
+                and self.backupFinished is not None
+            )
+        )
+
+    def _signal_resolution_if_ready(self):
+        """Signal the task-level resolution event at most once."""
+        if self.resolution_event.triggered:
+            return
+        if self._is_resolved():
+            self.resolution_event.succeed(float(self.env.now))
 
     def calc_input_output_delay(self, server_object):
         if server_object.server_type == "Edge":

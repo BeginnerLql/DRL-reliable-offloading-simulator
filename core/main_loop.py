@@ -183,14 +183,8 @@ class MainLoop:
                 last[3] = self.G_state
                 self.tempbuffer[self.taskCounter - 1] = tuple(last)
 
-        # Drain pending tasks until all task outcomes are resolved.
-        while len(self.pendingList) > 0:
-            yield_time = self.env_state.get_min_computation_demand()
-            yield self.env.timeout(yield_time)
-            if self.model_name == "ppo":
-                self._collect_resolved_task_outcomes()
-            else:
-                self.add_train()
+        # Drain pending tasks by waiting for real task-level resolution events.
+        yield from self._drain_pending_tasks()
 
         if self.model_name == "ppo":
             # Close the final arrival-to-terminal interval explicitly.
@@ -222,6 +216,40 @@ class MainLoop:
         self.avg_reward_list.append(avg_reward)
 
         print(f"Episode {self.this_episode} | Avg Reward: {avg_reward:.3f} | This Episode: {self.episodic_reward:.3f}")
+
+    def _drain_pending_tasks(self):
+        """Resolve pending tasks using task-level SimPy events, not polling."""
+        while len(self.pendingList) > 0:
+            if self.model_name == "ppo":
+                self._collect_resolved_task_outcomes()
+            else:
+                self.add_train()
+
+            if len(self.pendingList) == 0:
+                break
+
+            resolution_events = []
+            for task_id in self.pendingList:
+                task = self.env_state.get_task_by_id(task_id)
+                if task is None:
+                    raise RuntimeError(
+                        f"Pending task {task_id} is missing from the environment state"
+                    )
+                resolution_event = getattr(task, "resolution_event", None)
+                if resolution_event is None:
+                    raise RuntimeError(
+                        f"Pending task {task_id} has no resolution event"
+                    )
+                if resolution_event.triggered:
+                    raise RuntimeError(
+                        f"Pending task {task_id} has a triggered event but no resolved reward"
+                    )
+                resolution_events.append(resolution_event)
+
+            if not resolution_events:
+                raise RuntimeError("No resolution events remain for pending tasks")
+
+            yield self.env.any_of(resolution_events)
 
     def _finalize_resolved_task(self, task_counter, reward, delay):
         """Record common episode metrics and remove one resolved task."""
@@ -328,9 +356,22 @@ class MainLoop:
         """Accumulate completed task rewards into the current PPO interval."""
         for task_counter in list(self.pendingList):
             task = self.env_state.get_task_by_id(task_counter)
+            if task is None:
+                raise RuntimeError(
+                    f"Pending task {task_counter} is missing from the environment state"
+                )
             task_reward, delay = self.calcReward(task_counter)
+            resolution_event = getattr(task, "resolution_event", None)
             if task_reward is None:
+                if resolution_event is not None and resolution_event.triggered:
+                    raise RuntimeError(
+                        f"Task {task_counter} resolution event fired before calcReward resolved"
+                    )
                 continue
+            if resolution_event is not None and not resolution_event.triggered:
+                raise RuntimeError(
+                    f"Task {task_counter} has a reward but its resolution event is not triggered"
+                )
 
             task_outcome_time = self._get_task_outcome_time(task)
             if task_outcome_time is None:
