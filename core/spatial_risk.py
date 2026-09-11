@@ -272,3 +272,94 @@ def sample_spatial_risk_fields(
     if not np.isfinite(samples).all():
         raise ValueError("sampled spatial risk fields must be finite")
     return samples
+
+
+def _validate_failure_rate_vector(base_failure_rates: object) -> np.ndarray:
+    try:
+        rates = np.asarray(base_failure_rates, dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("base_failure_rates must be a numeric one-dimensional vector") from exc
+    if rates.ndim != 1:
+        raise ValueError("base_failure_rates must be one-dimensional")
+    if rates.size == 0:
+        raise ValueError("base_failure_rates must not be empty")
+    if not np.isfinite(rates).all():
+        raise ValueError("base_failure_rates must contain only finite values")
+    if (rates < 0.0).any():
+        raise ValueError("base_failure_rates must be non-negative")
+    return rates
+
+
+def _validate_spatial_risk_vector(spatial_risk_field: object) -> np.ndarray:
+    try:
+        risk = np.asarray(spatial_risk_field, dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("spatial_risk_field must be a numeric one-dimensional vector") from exc
+    if risk.ndim != 1:
+        raise ValueError("spatial_risk_field must be one-dimensional")
+    if risk.size == 0:
+        raise ValueError("spatial_risk_field must not be empty")
+    if not np.isfinite(risk).all():
+        raise ValueError("spatial_risk_field must contain only finite values")
+    return risk
+
+
+def _validate_beta_p(beta_p: object) -> float:
+    try:
+        beta_array = np.asarray(beta_p, dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("beta_p must be a finite non-negative scalar") from exc
+    if beta_array.ndim != 0:
+        raise ValueError("beta_p must be a scalar")
+    beta = float(beta_array)
+    if not math.isfinite(beta) or beta < 0.0:
+        raise ValueError("beta_p must be a finite non-negative scalar")
+    return beta
+
+
+def map_spatial_risk_to_effective_failure_rates(
+    base_failure_rates: object,
+    spatial_risk_field: object,
+    beta_p: object,
+) -> np.ndarray:
+    """Map a latent physical risk field to effective transient failure rates.
+
+    For each node, this implements
+
+    ``lambda_eff_j = lambda_0_j * exp(beta_p * Z_phy_j - beta_p**2 / 2)``.
+
+    ``lambda_0_j`` is the base transient fault arrival rate in ``1/s`` and
+    ``Z_phy`` is a latent standardized physical environmental risk field.  For
+    ``beta_p > 0``, larger ``Z_phy_j`` produces a larger effective rate, while
+    smaller values produce a smaller rate.  The ``-beta_p**2 / 2`` term gives
+    ``E[lambda_eff_j] = lambda_0_j`` when ``Z_phy_j ~ N(0, 1)``; it does not
+    preserve the marginal task-failure probability.  In particular, ``Z_phy_j
+    = 0`` does not generally recover ``lambda_0_j`` when ``beta_p > 0``.
+
+    This is a pure numerical mapping.  It does not read or modify ``Server``,
+    task, or simulator state.
+    """
+    base_rates = _validate_failure_rate_vector(base_failure_rates)
+    risk_field = _validate_spatial_risk_vector(spatial_risk_field)
+    if base_rates.shape != risk_field.shape:
+        raise ValueError(
+            "base_failure_rates and spatial_risk_field must have identical shapes"
+        )
+    beta = _validate_beta_p(beta_p)
+
+    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
+        exponent = (
+            np.float64(beta) * risk_field
+            - np.float64(0.5) * np.square(np.float64(beta))
+        )
+    if not np.isfinite(exponent).all():
+        raise ValueError("effective failure rate became non-finite")
+
+    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
+        effective_rates = base_rates * np.exp(exponent)
+    if (
+        not np.isfinite(effective_rates).all()
+        or (effective_rates < 0.0).any()
+    ):
+        raise ValueError("effective failure rate became non-finite")
+    return np.asarray(effective_rates, dtype=float)

@@ -10,6 +10,7 @@ from core.spatial_risk import (
     haversine_distance_km,
     sample_spatial_risk_field,
     sample_spatial_risk_fields,
+    map_spatial_risk_to_effective_failure_rates,
     validate_correlation_matrix,
 )
 
@@ -268,6 +269,117 @@ class SpatialRiskTests(unittest.TestCase):
                         num_samples,
                         rng=np.random.default_rng(1),
                     )
+
+
+    def test_effective_failure_rate_beta_zero_returns_base_rates(self):
+        base_rates = np.array([0.001, 0.002, 0.0005])
+        spatial_risk = np.array([-2.0, 0.5, 3.0])
+        effective_rates = map_spatial_risk_to_effective_failure_rates(
+            base_rates,
+            spatial_risk,
+            0.0,
+        )
+        self.assertTrue(np.array_equal(effective_rates, base_rates))
+
+    def test_effective_failure_rate_formula(self):
+        base_rates = np.array([0.001, 0.002])
+        spatial_risk = np.array([1.0, -1.0])
+        beta = 0.5
+        expected = base_rates * np.exp(beta * spatial_risk - 0.5 * beta**2)
+        actual = map_spatial_risk_to_effective_failure_rates(
+            base_rates,
+            spatial_risk,
+            beta,
+        )
+        self.assertTrue(np.allclose(actual, expected))
+
+    def test_effective_failure_rate_is_monotone_in_spatial_risk(self):
+        base_rates = np.full(3, 0.001)
+        effective_rates = map_spatial_risk_to_effective_failure_rates(
+            base_rates,
+            np.array([-1.0, 0.0, 1.0]),
+            0.8,
+        )
+        self.assertTrue(np.all(np.diff(effective_rates) > 0.0))
+
+    def test_effective_failure_rate_preserves_base_rate_ratio(self):
+        effective_rates = map_spatial_risk_to_effective_failure_rates(
+            np.array([0.001, 0.002]),
+            np.array([0.4, 0.4]),
+            0.8,
+        )
+        self.assertAlmostEqual(effective_rates[1], 2.0 * effective_rates[0])
+
+    def test_effective_failure_rate_rejects_shape_mismatch(self):
+        with self.assertRaisesRegex(ValueError, "identical shapes"):
+            map_spatial_risk_to_effective_failure_rates(
+                np.array([0.001, 0.002, 0.003]),
+                np.array([0.1, 0.2]),
+                0.5,
+            )
+
+    def test_effective_failure_rate_rejects_invalid_base_rates(self):
+        for base_rates in (
+            np.array([-0.001]),
+            np.array([np.nan]),
+            np.array([np.inf]),
+        ):
+            with self.subTest(base_rates=base_rates):
+                with self.assertRaisesRegex(ValueError, "base_failure_rates"):
+                    map_spatial_risk_to_effective_failure_rates(
+                        base_rates,
+                        np.array([0.0]),
+                        0.5,
+                    )
+
+    def test_effective_failure_rate_rejects_invalid_spatial_risk(self):
+        for spatial_risk in (np.array([np.nan]), np.array([np.inf])):
+            with self.subTest(spatial_risk=spatial_risk):
+                with self.assertRaisesRegex(ValueError, "spatial_risk_field"):
+                    map_spatial_risk_to_effective_failure_rates(
+                        np.array([0.001]),
+                        spatial_risk,
+                        0.5,
+                    )
+
+    def test_effective_failure_rate_rejects_invalid_beta(self):
+        for beta in (-0.1, np.nan, np.inf, np.array([0.5])):
+            with self.subTest(beta=beta):
+                with self.assertRaisesRegex(ValueError, "beta_p"):
+                    map_spatial_risk_to_effective_failure_rates(
+                        np.array([0.001]),
+                        np.array([0.0]),
+                        beta,
+                    )
+
+    def test_effective_failure_rate_rejects_overflow(self):
+        with self.assertRaisesRegex(ValueError, "effective failure rate became non-finite"):
+            map_spatial_risk_to_effective_failure_rates(
+                np.array([0.001]),
+                np.array([1.0]),
+                1e308,
+            )
+
+    def test_monte_carlo_mean_hazard_is_preserved(self):
+        base_rates = np.array([0.001, 0.003, 0.0005])
+        correlation_matrix = np.array([
+            [1.0, 0.5, 0.2],
+            [0.5, 1.0, 0.3],
+            [0.2, 0.3, 1.0],
+        ])
+        samples = sample_spatial_risk_fields(
+            correlation_matrix,
+            100_000,
+            rng=np.random.default_rng(2026),
+        )
+        beta = 0.8
+        # Mean-hazard preservation does not imply exact marginal task-failure-probability preservation.
+        effective_rate_samples = base_rates * np.exp(
+            beta * samples - 0.5 * beta**2
+        )
+        empirical_mean = effective_rate_samples.mean(axis=0)
+        relative_error = np.abs(empirical_mean - base_rates) / base_rates
+        self.assertTrue(np.all(relative_error < 0.02))
 
 
 if __name__ == "__main__":
