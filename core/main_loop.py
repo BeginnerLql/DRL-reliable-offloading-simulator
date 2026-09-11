@@ -514,14 +514,38 @@ class MainLoop:
     def setServers(self):
         excel_file = os.path.join(DATA_DIR, "server_info.xlsx")
         server_info_df = pd.read_excel(excel_file)
+        required_columns = {
+            "Server_ID",
+            "Server_Type",
+            "Processing_Frequency",
+            "Failure_Rate",
+            "Latitude",
+            "Longitude",
+        }
+        missing_columns = sorted(required_columns.difference(server_info_df.columns))
+        if missing_columns:
+            raise ValueError(
+                "server_info.xlsx is missing required columns: "
+                + ", ".join(missing_columns)
+            )
 
         for _, row in server_info_df.iterrows():
             server_id = int(row["Server_ID"])
             server_type = str(row["Server_Type"])
             processing_frequency = float(row["Processing_Frequency"])
             failure_rate = float(row["Failure_Rate"])
+            latitude = float(row["Latitude"])
+            longitude = float(row["Longitude"])
 
-            server = Server(self.env, server_type, server_id, processing_frequency, failure_rate)
+            server = Server(
+                self.env,
+                server_type,
+                server_id,
+                processing_frequency,
+                failure_rate,
+                latitude,
+                longitude,
+            )
             self.env_state.add_server_and_init_environment(server)
 
     # ---------------------------
