@@ -45,6 +45,8 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
         loop = MainLoop.__new__(MainLoop)
         loop.env_state = state
         loop.spatial_risk_rng = np.random.default_rng(seed)
+        loop.this_episode = 1
+        loop.episode_spatial_risk_log = []
         return loop
 
     @staticmethod
@@ -232,6 +234,53 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             spatial_state = state.get_state(task)
             self.assertEqual(len(spatial_state), params.num_states)
         self.assertTrue(np.array_equal(spatial_state, baseline_state))
+
+    def test_enabled_episode_logs_one_row_per_server_with_context_mapping(self):
+        state = self._build_state(server_ids=(9, 2, 5))
+        loop = self._build_loop(state)
+        with self._enabled_patch(beta=0.5):
+            loop._initialize_episode_spatial_risk()
+
+        self.assertEqual(len(loop.episode_spatial_risk_log), 3)
+        for index, row in enumerate(loop.episode_spatial_risk_log):
+            server_id = state.spatial_risk_server_ids[index]
+            self.assertEqual(row["episode"], 1)
+            self.assertEqual(row["server_id"], server_id)
+            self.assertTrue(row["spatial_risk_enabled"])
+            self.assertEqual(row["z_phy"], state.spatial_risk_field[index])
+            self.assertEqual(
+                row["base_failure_rate"],
+                state.get_server_by_id(server_id).failure_rate,
+            )
+            self.assertEqual(
+                row["effective_failure_rate"],
+                state.effective_failure_rates[server_id],
+            )
+            self.assertAlmostEqual(
+                row["hazard_multiplier"],
+                row["effective_failure_rate"] / row["base_failure_rate"],
+            )
+
+    def test_enabled_beta_zero_logs_unit_hazard_multipliers(self):
+        state = self._build_state()
+        loop = self._build_loop(state)
+        with self._enabled_patch(beta=0.0):
+            loop._initialize_episode_spatial_risk()
+
+        self.assertEqual(len(loop.episode_spatial_risk_log), 3)
+        for row in loop.episode_spatial_risk_log:
+            self.assertTrue(np.isclose(row["hazard_multiplier"], 1.0))
+            self.assertEqual(
+                row["effective_failure_rate"],
+                row["base_failure_rate"],
+            )
+
+    def test_disabled_episode_does_not_add_spatial_risk_log_rows(self):
+        state = self._build_state()
+        loop = self._build_loop(state)
+        with patch.object(params, "SPATIAL_RISK_ENABLED", False):
+            loop._initialize_episode_spatial_risk()
+        self.assertEqual(loop.episode_spatial_risk_log, [])
 
     def test_same_server_retry_uses_same_episode_hazard(self):
         state = self._build_state(server_ids=(9,))

@@ -58,6 +58,7 @@ class MainLoop:
         self.spatial_risk_rng = np.random.default_rng(params.SPATIAL_RISK_SEED)
         self.log_data = []
         self.task_Assignments_info = []
+        self.episode_spatial_risk_log = []
 
         # PPO-only arrival-driven SMDP bookkeeping.
         self.ppo_interval_reward = 0.0
@@ -133,6 +134,43 @@ class MainLoop:
             spatial_risk_field,
             effective_failure_rates,
         )
+
+        for index, server_id in enumerate(
+            self.env_state.spatial_risk_server_ids
+        ):
+            base_failure_rate = float(
+                self.env_state.get_server_by_id(server_id).failure_rate
+            )
+            effective_failure_rate = float(
+                self.env_state.effective_failure_rates[server_id]
+            )
+            if base_failure_rate == 0.0:
+                if effective_failure_rate != 0.0:
+                    raise RuntimeError(
+                        "effective failure rate must remain zero when "
+                        f"base failure rate is zero for server_id {server_id}"
+                    )
+                hazard_multiplier = 1.0
+            else:
+                hazard_multiplier = effective_failure_rate / base_failure_rate
+            if not np.isfinite(hazard_multiplier):
+                raise RuntimeError(
+                    f"hazard multiplier is non-finite for server_id {server_id}"
+                )
+            self.episode_spatial_risk_log.append({
+                "episode": self.this_episode,
+                "server_id": server_id,
+                "spatial_risk_enabled": True,
+                "correlation_length_km": float(
+                    params.SPATIAL_CORRELATION_LENGTH_KM
+                ),
+                "beta_p": float(params.SPATIAL_RISK_BETA_P),
+                "spatial_risk_seed": params.SPATIAL_RISK_SEED,
+                "base_failure_rate": base_failure_rate,
+                "z_phy": float(self.env_state.spatial_risk_field[index]),
+                "hazard_multiplier": float(hazard_multiplier),
+                "effective_failure_rate": effective_failure_rate,
+            })
 
 
     def _sample_interarrival_time(self):

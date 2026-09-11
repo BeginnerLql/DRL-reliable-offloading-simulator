@@ -15,7 +15,12 @@ from openpyxl.chart import LineChart, Reference
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
-def save_params_and_logs(params, log_data, task_Assignments_info):
+def save_params_and_logs(
+    params,
+    log_data,
+    task_Assignments_info,
+    episode_spatial_risk_log=None,
+):
     # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
 
@@ -63,6 +68,47 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
             "Avg Delay": log[3] if len(log) > 3 else None,
         })
     df_logs = pd.DataFrame(logs_rows)
+
+    # ---------------------------
+    # Episode spatial-risk audit dataframe (optional)
+    # ---------------------------
+    df_spatial_risk = None
+    if episode_spatial_risk_log is not None and len(episode_spatial_risk_log) > 0:
+        df_spatial_risk = pd.DataFrame(episode_spatial_risk_log).rename(
+            columns={
+                "episode": "Episode",
+                "server_id": "Server_ID",
+                "spatial_risk_enabled": "Spatial_Risk_Enabled",
+                "correlation_length_km": "Correlation_Length_km",
+                "beta_p": "Beta_p",
+                "spatial_risk_seed": "Spatial_Risk_Seed",
+                "base_failure_rate": "Base_Failure_Rate",
+                "z_phy": "Z_phy",
+                "hazard_multiplier": "Hazard_Multiplier",
+                "effective_failure_rate": "Effective_Failure_Rate",
+            }
+        )
+        spatial_risk_columns = [
+            "Episode",
+            "Server_ID",
+            "Spatial_Risk_Enabled",
+            "Correlation_Length_km",
+            "Beta_p",
+            "Spatial_Risk_Seed",
+            "Base_Failure_Rate",
+            "Z_phy",
+            "Hazard_Multiplier",
+            "Effective_Failure_Rate",
+        ]
+        missing_spatial_columns = sorted(
+            set(spatial_risk_columns).difference(df_spatial_risk.columns)
+        )
+        if missing_spatial_columns:
+            raise ValueError(
+                "episode_spatial_risk_log is missing required fields: "
+                + ", ".join(missing_spatial_columns)
+            )
+        df_spatial_risk = df_spatial_risk[spatial_risk_columns]
 
     # ---------------------------
     # TaskAssignments dataframe
@@ -130,6 +176,8 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
         df_logs.to_excel(writer, sheet_name="Logs", index=False)
         df_task_Assignments.to_excel(writer, sheet_name="TaskAssignments", index=False)
         summary_df.to_excel(writer, sheet_name="Summary", index=False)
+        if df_spatial_risk is not None:
+            df_spatial_risk.to_excel(writer, sheet_name="SpatialRisk", index=False)
 
     # ---------------------------
     # Add Excel-native charts
