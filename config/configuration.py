@@ -40,6 +40,13 @@ class parameters:
     # Approximately one representative Edge task service time.
     BACKLOG_TIME_SCALE_SEC = 4.0
 
+    # Episode-level quasi-static physical spatial risk field.
+    # Disabled by default to preserve the independent baseline.
+    SPATIAL_RISK_ENABLED = False
+    SPATIAL_CORRELATION_LENGTH_KM = 0.5
+    SPATIAL_RISK_BETA_P = None
+    SPATIAL_RISK_SEED = 2026
+
     # ======================================================================
     # RL hyperparameters
     # ======================================================================

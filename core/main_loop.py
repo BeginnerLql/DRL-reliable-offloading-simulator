@@ -9,6 +9,13 @@ from core.task import Task
 from core.env_state import EnvironmentState
 from config.params import params
 from config.paths import DATA_DIR
+from core.spatial_risk import (
+    build_distance_matrix,
+    build_spatial_correlation_matrix,
+    map_spatial_risk_to_effective_failure_rates,
+    sample_spatial_risk_field,
+    validate_correlation_matrix,
+)
 
 import simpy
 import numpy as np
@@ -48,6 +55,7 @@ class MainLoop:
 
         self.env = None
         self.env_state = None
+        self.spatial_risk_rng = np.random.default_rng(params.SPATIAL_RISK_SEED)
         self.log_data = []
         self.task_Assignments_info = []
 
@@ -81,8 +89,50 @@ class MainLoop:
             self.env_state.reset()
 
             self.setServers()
+            self._initialize_episode_spatial_risk()
             self.env.process(self.Iteration())
             self.env.run()
+
+
+    def _initialize_episode_spatial_risk(self):
+        """Sample and store one quasi-static spatial risk field for this episode."""
+        if not params.SPATIAL_RISK_ENABLED:
+            return
+        if params.SPATIAL_RISK_BETA_P is None:
+            raise ValueError(
+                "beta_p must be explicitly configured when spatial risk is enabled."
+            )
+
+        server_objects = [
+            server_info["server_object"]
+            for server_info in self.env_state.servers.values()
+        ]
+        server_ids, distance_matrix = build_distance_matrix(server_objects)
+        correlation_matrix = build_spatial_correlation_matrix(
+            distance_matrix,
+            params.SPATIAL_CORRELATION_LENGTH_KM,
+        )
+        validate_correlation_matrix(correlation_matrix)
+        spatial_risk_field = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=self.spatial_risk_rng,
+        )
+        base_failure_rates = np.array([
+            self.env_state.get_server_by_id(server_id).failure_rate
+            for server_id in server_ids
+        ], dtype=float)
+        effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
+            base_failure_rates,
+            spatial_risk_field,
+            params.SPATIAL_RISK_BETA_P,
+        )
+        self.env_state.set_episode_spatial_risk_context(
+            server_ids,
+            distance_matrix,
+            correlation_matrix,
+            spatial_risk_field,
+            effective_failure_rates,
+        )
 
 
     def _sample_interarrival_time(self):

@@ -11,6 +11,11 @@ class EnvironmentState:
         self.servers = {}  # Server objects and CPU backlog metadata.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
         self.num_completed_tasks = 0  # Number of completed tasks at all servers
+        self.spatial_risk_server_ids = None
+        self.spatial_distance_matrix = None
+        self.spatial_correlation_matrix = None
+        self.spatial_risk_field = None
+        self.effective_failure_rates = None
 
     def add_server_and_init_environment(self, server_object):
         """Add a server object to the environment state."""
@@ -101,6 +106,85 @@ class EnvironmentState:
         else:
             return None
 
+    def set_episode_spatial_risk_context(
+        self,
+        server_ids,
+        distance_matrix,
+        correlation_matrix,
+        spatial_risk_field,
+        effective_failure_rates,
+    ):
+        """Store one immutable-in-practice episode spatial-risk realization."""
+        try:
+            ordered_server_ids = list(server_ids)
+        except TypeError as exc:
+            raise ValueError("server_ids must be a non-empty sequence") from exc
+        if not ordered_server_ids:
+            raise ValueError("server_ids must not be empty")
+        try:
+            if len(set(ordered_server_ids)) != len(ordered_server_ids):
+                raise ValueError("server_ids must not contain duplicates")
+            current_server_ids = set(self.servers)
+        except TypeError as exc:
+            raise ValueError("server_ids must contain hashable IDs") from exc
+        if current_server_ids != set(ordered_server_ids):
+            raise ValueError(
+                "server_ids must match the current EnvironmentState servers"
+            )
+
+        try:
+            distance = np.asarray(distance_matrix, dtype=float)
+            correlation = np.asarray(correlation_matrix, dtype=float)
+            risk_field = np.asarray(spatial_risk_field, dtype=float)
+            effective = np.asarray(effective_failure_rates, dtype=float)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("episode spatial-risk context must be numeric") from exc
+
+        expected_matrix_shape = (len(ordered_server_ids), len(ordered_server_ids))
+        expected_vector_shape = (len(ordered_server_ids),)
+        if distance.shape != expected_matrix_shape:
+            raise ValueError("spatial_distance_matrix has an invalid shape")
+        if correlation.shape != expected_matrix_shape:
+            raise ValueError("spatial_correlation_matrix has an invalid shape")
+        if risk_field.shape != expected_vector_shape:
+            raise ValueError("spatial_risk_field has an invalid shape")
+        if effective.shape != expected_vector_shape:
+            raise ValueError("effective_failure_rates has an invalid shape")
+        for name, array in (
+            ("spatial_distance_matrix", distance),
+            ("spatial_correlation_matrix", correlation),
+            ("spatial_risk_field", risk_field),
+            ("effective_failure_rates", effective),
+        ):
+            if not np.isfinite(array).all():
+                raise ValueError(f"{name} must contain only finite values")
+        if (effective < 0.0).any():
+            raise ValueError("effective_failure_rates must be non-negative")
+
+        self.spatial_risk_server_ids = list(ordered_server_ids)
+        self.spatial_distance_matrix = np.array(distance, dtype=float, copy=True)
+        self.spatial_correlation_matrix = np.array(
+            correlation, dtype=float, copy=True
+        )
+        self.spatial_risk_field = np.array(risk_field, dtype=float, copy=True)
+        self.effective_failure_rates = {
+            server_id: float(effective[index])
+            for index, server_id in enumerate(ordered_server_ids)
+        }
+
+    def get_active_failure_rate(self, server_id):
+        """Return episode-effective or baseline transient fault arrival rate."""
+        server_object = self.get_server_by_id(server_id)
+        if server_object is None:
+            raise RuntimeError(f"Unknown server_id {server_id}")
+        if self.effective_failure_rates is None:
+            return server_object.failure_rate
+        if server_id not in self.effective_failure_rates:
+            raise RuntimeError(
+                f"Spatial risk context has no effective failure rate for server_id {server_id}"
+            )
+        return self.effective_failure_rates[server_id]
+
     def add_task(self, task_object):
         """Add a task object to the environment state."""
         task_id = task_object.id  # Extract the task ID from the task object
@@ -136,6 +220,11 @@ class EnvironmentState:
         self.servers = {}
         self.tasks= {}
         self.num_completed_tasks = 0
+        self.spatial_risk_server_ids = None
+        self.spatial_distance_matrix = None
+        self.spatial_correlation_matrix = None
+        self.spatial_risk_field = None
+        self.effective_failure_rates = None
 
     def normalize(self, val, min_val, max_val):
         denominator = max_val - min_val

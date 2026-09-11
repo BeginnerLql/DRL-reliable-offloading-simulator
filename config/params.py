@@ -37,6 +37,11 @@ class params:
     EDGE_FAILURE_RATE_RANGE = parameters.EDGE_FAILURE_RATE_RANGE
     CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
     BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC
+    # Episode-level quasi-static physical spatial risk field.
+    SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
+    SPATIAL_CORRELATION_LENGTH_KM = parameters.SPATIAL_CORRELATION_LENGTH_KM
+    SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
+    SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
 
     # RL hyperparameters
     num_states = 3 * serverNo + 2  # observable failure rate, frequency, backlog time per server + task profile
