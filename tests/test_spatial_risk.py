@@ -8,6 +8,8 @@ from core.spatial_risk import (
     build_distance_matrix,
     build_spatial_correlation_matrix,
     haversine_distance_km,
+    sample_spatial_risk_field,
+    sample_spatial_risk_fields,
     validate_correlation_matrix,
 )
 
@@ -153,6 +155,119 @@ class SpatialRiskTests(unittest.TestCase):
             validate_correlation_matrix(np.array([[1.0, 1.1], [1.1, 1.0]]))
         with self.assertRaisesRegex(ValueError, "symmetric"):
             validate_correlation_matrix(np.array([[1.0, 0.2], [0.3, 1.0]]))
+
+
+    def test_single_spatial_risk_field_has_expected_shape_and_is_finite(self):
+        correlation_matrix = np.array([[1.0, 0.5], [0.5, 1.0]])
+        sample = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=np.random.default_rng(2026),
+        )
+        self.assertEqual(sample.shape, (2,))
+        self.assertTrue(np.isfinite(sample).all())
+
+    def test_spatial_risk_sampling_is_reproducible_with_same_seed(self):
+        correlation_matrix = np.array([[1.0, 0.5], [0.5, 1.0]])
+        first = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=np.random.default_rng(7),
+        )
+        second = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=np.random.default_rng(7),
+        )
+        self.assertTrue(np.array_equal(first, second))
+
+    def test_spatial_risk_sampling_changes_with_different_seeds(self):
+        correlation_matrix = np.array([[1.0, 0.5], [0.5, 1.0]])
+        first = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=np.random.default_rng(7),
+        )
+        second = sample_spatial_risk_field(
+            correlation_matrix,
+            rng=np.random.default_rng(8),
+        )
+        self.assertFalse(np.array_equal(first, second))
+
+    def test_spatial_risk_batch_has_expected_shape_and_is_finite(self):
+        correlation_matrix = np.array([
+            [1.0, 0.4, 0.2],
+            [0.4, 1.0, 0.3],
+            [0.2, 0.3, 1.0],
+        ])
+        samples = sample_spatial_risk_fields(
+            correlation_matrix,
+            1000,
+            rng=np.random.default_rng(2026),
+        )
+        self.assertEqual(samples.shape, (1000, 3))
+        self.assertTrue(np.isfinite(samples).all())
+
+    def test_spatial_risk_batch_matches_target_statistics(self):
+        correlation_matrix = np.array([
+            [1.0, 0.45, 0.20],
+            [0.45, 1.0, 0.35],
+            [0.20, 0.35, 1.0],
+        ])
+        samples = sample_spatial_risk_fields(
+            correlation_matrix,
+            50_000,
+            rng=np.random.default_rng(2026),
+        )
+
+        self.assertTrue(np.all(np.abs(samples.mean(axis=0)) < 0.03))
+        self.assertTrue(np.all(np.abs(samples.var(axis=0, ddof=1) - 1.0) < 0.05))
+        empirical_correlation = np.corrcoef(samples, rowvar=False)
+        self.assertTrue(
+            np.allclose(empirical_correlation, correlation_matrix, atol=0.03)
+        )
+
+    def test_independent_spatial_risk_components_have_near_zero_correlation(self):
+        samples = sample_spatial_risk_fields(
+            np.eye(3),
+            50_000,
+            rng=np.random.default_rng(2026),
+        )
+        empirical_correlation = np.corrcoef(samples, rowvar=False)
+        off_diagonal = empirical_correlation - np.eye(3)
+        self.assertLess(np.max(np.abs(off_diagonal)), 0.03)
+
+    def test_strongly_correlated_spatial_risk_components_match_target(self):
+        correlation_matrix = np.array([[1.0, 0.9], [0.9, 1.0]])
+        samples = sample_spatial_risk_fields(
+            correlation_matrix,
+            50_000,
+            rng=np.random.default_rng(2026),
+        )
+        empirical_correlation = np.corrcoef(samples, rowvar=False)
+        self.assertAlmostEqual(empirical_correlation[0, 1], 0.9, delta=0.03)
+
+    def test_spatial_risk_sampler_reuses_correlation_validation(self):
+        invalid_matrix = np.array([
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, -1.0],
+            [1.0, -1.0, 1.0],
+        ])
+        with self.assertRaisesRegex(ValueError, "minimum eigenvalue"):
+            sample_spatial_risk_field(invalid_matrix, rng=np.random.default_rng(1))
+        with self.assertRaisesRegex(ValueError, "minimum eigenvalue"):
+            sample_spatial_risk_fields(
+                invalid_matrix,
+                10,
+                rng=np.random.default_rng(1),
+            )
+
+    def test_spatial_risk_batch_requires_positive_integer_count(self):
+        correlation_matrix = np.eye(2)
+        for num_samples in (0, -1, 1.5, float("nan")):
+            with self.subTest(num_samples=num_samples):
+                with self.assertRaisesRegex(ValueError, "positive integer"):
+                    sample_spatial_risk_fields(
+                        correlation_matrix,
+                        num_samples,
+                        rng=np.random.default_rng(1),
+                    )
 
 
 if __name__ == "__main__":

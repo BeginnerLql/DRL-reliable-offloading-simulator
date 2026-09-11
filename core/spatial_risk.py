@@ -9,8 +9,8 @@ positive correlation length in kilometres.  This represents latent physical
 environmental risk correlation; it is not a failure-event Pearson
 correlation, a failure probability, or a joint failure probability.
 
-This module only computes matrices.  It does not sample a spatial risk field,
-modify Server.failure_rate, or mutate simulator state.
+This module only computes matrices or samples explicitly requested latent risk
+fields.  It does not modify ``Server.failure_rate`` or mutate simulator state.
 """
 
 from __future__ import annotations
@@ -188,3 +188,87 @@ def validate_correlation_matrix(
             f"minimum eigenvalue = {minimum_eigenvalue}"
         )
     return True
+
+
+def _sampling_inputs(
+    correlation_matrix: object,
+    rng: np.random.Generator | None,
+) -> tuple[np.ndarray, np.random.Generator]:
+    """Validate sampling inputs without repairing the covariance matrix."""
+    validate_correlation_matrix(correlation_matrix)
+    matrix = np.asarray(correlation_matrix, dtype=float)
+    generator = np.random.default_rng() if rng is None else rng
+    if not hasattr(generator, "multivariate_normal"):
+        raise ValueError("rng must provide a multivariate_normal method")
+    return matrix, generator
+
+
+def _validate_num_samples(num_samples: object) -> int:
+    if isinstance(num_samples, (bool, np.bool_)) or not isinstance(
+        num_samples,
+        (int, np.integer),
+    ):
+        raise ValueError("num_samples must be a positive integer")
+    count = int(num_samples)
+    if count <= 0:
+        raise ValueError("num_samples must be a positive integer")
+    return count
+
+
+def sample_spatial_risk_field(
+    correlation_matrix: object,
+    rng: np.random.Generator | None = None,
+) -> np.ndarray:
+    """Sample one latent standardized physical environmental risk field.
+
+    The returned ``Z_phy`` follows ``N(0, R)``: each component has expected
+    value zero and variance one, and the component correlation is ``R``.  The
+    field is a latent physical environmental risk field, not a failure field
+    and not a failure-event or failure-probability sample.
+    """
+    matrix, generator = _sampling_inputs(correlation_matrix, rng)
+    dimension = matrix.shape[0]
+    sample = generator.multivariate_normal(
+        mean=np.zeros(dimension, dtype=float),
+        cov=matrix,
+        check_valid="raise",
+    )
+    sample = np.asarray(sample, dtype=float)
+    if sample.shape != (dimension,):
+        raise ValueError("sampled spatial risk field must have shape (N,)")
+    if not np.isfinite(sample).all():
+        raise ValueError("sampled spatial risk field must be finite")
+    return sample
+
+
+def sample_spatial_risk_fields(
+    correlation_matrix: object,
+    num_samples: object,
+    rng: np.random.Generator | None = None,
+) -> np.ndarray:
+    """Sample a batch of latent standardized physical environmental risk fields.
+
+    The returned array has shape ``(num_samples, N)``.  Every row is a draw
+    from ``Z_phy ~ N(0, R)`` with expected value zero, variance one, and
+    component correlation ``R``.  These are latent physical environmental
+    risk fields, not failure fields or failure-event samples.
+    """
+    count = _validate_num_samples(num_samples)
+    matrix, generator = _sampling_inputs(correlation_matrix, rng)
+    dimension = matrix.shape[0]
+    samples = generator.multivariate_normal(
+        mean=np.zeros(dimension, dtype=float),
+        cov=matrix,
+        size=count,
+        check_valid="raise",
+    )
+    samples = np.asarray(samples, dtype=float)
+    expected_shape = (count, dimension)
+    if samples.shape != expected_shape:
+        raise ValueError(
+            "sampled spatial risk fields must have shape "
+            f"{expected_shape}"
+        )
+    if not np.isfinite(samples).all():
+        raise ValueError("sampled spatial risk fields must be finite")
+    return samples
