@@ -11,6 +11,15 @@ quantity applies to distinct-server primary/backup replicas in both the
 parallel ``z=1`` and sequential ``z=0`` interpretations of the quasi-static
 episode model.  Queueing, arrival, recovery timing, and reward are not modeled.
 
+The independent reference is a matched-marginal product baseline:
+
+    P_ind(F_j=1, F_k=1) = P(F_j=1) P(F_k=1)
+
+using the same spatial-scenario marginal failure probabilities.  This isolates
+cross-node dependence without introducing Monte Carlo differences in the
+marginals.  It is a mechanism-isolation reference, not another physical
+environment simulation.
+
 This is an offline diagnostic only.  It does not run MainLoop or modify the
 simulator runtime.
 """
@@ -45,6 +54,7 @@ DEFAULT_SAMPLE_COUNT = 100_000
 DEFAULT_SEED = 2026
 DEFAULT_CORRELATION_LENGTH_KM = 0.5
 JOINT_PROBABILITY_EPSILON = 1e-15
+INDEPENDENT_BASELINE_TYPE = "matched_marginal_product"
 
 
 def _load_servers(server_path: Path):
@@ -177,42 +187,42 @@ def _binary_failure_correlation(marginal_j: float, marginal_k: float, joint: flo
 def pair_failure_statistics(
     p_j_spatial: object,
     p_k_spatial: object,
-    p_j_independent: object,
-    p_k_independent: object,
 ) -> dict:
-    """Compute pair failure and reliability metrics from conditional probabilities."""
+    """Compute pair metrics against the matched-marginal independent baseline."""
     spatial_j = np.asarray(p_j_spatial, dtype=float)
     spatial_k = np.asarray(p_k_spatial, dtype=float)
-    independent_j = np.asarray(p_j_independent, dtype=float)
-    independent_k = np.asarray(p_k_independent, dtype=float)
     if not (
-        spatial_j.ndim == spatial_k.ndim == independent_j.ndim == independent_k.ndim == 1
-        and spatial_j.shape == spatial_k.shape == independent_j.shape == independent_k.shape
+        spatial_j.ndim == spatial_k.ndim == 1
+        and spatial_j.shape == spatial_k.shape
     ):
         raise ValueError("pair probability samples must be equal-length vectors")
 
     marginal_j = float(spatial_j.mean())
     marginal_k = float(spatial_k.mean())
-    marginal_j_independent = float(independent_j.mean())
-    marginal_k_independent = float(independent_k.mean())
-    joint_spatial = float(np.mean(spatial_j * spatial_k))
-    joint_independent = float(np.mean(independent_j * independent_k))
+    joint_independent = marginal_j * marginal_k
+    # E[XY] = E[X]E[Y] + Cov(X,Y); centering keeps the constant beta=0
+    # control exactly equal to the matched-marginal product in floating point.
+    covariance = float(
+        np.mean((spatial_j - marginal_j) * (spatial_k - marginal_k))
+    )
+    joint_spatial = joint_independent + covariance
     excess = joint_spatial - joint_independent
     amplification = _safe_ratio(joint_spatial, joint_independent)
     return {
+        "independent_baseline_type": INDEPENDENT_BASELINE_TYPE,
         "marginal_j": marginal_j,
         "marginal_k": marginal_k,
-        "marginal_j_independent": marginal_j_independent,
-        "marginal_k_independent": marginal_k_independent,
+        "marginal_j_independent": marginal_j,
+        "marginal_k_independent": marginal_k,
         "joint_spatial": joint_spatial,
         "joint_independent": joint_independent,
         "joint_failure_amplification": amplification,
         "excess_joint_failure": excess,
         "relative_joint_underestimation": amplification - 1.0 if math.isfinite(amplification) else float("nan"),
-        "reliability_overestimation": (1.0 - joint_independent) - (1.0 - joint_spatial),
+        "reliability_overestimation": excess,
         "binary_failure_correlation": _binary_failure_correlation(marginal_j, marginal_k, joint_spatial),
-        "absolute_marginal_difference_j": abs(marginal_j - marginal_j_independent),
-        "absolute_marginal_difference_k": abs(marginal_k - marginal_k_independent),
+        "absolute_marginal_difference_j": 0.0,
+        "absolute_marginal_difference_k": 0.0,
     }
 
 
@@ -247,7 +257,7 @@ def run_diagnostic(
     sample_count: int = DEFAULT_SAMPLE_COUNT,
     correlation_length_km: float = DEFAULT_CORRELATION_LENGTH_KM,
 ):
-    """Run the spatial-vs-independent cross-node failure diagnostic."""
+    """Run the spatial-vs-matched-marginal cross-node failure diagnostic."""
     if not isinstance(sample_count, (int, np.integer)) or isinstance(sample_count, (bool, np.bool_)) or sample_count <= 0:
         raise ValueError("sample_count must be a positive integer")
     if not math.isfinite(float(correlation_length_km)) or correlation_length_km <= 0.0:
@@ -256,17 +266,10 @@ def run_diagnostic(
     server_ids, base_rates, frequencies, distance_matrix = _load_servers(Path(server_path))
     task_ids, computation_demands = _load_tasks(Path(task_path))
     spatial_correlation = build_spatial_correlation_matrix(distance_matrix, correlation_length_km)
-    independent_correlation = np.eye(len(server_ids), dtype=float)
     validate_correlation_matrix(spatial_correlation)
-    validate_correlation_matrix(independent_correlation)
 
     spatial_z = sample_spatial_risk_fields(
         spatial_correlation,
-        int(sample_count),
-        rng=np.random.default_rng(seed),
-    )
-    independent_z = sample_spatial_risk_fields(
-        independent_correlation,
         int(sample_count),
         rng=np.random.default_rng(seed),
     )
@@ -276,9 +279,7 @@ def run_diagnostic(
     detailed_rows = []
     for beta_p in BETA_VALUES:
         spatial_multipliers = compute_hazard_multipliers(spatial_z, beta_p)
-        independent_multipliers = compute_hazard_multipliers(independent_z, beta_p)
         spatial_rates = spatial_multipliers * base_rates[np.newaxis, :]
-        independent_rates = independent_multipliers * base_rates[np.newaxis, :]
         spatial_hazard_correlation = {
             pair: _empirical_correlation(spatial_multipliers[:, pair[0]], spatial_multipliers[:, pair[1]])
             for pair in pair_indices
@@ -292,22 +293,17 @@ def run_diagnostic(
                 [compute_failure_probability_samples(spatial_rates, service_times[index]) for index in range(service_times.shape[0])],
                 axis=1,
             )
-            independent_probabilities = np.stack(
-                [compute_failure_probability_samples(independent_rates, service_times[index]) for index in range(service_times.shape[0])],
-                axis=1,
-            )
             for local_index, task_id in enumerate(task_ids[task_slice]):
                 for j, k in pair_indices:
                     metrics = pair_failure_statistics(
                         spatial_probabilities[:, local_index, j],
                         spatial_probabilities[:, local_index, k],
-                        independent_probabilities[:, local_index, j],
-                        independent_probabilities[:, local_index, k],
                     )
                     rho = float(spatial_correlation[j, k])
                     empirical_hazard = spatial_hazard_correlation[(j, k)]
                     detailed_rows.append({
                         "Beta_p": beta_p,
+                        "Independent_Baseline_Type": INDEPENDENT_BASELINE_TYPE,
                         "Task_ID": int(task_id),
                         "Server_J": server_ids[j],
                         "Server_K": server_ids[k],
@@ -342,6 +338,7 @@ def run_diagnostic(
         first = group.iloc[0]
         summary_rows.append({
             "Beta_p": beta_p,
+            "Independent_Baseline_Type": INDEPENDENT_BASELINE_TYPE,
             "Server_J": server_j,
             "Server_K": server_k,
             "Distance_km": first["Distance_km"],
@@ -374,6 +371,7 @@ def run_diagnostic(
         farthest = pair_group.sort_values(["Distance_km", "Server_J", "Server_K"]).iloc[-1]
         global_rows.append({
             "Beta_p": beta_p,
+            "Independent_Baseline_Type": INDEPENDENT_BASELINE_TYPE,
             "Mean_Joint_Failure_Spatial": group["Joint_Failure_Spatial"].mean(),
             "Mean_Joint_Failure_Independent": group["Joint_Failure_Independent"].mean(),
             "Mean_Joint_Failure_Amplification": _finite_mean(group["Joint_Failure_Amplification"]),
