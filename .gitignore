@@ -17,7 +17,6 @@ venv/
 Thumbs.db
 
 # Generated data and results
-results/
 data/*.xlsx
 
 # Logs
