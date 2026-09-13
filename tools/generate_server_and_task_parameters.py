@@ -27,6 +27,27 @@ SERVER_INFO_COLUMNS = [
     "Latitude",
     "Longitude",
 ]
+RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
+RELIABILITY_REQUIREMENT_SEED = 2026
+
+
+def generate_reliability_requirements(
+    num_tasks: int,
+    seed: int = RELIABILITY_REQUIREMENT_SEED,
+) -> list[float]:
+    """Return a reproducibly shuffled, equally balanced requirement list."""
+    if isinstance(num_tasks, (bool, np.bool_)) or not isinstance(num_tasks, (int, np.integer)):
+        raise ValueError("num_tasks must be a positive integer")
+    if num_tasks <= 0 or num_tasks % len(RELIABILITY_REQUIREMENT_LEVELS) != 0:
+        raise ValueError(
+            "num_tasks must be a positive multiple of "
+            f"{len(RELIABILITY_REQUIREMENT_LEVELS)}"
+        )
+
+    per_level = num_tasks // len(RELIABILITY_REQUIREMENT_LEVELS)
+    requirements = np.repeat(RELIABILITY_REQUIREMENT_LEVELS, per_level).astype(float)
+    np.random.default_rng(seed).shuffle(requirements)
+    return requirements.tolist()
 
 
 def generate_processing_frequencies(number_of_server: int, server_type: str):
@@ -178,11 +199,12 @@ def generate_server_info(
 def generate_task_params(filename: str = "task_parameters.xlsx"):
     """
     Generate task parameters Excel:
-      Task_ID, Task_Size, Computation_Demand
+      Task_ID, Task_Size, Computation_Demand, Reliability_Requirement
     """
     task_info = []
     NUM_TASKS = parameters.taskno
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
+    reliability_requirements = generate_reliability_requirements(NUM_TASKS)
 
     a, b = parameters.Low_demand, parameters.High_demand
     mu = (a + b) / 2
@@ -196,9 +218,24 @@ def generate_task_params(filename: str = "task_parameters.xlsx"):
         # Computation_Demand (float)
         computation_demand = truncnorm.rvs(lower, upper, loc=mu, scale=sigma)
 
-        task_info.append([task_id, task_size, float(computation_demand)])
+        task_info.append(
+            [
+                task_id,
+                task_size,
+                float(computation_demand),
+                reliability_requirements[task_id - 1],
+            ]
+        )
 
-    task_df = pd.DataFrame(task_info, columns=["Task_ID", "Task_Size", "Computation_Demand"])
+    task_df = pd.DataFrame(
+        task_info,
+        columns=[
+            "Task_ID",
+            "Task_Size",
+            "Computation_Demand",
+            "Reliability_Requirement",
+        ],
+    )
     task_df.to_excel(filename, index=False)
 
 

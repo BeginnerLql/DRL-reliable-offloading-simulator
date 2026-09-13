@@ -17,6 +17,9 @@ from config.params import params
 from config.paths import DATA_DIR
 
 
+RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
+
+
 class Task:
 
     def __init__(self, env, state, id, params_file: str = "task_parameters.xlsx"):
@@ -49,9 +52,44 @@ class Task:
         if not os.path.isabs(resolved):
             resolved = os.path.join(DATA_DIR, resolved)
         task_info_df = pd.read_excel(resolved)
-        task_row = task_info_df.loc[task_info_df['Task_ID'] == self.id]
-        self.task_size = task_row['Task_Size'].values[0]
-        self.computation_demand = task_row['Computation_Demand'].values[0]
+        required_columns = {
+            "Task_ID",
+            "Task_Size",
+            "Computation_Demand",
+            "Reliability_Requirement",
+        }
+        missing_columns = sorted(required_columns.difference(task_info_df.columns))
+        if missing_columns:
+            raise ValueError(
+                "task_parameters.xlsx is missing required columns: "
+                + ", ".join(missing_columns)
+            )
+
+        task_row = task_info_df.loc[task_info_df["Task_ID"] == self.id]
+        if len(task_row) != 1:
+            raise ValueError(
+                f"task_parameters.xlsx must contain exactly one row for Task_ID {self.id}"
+            )
+        self.task_size = task_row["Task_Size"].values[0]
+        self.computation_demand = task_row["Computation_Demand"].values[0]
+
+        reliability_requirement = float(task_row["Reliability_Requirement"].values[0])
+        if not math.isfinite(reliability_requirement) or reliability_requirement <= 0.0:
+            raise ValueError("Reliability_Requirement must be a finite value greater than 0")
+        if not any(
+            math.isclose(
+                reliability_requirement,
+                allowed,
+                rel_tol=1e-9,
+                abs_tol=1e-12,
+            )
+            for allowed in RELIABILITY_REQUIREMENT_LEVELS
+        ):
+            raise ValueError(
+                "Reliability_Requirement must be one of "
+                + ", ".join(str(value) for value in RELIABILITY_REQUIREMENT_LEVELS)
+            )
+        self.reliability_requirement = reliability_requirement
         self.teta = None  
 
     def execute_task(self, X, Y, Z):
