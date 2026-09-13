@@ -282,22 +282,32 @@ class EnvironmentState:
         frequencies = []
         backlog_times = []
 
+        failure_rate_scale = float(params.FAILURE_RATE_SCALE)
+        if not np.isfinite(failure_rate_scale) or failure_rate_scale <= 0.0:
+            raise ValueError("FAILURE_RATE_SCALE must be a finite positive number")
+
         for server_id, server_info in self.servers.items():
             server_object = server_info['server_object']
-            failure_rates.append(server_object.failure_rate)
+            # The policy observes the known nominal runtime hazard
+            # FAILURE_RATE_SCALE * lambda_0, but not the episode-specific
+            # spatial realization Z or lambda_eff.
+            nominal_failure_rate = failure_rate_scale * server_object.failure_rate
+            failure_rates.append(nominal_failure_rate)
             frequencies.append(server_object.processing_frequency)
             backlog_times.append(
                 self.get_server_backlog_time(server_id, task.env.now)
             )
 
-        min_failure_rate = min(
+        min_raw_failure_rate = min(
             params.EDGE_FAILURE_RATE_RANGE[0],
             params.CLOUD_FAILURE_RATE_RANGE[0]
         )
-        max_failure_rate = max(
+        max_raw_failure_rate = max(
             params.EDGE_FAILURE_RATE_RANGE[1],
             params.CLOUD_FAILURE_RATE_RANGE[1]
         )
+        min_failure_rate = failure_rate_scale * min_raw_failure_rate
+        max_failure_rate = failure_rate_scale * max_raw_failure_rate
         normalized_failure_rates = self.normalize(
             np.array(failure_rates), min_failure_rate, max_failure_rate
         )

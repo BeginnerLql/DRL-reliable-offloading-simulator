@@ -65,10 +65,15 @@ class ReliabilityRequirementStateTests(unittest.TestCase):
         self.assertAlmostEqual(observation_a[-1], 0.0)
         self.assertAlmostEqual(observation_b[-1], 1.0)
 
-    def test_observation_failure_features_use_raw_server_rates(self):
+    def test_observation_failure_features_use_nominal_server_rates(self):
         state, task = self._state_and_task(0.99)
         baseline = state.get_state(task)
-        # Effective runtime hazards may differ, but the state must stay raw.
+        expected_nominal = 10.0 * 0.001
+        raw_min = min(params.EDGE_FAILURE_RATE_RANGE[0], params.CLOUD_FAILURE_RATE_RANGE[0])
+        raw_max = max(params.EDGE_FAILURE_RATE_RANGE[1], params.CLOUD_FAILURE_RATE_RANGE[1])
+        expected_first = (expected_nominal - 10.0 * raw_min) / (10.0 * raw_max - 10.0 * raw_min)
+        self.assertAlmostEqual(baseline[0], expected_first)
+        # Effective runtime hazards may differ, but the state must stay nominal.
         state.set_episode_effective_failure_rates(
             list(range(1, params.serverNo + 1)),
             np.arange(1, params.serverNo + 1, dtype=float),
