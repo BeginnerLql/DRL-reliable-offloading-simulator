@@ -162,8 +162,8 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
         self.assertAlmostEqual(row["effective_failure_rate"], 0.01)
         self.assertAlmostEqual(row["spatial_hazard_multiplier"], 1.0)
 
-    def test_ppo_state_dimension_is_unchanged(self):
-        self.assertEqual(params.num_states, 3 * params.serverNo + 2)
+    def test_ppo_state_dimension_includes_reliability_requirement(self):
+        self.assertEqual(params.num_states, 3 * params.serverNo + 3)
 
     def test_final_status_uses_reliability_satisfied(self):
         with tempfile.TemporaryDirectory() as temp:

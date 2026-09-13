@@ -230,9 +230,10 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             env=simpy.Environment(),
             task_size=50.0,
             computation_demand=50.0,
+            reliability_requirement=0.9,
         )
         loop = self._build_loop(state)
-        with patch.object(params, "num_states", 11):
+        with patch.object(params, "num_states", 12):
             baseline_state = state.get_state(task)
             with self._enabled_patch(beta=0.5):
                 loop._initialize_episode_spatial_risk()
@@ -348,10 +349,11 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
     def test_spatial_off_keeps_ppo_state_on_raw_rates(self):
         state = self._build_state(server_ids=(9, 2, 5))
         task = SimpleNamespace(
-            env=simpy.Environment(), task_size=50.0, computation_demand=50.0
+            env=simpy.Environment(), task_size=50.0, computation_demand=50.0,
+            reliability_requirement=0.9
         )
         loop = self._build_loop(state)
-        with patch.object(params, "num_states", 11):
+        with patch.object(params, "num_states", 12):
             baseline_state = state.get_state(task)
             with patch.multiple(params, SPATIAL_RISK_ENABLED=False, FAILURE_RATE_SCALE=10.0):
                 loop._initialize_episode_failure_rates()

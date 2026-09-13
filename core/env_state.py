@@ -262,6 +262,21 @@ class EnvironmentState:
             return 0.0
         return (val - min_val) / denominator
 
+    @staticmethod
+    def normalize_reliability_requirement(reliability_requirement):
+        """Encode R_req in the number-of-nines domain for the policy."""
+        try:
+            value = float(reliability_requirement)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("reliability_requirement must be finite and in (0, 1)") from exc
+        if not np.isfinite(value) or not 0.0 < value < 1.0:
+            raise ValueError("reliability_requirement must be finite and in (0, 1)")
+        # Raw reliability values cluster near one; map through number of nines
+        # / log failure probability before feeding the policy.
+        nines = -np.log10(1.0 - value)
+        normalized = (nines - 1.0) / 3.0
+        return float(np.clip(normalized, 0.0, 1.0))
+
     def get_state(self, task):
         failure_rates = []
         frequencies = []
@@ -302,12 +317,19 @@ class EnvironmentState:
         normalized_computation_demand = self.normalize(
             task.computation_demand, params.Low_demand, params.High_demand
         )
+        normalized_reliability_requirement = self.normalize_reliability_requirement(
+            task.reliability_requirement
+        )
 
         normalized_arr = np.concatenate([
             normalized_failure_rates,
             normalized_processing_frequencies,
             normalized_backlog_times,
-            [normalized_task_size, normalized_computation_demand]
+            [
+                normalized_task_size,
+                normalized_computation_demand,
+                normalized_reliability_requirement,
+            ],
         ], dtype=np.float32)
         assert len(normalized_arr) == params.num_states
         return normalized_arr
