@@ -62,10 +62,10 @@ class MainLoop:
         self.episode_spatial_risk_log = []
 
         # PPO-only arrival-driven SMDP bookkeeping.
-        self.ppo_interval_reward = 0.0
         self.ppo_last_decision_state = None
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
+        self.ppo_last_decision_task_id = None
         self.ppo_last_resolved_outcome_time = None
 
 
@@ -80,10 +80,10 @@ class MainLoop:
             self.tempbuffer = {}
             self.taskCounter = 1
             self.pendingList = []
-            self.ppo_interval_reward = 0.0
             self.ppo_last_decision_state = None
             self.ppo_last_decision_action = None
             self.ppo_last_decision_time = None
+            self.ppo_last_decision_task_id = None
             self.ppo_last_resolved_outcome_time = None
 
             self.env = simpy.Environment()
@@ -242,12 +242,12 @@ class MainLoop:
                     self.model.store_transition(
                         self.ppo_last_decision_state,
                         self.ppo_last_decision_action,
-                        self.ppo_interval_reward,
+                        None,
                         self.G_state,
                         delta_t=max(float(delta_t), 0.0),
                         done=False,
+                        task_id=self.ppo_last_decision_task_id,
                     )
-                    self.ppo_interval_reward = 0.0
             elif self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
                 # resolved tasks using the legacy DQN/DDPG path.
@@ -280,6 +280,7 @@ class MainLoop:
                 self.ppo_last_decision_state = self.G_state
                 self.ppo_last_decision_action = self.G_action
                 self.ppo_last_decision_time = current_time
+                self.ppo_last_decision_task_id = task.id
             else:
                 # Store the legacy task-centric transition for DQN/DDPG.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
@@ -309,12 +310,12 @@ class MainLoop:
                 self.model.store_transition(
                     self.ppo_last_decision_state,
                     self.ppo_last_decision_action,
-                    self.ppo_interval_reward,
+                    None,
                     terminal_next_state,
                     delta_t=max(float(delta_t), 0.0),
                     done=True,
+                    task_id=self.ppo_last_decision_task_id,
                 )
-                self.ppo_interval_reward = 0.0
             # PPO remains on-policy and updates once after the episode.
             self.model.train_step()
 
@@ -523,7 +524,7 @@ class MainLoop:
         return max(decision_time, float(self.ppo_last_resolved_outcome_time))
 
     def _collect_resolved_task_outcomes(self):
-        """Accumulate completed task rewards into the current PPO interval."""
+        """Backfill each resolved task reward into its origin transition."""
         for task_counter in list(self.pendingList):
             task = self.env_state.get_task_by_id(task_counter)
             if task is None:
@@ -549,7 +550,7 @@ class MainLoop:
                     "Resolved PPO task has no valid outcome timestamp"
                 )
 
-            self.ppo_interval_reward += task_reward
+            self.model.assign_task_reward(task_counter, task_reward)
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time
             else:

@@ -151,6 +151,9 @@ class PPOAgent:
         self.dones = []
         self.old_log_probs = []
         self.delta_times = []
+        self.task_ids = []
+        self.task_id_to_transition_index = {}
+        self.pending_task_rewards = {}
 
         # Compatibility placeholder:
         # Some parts of the project check agent.replay_buffer length (DQN-style).
@@ -186,14 +189,18 @@ class PPOAgent:
     # -----------------------------
     # store transition
     # -----------------------------
-    def store_transition(self, s, a, r, s_next, delta_t, done=False):
-        """Store one arrival-ordered SMDP transition.
+    def store_transition(self, s, a, r, s_next, delta_t, done=False, task_id=None):
+        """Store one arrival-ordered SMDP transition bound to its origin task.
 
-        ``delta_t`` is the elapsed simulation time to the next decision
-        epoch (or terminal drain), measured in seconds.
+        ``delta_t`` remains the elapsed simulation time to the next arrival
+        decision (or terminal drain).  A reward may be unresolved when the
+        transition shell is created; :meth:`assign_task_reward` fills it in
+        later, or a previously pending reward is consumed immediately.
         """
-        if r is None:
-            return
+        if task_id is None:
+            raise ValueError("PPO store_transition requires a task_id")
+        if task_id in self.task_id_to_transition_index:
+            raise RuntimeError(f"Duplicate PPO transition task_id: {task_id}")
 
         delta_t = float(delta_t)
         if not np.isfinite(delta_t):
@@ -202,12 +209,27 @@ class PPOAgent:
             raise ValueError(f"PPO delta_t cannot be negative, got {delta_t}")
         delta_t = max(delta_t, 0.0)
 
+        resolved_reward = None if r is None else float(r)
+        if task_id in self.pending_task_rewards:
+            pending_reward = self.pending_task_rewards.pop(task_id)
+            if resolved_reward is not None and not np.isclose(
+                resolved_reward, pending_reward, rtol=0.0, atol=1e-12
+            ):
+                raise RuntimeError(
+                    f"Conflicting PPO rewards for task_id {task_id}: "
+                    f"pending={pending_reward}, direct={resolved_reward}"
+                )
+            resolved_reward = pending_reward
+
+        transition_index = len(self.states)
         self.states.append(np.array(s, copy=True))
         self.actions.append(int(a))
-        self.rewards.append(float(r))
+        self.rewards.append(resolved_reward)
         self.next_states.append(np.array(s_next, copy=True))
         self.dones.append(bool(done))
         self.delta_times.append(delta_t)
+        self.task_ids.append(task_id)
+        self.task_id_to_transition_index[task_id] = transition_index
 
         # Store old log-prob using policy_old (standard PPO approach).
         with torch.no_grad():
@@ -222,6 +244,25 @@ class PPOAgent:
                 if not np.isfinite(log_prob):
                     log_prob = 0.0
                 self.old_log_probs.append(float(log_prob))
+
+    def assign_task_reward(self, task_id, reward):
+        """Assign one resolved task reward to its origin transition.
+
+        Resolution may happen before or after the arrival transition shell is
+        created.  Every task may be assigned at most once.
+        """
+        reward = float(reward)
+        if not np.isfinite(reward):
+            raise ValueError(f"PPO task reward must be finite, got {reward}")
+        if task_id in self.task_id_to_transition_index:
+            index = self.task_id_to_transition_index[task_id]
+            if self.rewards[index] is not None:
+                raise RuntimeError(f"Duplicate PPO reward assignment for task_id {task_id}")
+            self.rewards[index] = reward
+            return
+        if task_id in self.pending_task_rewards:
+            raise RuntimeError(f"Duplicate PPO reward assignment for task_id {task_id}")
+        self.pending_task_rewards[task_id] = reward
 
     # -----------------------------
     # training: end of episode
@@ -238,14 +279,44 @@ class PPOAgent:
         """Optimize the arrival-ordered event-driven PPO rollout."""
         N = len(self.states)
         if N == 0:
+            if self.pending_task_rewards:
+                self.clear_rollout()
+                raise RuntimeError("PPO rollout has pending rewards without transitions")
             return
 
         if not (
             len(self.actions) == len(self.rewards) == len(self.next_states)
-            == len(self.dones) == len(self.old_log_probs) == len(self.delta_times) == N
+            == len(self.dones) == len(self.old_log_probs) == len(self.delta_times)
+            == len(self.task_ids) == N
         ):
             self.clear_rollout()
             raise RuntimeError("PPO rollout buffers have inconsistent lengths")
+
+        if (
+            len(self.task_id_to_transition_index) != N
+            or len(set(self.task_ids)) != N
+            or any(
+                self.task_id_to_transition_index.get(task_id) != index
+                for index, task_id in enumerate(self.task_ids)
+            )
+            or self.pending_task_rewards
+            or any(reward is None for reward in self.rewards)
+        ):
+            self.clear_rollout()
+            raise RuntimeError(
+                "PPO rollout task/reward bookkeeping is unresolved or inconsistent"
+            )
+        try:
+            strictly_increasing = all(
+                self.task_ids[index] < self.task_ids[index + 1]
+                for index in range(N - 1)
+            )
+        except TypeError as exc:
+            self.clear_rollout()
+            raise RuntimeError("PPO task_ids must be orderable") from exc
+        if not strictly_increasing:
+            self.clear_rollout()
+            raise RuntimeError("PPO task_ids must be strictly increasing")
 
         # A normal episode must explicitly provide a terminal transition.
         if not any(self.dones):
@@ -420,3 +491,6 @@ class PPOAgent:
         self.dones.clear()
         self.old_log_probs.clear()
         self.delta_times.clear()
+        self.task_ids.clear()
+        self.task_id_to_transition_index.clear()
+        self.pending_task_rewards.clear()

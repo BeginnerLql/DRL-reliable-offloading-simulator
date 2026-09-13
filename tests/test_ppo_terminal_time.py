@@ -1,4 +1,3 @@
-import math
 import unittest
 from types import SimpleNamespace
 
@@ -35,8 +34,11 @@ def _task(task_id, z, primary_stat, backup_stat, primary_finished, backup_finish
 
 class PPOOutcomeTimestampTests(unittest.TestCase):
     def setUp(self):
+        self.assigned_rewards = []
         self.loop = MainLoop(
-            model=SimpleNamespace(),
+            model=SimpleNamespace(
+                assign_task_reward=lambda task_id, reward: self.assigned_rewards.append((task_id, reward))
+            ),
             total_episodes=0,
             maxtaskno=0,
             num_states=params.num_states,
@@ -93,17 +95,15 @@ class PPOOutcomeTimestampTests(unittest.TestCase):
         ]
         self.loop.env_state = _TaskRegistry(tasks)
         self.loop.pendingList = [1, 2, 3]
-        self.loop.ppo_interval_reward = 0.0
         self.loop.ppo_last_resolved_outcome_time = None
         self.loop.calcReward = lambda task_id: (2.0, 1.0)
 
         self.loop._collect_resolved_task_outcomes()
 
-        self.assertAlmostEqual(self.loop.ppo_interval_reward, 6.0)
+        self.assertEqual(self.assigned_rewards, [(1, 2.0), (2, 2.0), (3, 2.0)])
         self.assertAlmostEqual(self.loop.ppo_last_resolved_outcome_time, 101.2)
         self.assertEqual(self.loop.pendingList, [])
         self.assertEqual(self.loop.env_state.tasks, {})
-        self.assertTrue(math.isclose(self.loop.ppo_interval_reward, 3 * 2.0, abs_tol=1e-6))
 
 
 if __name__ == "__main__":

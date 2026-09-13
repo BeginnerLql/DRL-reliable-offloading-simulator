@@ -70,10 +70,13 @@ class TaskResolutionEventTests(unittest.TestCase):
 
         loop = MainLoop.__new__(MainLoop)
         loop.model_name = "ppo"
+        assigned_rewards = []
+        loop.model = SimpleNamespace(
+            assign_task_reward=lambda task_id, reward: assigned_rewards.append((task_id, reward))
+        )
         loop.env = env
         loop.env_state = Registry()
         loop.pendingList = [1, 2]
-        loop.ppo_interval_reward = 0.0
         loop.ppo_last_resolved_outcome_time = None
         wake_times = []
 
@@ -104,7 +107,7 @@ class TaskResolutionEventTests(unittest.TestCase):
 
         self.assertEqual(wake_times, [2.0, 5.0])
         self.assertEqual(loop.pendingList, [])
-        self.assertAlmostEqual(loop.ppo_interval_reward, 2.0)
+        self.assertEqual(assigned_rewards, [(1, 1.0), (2, 1.0)])
 
 
 if __name__ == "__main__":
