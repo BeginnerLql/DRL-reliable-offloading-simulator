@@ -364,12 +364,27 @@ class MainLoop:
 
             yield self.env.any_of(resolution_events)
 
+    @staticmethod
+    def _reliability_diagnostic_metrics(task):
+        """Return task-level diagnostic metrics without changing reward logic."""
+        requirement = getattr(task, "reliability_requirement", None)
+        execution_reliability = getattr(task, "execution_reliability", None)
+        if requirement is None or execution_reliability is None:
+            return (None, None, None)
+        margin = float(execution_reliability) - float(requirement)
+        shortfall = max(float(requirement) - float(execution_reliability), 0.0)
+        excess = max(float(execution_reliability) - float(requirement), 0.0)
+        return (margin, shortfall, excess)
+
     def _finalize_resolved_task(self, task_counter, reward, delay):
         """Record common episode metrics and remove one resolved task."""
         task = self.env_state.get_task_by_id(task_counter)
         self.episodic_reward += reward
         self.episodic_delay += delay
         self.rewardsAll.append(reward)
+        reliability_margin, reliability_shortfall, reliability_excess = (
+            self._reliability_diagnostic_metrics(task)
+        )
         self.task_Assignments_info.append(
             (
                 self.this_episode,
@@ -393,6 +408,11 @@ class MainLoop:
                 getattr(task, "joint_failure_probability", None),
                 getattr(task, "execution_reliability", None),
                 getattr(task, "reliability_satisfied", None),
+                reward,
+                delay,
+                reliability_margin,
+                reliability_shortfall,
+                reliability_excess,
             )
         )
         self.pendingList.remove(task_counter)
@@ -555,6 +575,7 @@ class MainLoop:
             return
 
         removeList = []
+        resolved_rewards = {}
 
         for task_counter in list(self.pendingList):
             reward, delay = self.calcReward(task_counter)
@@ -568,6 +589,7 @@ class MainLoop:
             temp = list(self.tempbuffer[task_counter])
             temp[2] = reward
             self.tempbuffer[task_counter] = tuple(temp)
+            resolved_rewards[task_counter] = (reward, delay)
 
             s, a, r, s_ = self.tempbuffer[task_counter]
 
@@ -587,6 +609,10 @@ class MainLoop:
         for t in removeList:
             self.pendingList.remove(t)
             task = self.env_state.get_task_by_id(t)
+            task_reward, task_delay = resolved_rewards[t]
+            reliability_margin, reliability_shortfall, reliability_excess = (
+                self._reliability_diagnostic_metrics(task)
+            )
             self.task_Assignments_info.append(
                 (
                     self.this_episode,
@@ -610,6 +636,11 @@ class MainLoop:
                     getattr(task, "joint_failure_probability", None),
                     getattr(task, "execution_reliability", None),
                     getattr(task, "reliability_satisfied", None),
+                    task_reward,
+                    task_delay,
+                    reliability_margin,
+                    reliability_shortfall,
+                    reliability_excess,
                 )
             )
             self.env_state.remove_task(t)

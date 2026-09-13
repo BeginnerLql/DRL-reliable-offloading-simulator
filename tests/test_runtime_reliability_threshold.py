@@ -173,11 +173,33 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
             task_row = (
                 1, 1, 1, 0.0, 1.0, "success", 1, None, None, None, 0,
                 0.9999, 0.1, 0.1, 1.0, 1.0, 0.1, 0.1, 0.01, 0.99, False,
+                2.5, 1.0, -0.0099, 0.0099, 0.0,
             )
             with patch.object(save_logs, "DATA_DIR", str(temp_path)), patch.object(save_logs, "RESULTS_DIR", str(temp_path / "results")):
                 save_logs.save_params_and_logs(params, [], [task_row])
-            assignments = pd.read_excel(temp_path / "results" / "fixed_rate_results" / "ppo_results.xlsx", sheet_name="TaskAssignments")
+            output_path = temp_path / "results" / "fixed_rate_results" / "ppo_results.xlsx"
+            assignments = pd.read_excel(output_path, sheet_name="TaskAssignments")
+            expected_prefix = [
+                "episode", "task_id", "Primary", "Primary_Start", "Primary_End",
+                "Primary_Status", "Backup", "Backup_Start", "Backup_End",
+                "Backup_Status", "Z", "Reliability_Requirement",
+                "Primary_Effective_Failure_Rate", "Backup_Effective_Failure_Rate",
+                "Primary_Reliability_Service_Time", "Backup_Reliability_Service_Time",
+                "Primary_Failure_Probability", "Backup_Failure_Probability",
+                "Joint_Failure_Probability", "Execution_Reliability",
+                "Reliability_Satisfied",
+            ]
+            self.assertEqual(list(assignments.columns[:21]), expected_prefix)
+            self.assertEqual(list(assignments.columns[21:26]), [
+                "Task_Reward", "Task_Delay", "Reliability_Margin",
+                "Reliability_Shortfall", "Reliability_Excess",
+            ])
             self.assertEqual(assignments.loc[0, "Final_status"], "failure")
+            self.assertEqual(assignments.loc[0, "Task_Reward"], 2.5)
+            self.assertEqual(assignments.loc[0, "Task_Delay"], 1.0)
+            workbook = pd.ExcelFile(output_path)
+            self.assertIn("ReliabilityDiagnostics", workbook.sheet_names)
+            self.assertIn("PairDiagnostics", workbook.sheet_names)
 
 
 if __name__ == "__main__":

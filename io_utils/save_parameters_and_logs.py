@@ -16,6 +16,116 @@ from openpyxl.chart import LineChart, Reference
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
+RELIABILITY_DIAGNOSTIC_COLUMNS = [
+    "Reliability_Requirement",
+    "Task_Count",
+    "Success_Count",
+    "Failure_Count",
+    "Success_Rate",
+    "Mean_Task_Reward",
+    "Std_Task_Reward",
+    "Mean_Task_Delay",
+    "Mean_Execution_Reliability",
+    "Mean_Reliability_Margin",
+    "Median_Reliability_Margin",
+    "Mean_Reliability_Excess",
+    "Mean_Reliability_Shortfall",
+    "Mean_Joint_Failure_Probability",
+    "Parallel_Mode_Count",
+    "Parallel_Mode_Rate",
+]
+
+PAIR_DIAGNOSTIC_COLUMNS = [
+    "Reliability_Requirement",
+    "Primary",
+    "Backup",
+    "Z",
+    "Selection_Count",
+    "Selection_Share_Within_Requirement",
+    "Success_Count",
+    "Success_Rate",
+    "Mean_Task_Reward",
+    "Mean_Task_Delay",
+    "Mean_Execution_Reliability",
+    "Mean_Reliability_Margin",
+    "Mean_Joint_Failure_Probability",
+]
+
+
+def build_reliability_diagnostics(task_assignments_df):
+    """Aggregate task outcomes by the original, unnormalized R_req value."""
+    if task_assignments_df.empty:
+        return pd.DataFrame(columns=RELIABILITY_DIAGNOSTIC_COLUMNS)
+    rows = []
+    grouped = task_assignments_df.groupby("Reliability_Requirement", sort=True, dropna=False)
+    for requirement, group in grouped:
+        task_count = len(group)
+        success_mask = group["Final_status"].eq("success")
+        reward = pd.to_numeric(group["Task_Reward"], errors="coerce")
+        delay = pd.to_numeric(group["Task_Delay"], errors="coerce")
+        execution_reliability = pd.to_numeric(group["Execution_Reliability"], errors="coerce")
+        margin = pd.to_numeric(group["Reliability_Margin"], errors="coerce")
+        excess = pd.to_numeric(group["Reliability_Excess"], errors="coerce")
+        shortfall = pd.to_numeric(group["Reliability_Shortfall"], errors="coerce")
+        joint_failure = pd.to_numeric(group["Joint_Failure_Probability"], errors="coerce")
+        parallel_mask = pd.to_numeric(group["Z"], errors="coerce").eq(1)
+        rows.append({
+            "Reliability_Requirement": requirement,
+            "Task_Count": task_count,
+            "Success_Count": int(success_mask.sum()),
+            "Failure_Count": int((~success_mask).sum()),
+            "Success_Rate": float(success_mask.mean()),
+            "Mean_Task_Reward": float(reward.mean()),
+            "Std_Task_Reward": float(reward.std(ddof=0)),
+            "Mean_Task_Delay": float(delay.mean()),
+            "Mean_Execution_Reliability": float(execution_reliability.mean()),
+            "Mean_Reliability_Margin": float(margin.mean()),
+            "Median_Reliability_Margin": float(margin.median()),
+            "Mean_Reliability_Excess": float(excess.mean()),
+            "Mean_Reliability_Shortfall": float(shortfall.mean()),
+            "Mean_Joint_Failure_Probability": float(joint_failure.mean()),
+            "Parallel_Mode_Count": int(parallel_mask.sum()),
+            "Parallel_Mode_Rate": float(parallel_mask.mean()),
+        })
+    return pd.DataFrame(rows, columns=RELIABILITY_DIAGNOSTIC_COLUMNS)
+
+
+def build_pair_diagnostics(task_assignments_df):
+    """Aggregate selected primary/backup/Z combinations within each R_req."""
+    if task_assignments_df.empty:
+        return pd.DataFrame(columns=PAIR_DIAGNOSTIC_COLUMNS)
+    rows = []
+    requirement_totals = task_assignments_df.groupby(
+        "Reliability_Requirement", sort=True, dropna=False
+    ).size()
+    grouped = task_assignments_df.groupby(
+        ["Reliability_Requirement", "Primary", "Backup", "Z"],
+        sort=True,
+        dropna=False,
+    )
+    for (requirement, primary, backup, z), group in grouped:
+        selection_count = len(group)
+        success_mask = group["Final_status"].eq("success")
+        rows.append({
+            "Reliability_Requirement": requirement,
+            "Primary": primary,
+            "Backup": backup,
+            "Z": z,
+            "Selection_Count": selection_count,
+            "Selection_Share_Within_Requirement": float(
+                selection_count / requirement_totals.loc[requirement]
+            ),
+            "Success_Count": int(success_mask.sum()),
+            "Success_Rate": float(success_mask.mean()),
+            "Mean_Task_Reward": float(pd.to_numeric(group["Task_Reward"], errors="coerce").mean()),
+            "Mean_Task_Delay": float(pd.to_numeric(group["Task_Delay"], errors="coerce").mean()),
+            "Mean_Execution_Reliability": float(pd.to_numeric(group["Execution_Reliability"], errors="coerce").mean()),
+            "Mean_Reliability_Margin": float(pd.to_numeric(group["Reliability_Margin"], errors="coerce").mean()),
+            "Mean_Joint_Failure_Probability": float(pd.to_numeric(group["Joint_Failure_Probability"], errors="coerce").mean()),
+        })
+    return pd.DataFrame(rows, columns=PAIR_DIAGNOSTIC_COLUMNS)
+
+
 def save_params_and_logs(
     params,
     log_data,
@@ -144,6 +254,11 @@ def save_params_and_logs(
             "Joint_Failure_Probability",
             "Execution_Reliability",
             "Reliability_Satisfied",
+            "Task_Reward",
+            "Task_Delay",
+            "Reliability_Margin",
+            "Reliability_Shortfall",
+            "Reliability_Excess",
         ],
     )
 
@@ -156,6 +271,9 @@ def save_params_and_logs(
         )
     else:
         df_task_Assignments["Final_status"] = []
+
+    reliability_diagnostics_df = build_reliability_diagnostics(df_task_Assignments)
+    pair_diagnostics_df = build_pair_diagnostics(df_task_Assignments)
 
     # ---------------------------
     # Summary: counts per episode + AVG_Failure (rolling mean 40)
@@ -191,6 +309,8 @@ def save_params_and_logs(
         df_logs.to_excel(writer, sheet_name="Logs", index=False)
         df_task_Assignments.to_excel(writer, sheet_name="TaskAssignments", index=False)
         summary_df.to_excel(writer, sheet_name="Summary", index=False)
+        reliability_diagnostics_df.to_excel(writer, sheet_name="ReliabilityDiagnostics", index=False)
+        pair_diagnostics_df.to_excel(writer, sheet_name="PairDiagnostics", index=False)
         if df_spatial_risk is not None:
             df_spatial_risk.to_excel(writer, sheet_name="SpatialRisk", index=False)
 
