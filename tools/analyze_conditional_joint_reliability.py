@@ -87,6 +87,13 @@ def _finite_non_negative(value: object, name: str) -> float:
     return parsed
 
 
+def _finite_positive(value: object, name: str) -> float:
+    parsed = _finite_non_negative(value, name)
+    if parsed <= 0.0:
+        raise ValueError(f"{name} must be finite and positive")
+    return parsed
+
+
 def _summary_row(metric: str, values: object) -> dict:
     array = np.asarray(values, dtype=float).reshape(-1)
     if array.size == 0 or not np.isfinite(array).all():
@@ -117,10 +124,17 @@ def calculate_conditional_joint_reliability(
     episodes: int,
     beta_p: float,
     seed: int,
+    failure_rate_scale: float = 1.0,
+    spatial_fields: object | None = None,
 ) -> dict:
-    """Compute exact conditional failure/success probabilities for all samples."""
+    """Compute exact conditional probabilities for all task/pair samples.
+
+    ``spatial_fields`` may be supplied by a sensitivity analysis so several
+    failure-rate scales use exactly the same episode risk environments.
+    """
     episode_count = _positive_integer(episodes, "episodes")
     beta = _finite_non_negative(beta_p, "beta_p")
+    rate_scale = _finite_positive(failure_rate_scale, "failure_rate_scale")
     validate_correlation_matrix(correlation_matrix)
 
     rates = np.asarray(base_failure_rates, dtype=float)
@@ -141,14 +155,27 @@ def calculate_conditional_joint_reliability(
     if node_count < 2:
         raise ValueError("at least two servers are required")
 
-    spatial_fields = sample_spatial_risk_fields(
-        correlation,
-        episode_count,
-        rng=np.random.default_rng(seed),
-    )
+    if spatial_fields is None:
+        spatial_fields = sample_spatial_risk_fields(
+            correlation,
+            episode_count,
+            rng=np.random.default_rng(seed),
+        )
+    else:
+        spatial_fields = np.asarray(spatial_fields, dtype=float)
+        expected_shape = (episode_count, node_count)
+        if spatial_fields.shape != expected_shape:
+            raise ValueError(
+                "spatial_fields must have shape "
+                f"{expected_shape}, got {spatial_fields.shape}"
+            )
+        if not np.isfinite(spatial_fields).all():
+            raise ValueError("spatial_fields must contain only finite values")
+
+    scaled_rates = rate_scale * rates
     effective_rates = np.vstack(
         [
-            map_spatial_risk_to_effective_failure_rates(rates, field, beta)
+            map_spatial_risk_to_effective_failure_rates(scaled_rates, field, beta)
             for field in spatial_fields
         ]
     )
