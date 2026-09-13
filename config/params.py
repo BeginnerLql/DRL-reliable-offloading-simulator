@@ -43,6 +43,7 @@ class params:
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
     SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
     FAILURE_RATE_SCALE = parameters.FAILURE_RATE_SCALE
+    RELIABILITY_VIOLATION_WEIGHT = parameters.RELIABILITY_VIOLATION_WEIGHT
 
     # RL observation: three server features per node plus task size,
     # computation demand, and reliability requirement.

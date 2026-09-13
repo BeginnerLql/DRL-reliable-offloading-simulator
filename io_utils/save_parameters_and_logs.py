@@ -230,36 +230,45 @@ def save_params_and_logs(
     # ---------------------------
     # TaskAssignments dataframe
     # ---------------------------
+    task_assignment_columns = [
+        "episode",
+        "task_id",
+        "Primary",
+        "Primary_Start",
+        "Primary_End",
+        "Primary_Status",
+        "Backup",
+        "Backup_Start",
+        "Backup_End",
+        "Backup_Status",
+        "Z",
+        "Reliability_Requirement",
+        "Primary_Effective_Failure_Rate",
+        "Backup_Effective_Failure_Rate",
+        "Primary_Reliability_Service_Time",
+        "Backup_Reliability_Service_Time",
+        "Primary_Failure_Probability",
+        "Backup_Failure_Probability",
+        "Joint_Failure_Probability",
+        "Execution_Reliability",
+        "Reliability_Satisfied",
+        "Task_Reward",
+        "Task_Delay",
+        "Reliability_Margin",
+        "Reliability_Shortfall",
+        "Reliability_Excess",
+        "Base_Reward",
+        "Reliability_Violation_Log10",
+        "Reliability_Penalty",
+    ]
+    reward_diagnostic_columns = [
+        "Base_Reward",
+        "Reliability_Violation_Log10",
+        "Reliability_Penalty",
+    ]
     df_task_Assignments = pd.DataFrame(
         task_Assignments_info,
-        columns=[
-            "episode",
-            "task_id",
-            "Primary",
-            "Primary_Start",
-            "Primary_End",
-            "Primary_Status",
-            "Backup",
-            "Backup_Start",
-            "Backup_End",
-            "Backup_Status",
-            "Z",
-            "Reliability_Requirement",
-            "Primary_Effective_Failure_Rate",
-            "Backup_Effective_Failure_Rate",
-            "Primary_Reliability_Service_Time",
-            "Backup_Reliability_Service_Time",
-            "Primary_Failure_Probability",
-            "Backup_Failure_Probability",
-            "Joint_Failure_Probability",
-            "Execution_Reliability",
-            "Reliability_Satisfied",
-            "Task_Reward",
-            "Task_Delay",
-            "Reliability_Margin",
-            "Reliability_Shortfall",
-            "Reliability_Excess",
-        ],
+        columns=task_assignment_columns,
     )
 
     if not df_task_Assignments.empty:
@@ -271,6 +280,10 @@ def save_params_and_logs(
         )
     else:
         df_task_Assignments["Final_status"] = []
+    # Preserve the existing 27-column prefix and append new diagnostics at the end.
+    df_task_Assignments = df_task_Assignments[
+        task_assignment_columns[:26] + ["Final_status"] + reward_diagnostic_columns
+    ]
 
     reliability_diagnostics_df = build_reliability_diagnostics(df_task_Assignments)
     pair_diagnostics_df = build_pair_diagnostics(df_task_Assignments)

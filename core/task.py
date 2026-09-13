@@ -49,6 +49,10 @@ class Task:
         self.joint_failure_probability = None
         self.execution_reliability = None
         self.reliability_satisfied = None
+        # Reward diagnostics populated when MainLoop.calcReward resolves this task.
+        self.base_reward = None
+        self.reliability_violation = None
+        self.reliability_penalty = None
 
         # Task-level event used by the episode drain. This is triggered once
         # when the current primary/backup semantics produce a final outcome;

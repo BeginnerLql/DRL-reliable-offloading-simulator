@@ -376,6 +376,31 @@ class MainLoop:
         excess = max(float(execution_reliability) - float(requirement), 0.0)
         return (margin, shortfall, excess)
 
+    @staticmethod
+    def _calculate_reliability_violation(task):
+        """Return log10 failure-budget violation for a resolved task."""
+        try:
+            requirement = float(task.reliability_requirement)
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("Reliability_Requirement must be a finite value in (0, 1)") from exc
+        if not math.isfinite(requirement) or not 0.0 < requirement < 1.0:
+            raise ValueError("Reliability_Requirement must be a finite value in (0, 1)")
+
+        try:
+            joint_failure_probability = float(task.joint_failure_probability)
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("Joint failure probability must be a finite value in [0, 1]") from exc
+        if not math.isfinite(joint_failure_probability) or not 0.0 <= joint_failure_probability <= 1.0:
+            raise ValueError("Joint failure probability must be a finite value in [0, 1]")
+        if joint_failure_probability <= 0.0:
+            return 0.0
+
+        failure_budget = 1.0 - requirement
+        ratio = joint_failure_probability / failure_budget
+        if ratio <= 1.0:
+            return 0.0
+        return math.log10(ratio)
+
     def _finalize_resolved_task(self, task_counter, reward, delay):
         """Record common episode metrics and remove one resolved task."""
         task = self.env_state.get_task_by_id(task_counter)
@@ -413,6 +438,9 @@ class MainLoop:
                 reliability_margin,
                 reliability_shortfall,
                 reliability_excess,
+                getattr(task, "base_reward", None),
+                getattr(task, "reliability_violation", None),
+                getattr(task, "reliability_penalty", None),
             )
         )
         self.pendingList.remove(task_counter)
@@ -532,10 +560,10 @@ class MainLoop:
             self._finalize_resolved_task(task_counter, task_reward, delay)
 
     # ---------------------------
-    # REWARD CALCULATION (unchanged)
+    # REWARD CALCULATION
     # ---------------------------
     def calcReward(self, taskID):
-        """Return the existing numeric reward using the task threshold outcome."""
+        """Return final reward and delay for a resolved task."""
         task = self.env_state.get_task_by_id(taskID)
         primary_started = task.primaryStarted
         finish_times = [
@@ -555,15 +583,29 @@ class MainLoop:
             return None, None
         if task.reliability_satisfied:
             success_reward_weight = 1.0
-            reward = success_reward_weight * (
+            base_reward = success_reward_weight * (
                 math.log(1 - (1 / math.exp(math.sqrt(delay))))
                 / math.log(0.995)
             )
         else:
             failure_penalty_weight = 3.0
-            reward = -failure_penalty_weight * delay
-            if reward > -3:
-                reward = -3
+            base_reward = -failure_penalty_weight * delay
+            if base_reward > -3:
+                base_reward = -3
+
+        reliability_violation = self._calculate_reliability_violation(task)
+        try:
+            violation_weight = float(params.RELIABILITY_VIOLATION_WEIGHT)
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("RELIABILITY_VIOLATION_WEIGHT must be a finite non-negative number") from exc
+        if not math.isfinite(violation_weight) or violation_weight < 0.0:
+            raise ValueError("RELIABILITY_VIOLATION_WEIGHT must be a finite non-negative number")
+        reliability_penalty = violation_weight * reliability_violation
+        reward = base_reward - reliability_penalty
+
+        task.base_reward = base_reward
+        task.reliability_violation = reliability_violation
+        task.reliability_penalty = reliability_penalty
         return reward, delay
 
     # ---------------------------
@@ -641,6 +683,9 @@ class MainLoop:
                     reliability_margin,
                     reliability_shortfall,
                     reliability_excess,
+                    getattr(task, "base_reward", None),
+                    getattr(task, "reliability_violation", None),
+                    getattr(task, "reliability_penalty", None),
                 )
             )
             self.env_state.remove_task(t)

@@ -174,6 +174,7 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
                 1, 1, 1, 0.0, 1.0, "success", 1, None, None, None, 0,
                 0.9999, 0.1, 0.1, 1.0, 1.0, 0.1, 0.1, 0.01, 0.99, False,
                 2.5, 1.0, -0.0099, 0.0099, 0.0,
+                2.5, 0.0, 0.0,
             )
             with patch.object(save_logs, "DATA_DIR", str(temp_path)), patch.object(save_logs, "RESULTS_DIR", str(temp_path / "results")):
                 save_logs.save_params_and_logs(params, [], [task_row])
@@ -194,9 +195,20 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
                 "Task_Reward", "Task_Delay", "Reliability_Margin",
                 "Reliability_Shortfall", "Reliability_Excess",
             ])
+            self.assertEqual(assignments.columns[26], "Final_status")
+            self.assertEqual(list(assignments.columns[27:30]), [
+                "Base_Reward", "Reliability_Violation_Log10", "Reliability_Penalty",
+            ])
             self.assertEqual(assignments.loc[0, "Final_status"], "failure")
             self.assertEqual(assignments.loc[0, "Task_Reward"], 2.5)
             self.assertEqual(assignments.loc[0, "Task_Delay"], 1.0)
+            self.assertEqual(assignments.loc[0, "Base_Reward"], 2.5)
+            self.assertEqual(assignments.loc[0, "Reliability_Violation_Log10"], 0.0)
+            self.assertEqual(assignments.loc[0, "Reliability_Penalty"], 0.0)
+            self.assertAlmostEqual(
+                assignments.loc[0, "Task_Reward"],
+                assignments.loc[0, "Base_Reward"] - assignments.loc[0, "Reliability_Penalty"],
+            )
             workbook = pd.ExcelFile(output_path)
             self.assertIn("ReliabilityDiagnostics", workbook.sheet_names)
             self.assertIn("PairDiagnostics", workbook.sheet_names)

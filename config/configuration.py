@@ -48,6 +48,8 @@ class parameters:
     SPATIAL_RISK_SEED = 2026
     # Multiplier applied to raw Excel base failure rates at runtime only.
     FAILURE_RATE_SCALE = 10.0
+    # Weight applied to the logarithmic failure-budget violation penalty.
+    RELIABILITY_VIOLATION_WEIGHT = 10.0
 
     # ======================================================================
     # RL hyperparameters
