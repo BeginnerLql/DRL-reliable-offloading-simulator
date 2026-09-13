@@ -56,6 +56,7 @@ class MainLoop:
         self.env = None
         self.env_state = None
         self.spatial_risk_rng = np.random.default_rng(params.SPATIAL_RISK_SEED)
+        self.arrival_rng = np.random.default_rng(params.TASK_ARRIVAL_SEED)
         self.log_data = []
         self.task_Assignments_info = []
         self.episode_spatial_risk_log = []
@@ -201,9 +202,7 @@ class MainLoop:
             raise ValueError(
                 "TASK_ARRIVAL_RATE must be positive and measured in tasks/s"
             )
-        return float(
-            np.random.exponential(scale=1.0 / arrival_rate)
-        )
+        return float(self.arrival_rng.exponential(scale=1.0 / arrival_rate))
 
     # ---------------------------
     # epsilon schedule (DQN only; PPO ignores epsilon in its select_action signature)

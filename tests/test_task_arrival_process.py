@@ -9,6 +9,7 @@ from core.main_loop import MainLoop
 class TaskArrivalProcessTests(unittest.TestCase):
     def setUp(self):
         self.loop = MainLoop.__new__(MainLoop)
+        self.loop.arrival_rng = np.random.default_rng(params.TASK_ARRIVAL_SEED)
         self.original_rate = params.TASK_ARRIVAL_RATE
 
     def tearDown(self):

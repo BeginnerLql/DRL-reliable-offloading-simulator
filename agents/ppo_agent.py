@@ -104,6 +104,7 @@ class PPOAgent:
         max_grad_norm=0.5,
         activation="tanh",
         min_rollout=8,          # Minimum number of transitions required before performing an update
+        minibatch_seed=2028,
     ):
         self.device = torch.device(device)
         self.num_actions = num_actions
@@ -119,6 +120,7 @@ class PPOAgent:
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
         self.min_rollout = int(min_rollout)
+        self.minibatch_rng = np.random.default_rng(minibatch_seed)
 
         # Policy networks:
         # - policy_net: trainable policy
@@ -224,6 +226,14 @@ class PPOAgent:
     # -----------------------------
     # training: end of episode
     # -----------------------------
+    def _shuffled_indices(self, n):
+        """Return a minibatch permutation without consuming global NumPy RNG."""
+        if n < 0:
+            raise ValueError("n must be non-negative")
+        indices = np.arange(n)
+        self.minibatch_rng.shuffle(indices)
+        return indices
+
     def train_step(self):
         """Optimize the arrival-ordered event-driven PPO rollout."""
         N = len(self.states)
@@ -317,8 +327,7 @@ class PPOAgent:
 
         for _ in range(int(self.k_epochs)):
             # Minibatch shuffling is safe only after ordered GAE is complete.
-            idx = np.arange(N)
-            np.random.shuffle(idx)
+            idx = self._shuffled_indices(N)
 
             for start in range(0, N, batch_size):
                 end = start + batch_size

@@ -46,6 +46,9 @@ class parameters:
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
     SPATIAL_RISK_BETA_P = 0.8
     SPATIAL_RISK_SEED = 2026
+    # Independent random streams for environment arrivals and PPO minibatches.
+    TASK_ARRIVAL_SEED = 2027
+    PPO_MINIBATCH_SEED = 2028
     # Multiplier applied to raw Excel base failure rates at runtime only.
     FAILURE_RATE_SCALE = 10.0
     # Weight applied to the logarithmic failure-budget violation penalty.

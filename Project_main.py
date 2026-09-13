@@ -85,6 +85,7 @@ def build_model():
             value_loss_coef=params.value_loss_coef_ppo,
             max_grad_norm=params.max_grad_norm_ppo,
             activation=params.af_ppo,
+            minibatch_seed=params.PPO_MINIBATCH_SEED,
         )
         print("PPOAgent is set.")
         return model
