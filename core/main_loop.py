@@ -122,8 +122,12 @@ class MainLoop:
             self.env_state.get_server_by_id(server_id).failure_rate
             for server_id in server_ids
         ], dtype=float)
+        failure_rate_scale = float(params.FAILURE_RATE_SCALE)
+        if not np.isfinite(failure_rate_scale) or failure_rate_scale <= 0.0:
+            raise ValueError("FAILURE_RATE_SCALE must be a finite positive number")
+        scaled_base_failure_rates = failure_rate_scale * base_failure_rates
         effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
-            base_failure_rates,
+            scaled_base_failure_rates,
             spatial_risk_field,
             params.SPATIAL_RISK_BETA_P,
         )
@@ -141,21 +145,26 @@ class MainLoop:
             base_failure_rate = float(
                 self.env_state.get_server_by_id(server_id).failure_rate
             )
+            scaled_base_failure_rate = float(
+                failure_rate_scale * base_failure_rate
+            )
             effective_failure_rate = float(
                 self.env_state.effective_failure_rates[server_id]
             )
-            if base_failure_rate == 0.0:
+            if scaled_base_failure_rate == 0.0:
                 if effective_failure_rate != 0.0:
                     raise RuntimeError(
                         "effective failure rate must remain zero when "
-                        f"base failure rate is zero for server_id {server_id}"
+                        f"scaled base failure rate is zero for server_id {server_id}"
                     )
-                hazard_multiplier = 1.0
+                spatial_hazard_multiplier = 1.0
             else:
-                hazard_multiplier = effective_failure_rate / base_failure_rate
-            if not np.isfinite(hazard_multiplier):
+                spatial_hazard_multiplier = (
+                    effective_failure_rate / scaled_base_failure_rate
+                )
+            if not np.isfinite(spatial_hazard_multiplier):
                 raise RuntimeError(
-                    f"hazard multiplier is non-finite for server_id {server_id}"
+                    f"spatial hazard multiplier is non-finite for server_id {server_id}"
                 )
             self.episode_spatial_risk_log.append({
                 "episode": self.this_episode,
@@ -167,8 +176,13 @@ class MainLoop:
                 "beta_p": float(params.SPATIAL_RISK_BETA_P),
                 "spatial_risk_seed": params.SPATIAL_RISK_SEED,
                 "base_failure_rate": base_failure_rate,
+                "failure_rate_scale": failure_rate_scale,
+                "scaled_base_failure_rate": scaled_base_failure_rate,
                 "z_phy": float(self.env_state.spatial_risk_field[index]),
-                "hazard_multiplier": float(hazard_multiplier),
+                "spatial_hazard_multiplier": float(spatial_hazard_multiplier),
+                # Backward-compatible name; it is the spatial-only multiplier
+                # relative to the scaled base rate, not relative to raw Excel lambda.
+                "hazard_multiplier": float(spatial_hazard_multiplier),
                 "effective_failure_rate": effective_failure_rate,
             })
 
@@ -251,6 +265,10 @@ class MainLoop:
                 action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
                 X, Y, Z = self.extract_parameters_from_index(self.G_action)
+
+            # Reliability is evaluated once from the selected action and the
+            # episode-effective hazards, before any replica process starts.
+            task.initialize_reliability_evaluation(X, Y)
 
             if self.model_name == "ppo":
                 self.ppo_last_decision_state = self.G_state
@@ -358,6 +376,16 @@ class MainLoop:
                 task.backupFinished,
                 task.backupStat,
                 task.z,
+                getattr(task, "reliability_requirement", None),
+                getattr(task, "primary_effective_failure_rate", None),
+                getattr(task, "backup_effective_failure_rate", None),
+                getattr(task, "primary_service_time_for_reliability", None),
+                getattr(task, "backup_service_time_for_reliability", None),
+                getattr(task, "primary_failure_probability", None),
+                getattr(task, "backup_failure_probability", None),
+                getattr(task, "joint_failure_probability", None),
+                getattr(task, "execution_reliability", None),
+                getattr(task, "reliability_satisfied", None),
             )
         )
         self.pendingList.remove(task_counter)
@@ -480,62 +508,35 @@ class MainLoop:
     # REWARD CALCULATION (unchanged)
     # ---------------------------
     def calcReward(self, taskID):
-        """Reward completed replica executions and task-level outcomes.
-
-        A ``failure`` status means the corresponding replica execution was
-        defeated by a transient fault. It does not mean that a server is down.
-        A final failure means that all required replicas failed.
-        """
+        """Return the existing numeric reward using the task threshold outcome."""
         task = self.env_state.get_task_by_id(taskID)
-        z = task.z
-        primaryStat = task.primaryStat
-        backupStat = task.backupStat
-        primaryFinished = task.primaryFinished
-        primaryStarted = task.primaryStarted
-        backupFinished = task.backupFinished
-        backupStarted = task.backupStarted
-
-        flag = "s"
-        delay = None
-
-        if z == 0:
-            if primaryStat == 'success' and backupStat is None and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'failure':
-                delay = backupFinished - primaryStarted
-                flag = "f"
-            else:
-                flag = "n"
+        primary_started = task.primaryStarted
+        finish_times = [
+            timestamp for timestamp in (task.primaryFinished, task.backupFinished)
+            if timestamp is not None
+        ]
+        if task.z == 0:
+            if task.primaryFinished is None or primary_started is None:
+                return None, None
+            delay = task.primaryFinished - primary_started
         else:
-            if primaryStat == 'success' and backupStat == 'success' and primaryFinished is not None and backupFinished is not None:
-                delay = min(primaryFinished, backupFinished) - primaryStarted
-            elif primaryStat == 'success' and backupStat == 'failure' and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - backupStarted
-            elif primaryStat == 'failure' and backupStat == 'failure':
-                delay = max(backupFinished - backupStarted, primaryFinished - primaryStarted)
-                flag = "f"
-            elif primaryStat == 'success' and backupStat is None and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat is None and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - backupStarted
-            else:
-                flag = "n"
+            if not finish_times or primary_started is None:
+                return None, None
+            delay = min(finish_times) - primary_started
 
-        if flag == "f":
+        if task.reliability_satisfied is None:
+            return None, None
+        if task.reliability_satisfied:
+            success_reward_weight = 1.0
+            reward = success_reward_weight * (
+                math.log(1 - (1 / math.exp(math.sqrt(delay))))
+                / math.log(0.995)
+            )
+        else:
             failure_penalty_weight = 3.0
             reward = -failure_penalty_weight * delay
             if reward > -3:
                 reward = -3
-        elif flag == "s":
-            success_reward_weight = 1.0
-            reward = success_reward_weight * (math.log(1 - (1 / math.exp(math.sqrt(delay)))) / math.log(0.995))
-        else:
-            reward = None
-
         return reward, delay
 
     # ---------------------------
@@ -592,6 +593,16 @@ class MainLoop:
                     task.backupFinished,
                     task.backupStat,
                     task.z,
+                    getattr(task, "reliability_requirement", None),
+                    getattr(task, "primary_effective_failure_rate", None),
+                    getattr(task, "backup_effective_failure_rate", None),
+                    getattr(task, "primary_service_time_for_reliability", None),
+                    getattr(task, "backup_service_time_for_reliability", None),
+                    getattr(task, "primary_failure_probability", None),
+                    getattr(task, "backup_failure_probability", None),
+                    getattr(task, "joint_failure_probability", None),
+                    getattr(task, "execution_reliability", None),
+                    getattr(task, "reliability_satisfied", None),
                 )
             )
             self.env_state.remove_task(t)

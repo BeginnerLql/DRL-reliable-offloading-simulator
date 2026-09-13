@@ -11,7 +11,6 @@ Change in the modular refactor:
 import os
 import pandas as pd
 import math
-import random
 
 from config.params import params
 from config.paths import DATA_DIR
@@ -39,6 +38,17 @@ class Task:
         self.backupStarted = None
         self.backupFinished = None
         self.backupStat = None
+
+        # Task-level reliability evaluation, computed once after action selection.
+        self.primary_effective_failure_rate = None
+        self.backup_effective_failure_rate = None
+        self.primary_service_time_for_reliability = None
+        self.backup_service_time_for_reliability = None
+        self.primary_failure_probability = None
+        self.backup_failure_probability = None
+        self.joint_failure_probability = None
+        self.execution_reliability = None
+        self.reliability_satisfied = None
 
         # Task-level event used by the episode drain. This is triggered once
         # when the current primary/backup semantics produce a final outcome;
@@ -92,22 +102,39 @@ class Task:
         self.reliability_requirement = reliability_requirement
         self.teta = None  
 
+    def initialize_reliability_evaluation(self, primary_node, backup_node):
+        """Compute task reliability once for the selected action."""
+        self.primaryNode = primary_node
+        self.backupNode = backup_node
+        primary_rate = float(self.set_failure_rate(primary_node))
+        backup_rate = float(self.set_failure_rate(backup_node))
+        primary_service_time = float(self.computation_demand / primary_node.processing_frequency)
+        backup_service_time = float(self.computation_demand / backup_node.processing_frequency)
+        values = (primary_rate, backup_rate, primary_service_time, backup_service_time)
+        if not all(math.isfinite(value) and value >= 0.0 for value in values):
+            raise ValueError("reliability inputs must be finite and non-negative")
+        self.primary_effective_failure_rate = primary_rate
+        self.backup_effective_failure_rate = backup_rate
+        self.primary_service_time_for_reliability = primary_service_time
+        self.backup_service_time_for_reliability = backup_service_time
+        self.primary_failure_probability = -math.expm1(-primary_rate * primary_service_time)
+        self.backup_failure_probability = -math.expm1(-backup_rate * backup_service_time)
+        # Same-server retry uses the same hazard with conditionally independent
+        # transient retry outcomes, so the joint term is p_j * p_k (p^2 for retry).
+        self.joint_failure_probability = self.primary_failure_probability * self.backup_failure_probability
+        self.execution_reliability = 1.0 - self.joint_failure_probability
+        self.reliability_satisfied = self.execution_reliability >= self.reliability_requirement
+
     def execute_task(self, X, Y, Z):
 
         self.primaryNode=X
         self.backupNode=Y
         self.z = Z
         if self.z == 0:
+            # Sequential mode retains its action semantics, but reliability is
+            # assessed analytically and the primary completion resolves it.
             self.primaryStarted = self.env.now
             yield self.env.process(self.primary())
-            # Retry/failover follows a primary replica execution failure.
-            # The fault is transient, so the selected server remains usable.
-            if self.primaryStat == "failure":
-
-                yield self.env.timeout(0)
-                self.backupStarted = self.env.now
-                self.env.process(self.backup())
-            
         else: ## z==1
             self.primaryStarted = self.backupStarted = self.env.now
             self.env.process(self.primary())
@@ -133,25 +160,16 @@ class Task:
                 self.primaryNode.server_id, self, "primary",
                 self.primary_service_time, self.env.now
             )
-            failure_rate=self.set_failure_rate(self.primaryNode)
-            # Simulate execution either success or failed
+            # Reliability was evaluated analytically before execution.
             yield self.env.timeout(self.primary_service_time)
             self.env_state.complete_replica_execution(
                 self.primaryNode.server_id, self, "primary"
             )
             
-        # Probability that at least one transient server fault occurs during
-        # this primary replica's execution interval.
-        fault_prob= 1-math.exp(-failure_rate * self.primary_service_time)
-        r=random.uniform(0, 1)
-        if(r<fault_prob):
-            # This is a primary replica execution failure, not a permanent
-            # failure of the selected server.
-            self.primaryStat = "failure"
-            
-        else:
-            yield self.env.timeout(outDelay)
-            self.primaryStat = "success"
+        # Replica completion is nominal; task-level threshold is stored in
+        # reliability_satisfied and applied by MainLoop reward bookkeeping.
+        yield self.env.timeout(outDelay)
+        self.primaryStat = "success"
 
         self.primaryFinished = self.env.now
         
@@ -180,7 +198,6 @@ class Task:
                     self.backupNode.server_id, self, "backup",
                     backup_service_time, self.env.now
                 )
-                failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
                 self.env_state.complete_replica_execution(
                     self.backupNode.server_id, self, "backup"
@@ -198,7 +215,6 @@ class Task:
                     self.backupNode.server_id, self, "backup",
                     backup_service_time, self.env.now
                 )
-                failure_rate=self.set_failure_rate(self.backupNode)
                 yield self.env.timeout(backup_service_time)
                 self.env_state.complete_replica_execution(
                     self.backupNode.server_id, self, "backup"
@@ -206,18 +222,10 @@ class Task:
 
             
         
-        
-        # Probability that at least one transient server fault occurs during
-        # this backup replica's execution interval.
-        fault_prob= 1-math.exp(-failure_rate * backup_service_time)
-        r=random.uniform(0, 1)
-        if(r<fault_prob):
-            # This is a backup replica execution failure; the server remains
-            # available for later tasks and retries.
-            self.backupStat = "failure"
-        else:
-            yield self.env.timeout(outDelay)
-            self.backupStat = "success"
+        # Replica completion is nominal; task-level threshold is stored in
+        # reliability_satisfied and applied by MainLoop reward bookkeeping.
+        yield self.env.timeout(outDelay)
+        self.backupStat = "success"
          
         self.backupFinished = self.env.now
         
@@ -226,28 +234,20 @@ class Task:
         self._signal_resolution_if_ready()
 
     def _is_resolved(self):
-        """Match MainLoop.calcReward() final-outcome conditions."""
+        """Return whether the selected execution semantics have a result.
+
+        Runtime replicas are nominally successful; the legacy failure cases are
+        retained only so old synthetic event tests remain interpretable.
+        """
         if self.z == 0:
             return (
-                (
-                    self.primaryStat == "success"
-                    and self.primaryFinished is not None
-                    and self.backupStat is None
-                )
+                (self.primaryStat == "success" and self.primaryFinished is not None)
                 or (
                     self.primaryStat == "failure"
-                    and self.backupStat == "success"
-                    and self.backupFinished is not None
-                )
-                or (
-                    self.primaryStat == "failure"
-                    and self.backupStat == "failure"
+                    and self.backupStat in {"success", "failure"}
                     and self.backupFinished is not None
                 )
             )
-
-        # Parallel first-result semantics: one success resolves immediately;
-        # two failures require both replica timestamps.
         return (
             (self.primaryStat == "success" and self.primaryFinished is not None)
             or (self.backupStat == "success" and self.backupFinished is not None)

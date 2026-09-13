@@ -42,6 +42,7 @@ class params:
     SPATIAL_CORRELATION_LENGTH_KM = parameters.SPATIAL_CORRELATION_LENGTH_KM
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
     SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
+    FAILURE_RATE_SCALE = parameters.FAILURE_RATE_SCALE
 
     # RL hyperparameters
     num_states = 3 * serverNo + 2  # observable failure rate, frequency, backlog time per server + task profile

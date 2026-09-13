@@ -45,19 +45,18 @@ class Z0RecoveryWaitTests(unittest.TestCase):
         task.primary = types.MethodType(primary, task)
         task.backup = types.MethodType(backup, task)
 
-    def test_z0_failure_starts_backup_at_primary_failure_time(self):
+    def test_z0_primary_completion_keeps_backup_standby(self):
         env = simpy.Environment()
         task = self._task(env)
         backup_starts = []
-        self._install_replica_stubs(task, "failure", backup_starts)
+        self._install_replica_stubs(task, "success", backup_starts)
 
         env.process(task.execute_task("primary", "backup", 0))
         env.run()
 
-        self.assertEqual(backup_starts, [2.0])
-        self.assertAlmostEqual(task.backupStarted, task.primaryFinished)
-        self.assertAlmostEqual(task.backupStarted, 2.0)
-        self.assertAlmostEqual(task.backupFinished, 3.0)
+        self.assertEqual(backup_starts, [])
+        self.assertIsNone(task.backupStarted)
+        self.assertIsNone(task.backupFinished)
         self.assertTrue(task.resolution_event.triggered)
         self.assertEqual(task.teta, 10.0)
 

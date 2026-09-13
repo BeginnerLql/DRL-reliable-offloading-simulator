@@ -8,6 +8,7 @@
 
 import os
 import pandas as pd
+import numpy as np
 from openpyxl import load_workbook
 from openpyxl.chart import LineChart, Reference
 
@@ -83,7 +84,10 @@ def save_params_and_logs(
                 "beta_p": "Beta_p",
                 "spatial_risk_seed": "Spatial_Risk_Seed",
                 "base_failure_rate": "Base_Failure_Rate",
+                "failure_rate_scale": "Failure_Rate_Scale",
+                "scaled_base_failure_rate": "Scaled_Base_Failure_Rate",
                 "z_phy": "Z_phy",
+                "spatial_hazard_multiplier": "Spatial_Hazard_Multiplier",
                 "hazard_multiplier": "Hazard_Multiplier",
                 "effective_failure_rate": "Effective_Failure_Rate",
             }
@@ -96,7 +100,10 @@ def save_params_and_logs(
             "Beta_p",
             "Spatial_Risk_Seed",
             "Base_Failure_Rate",
+            "Failure_Rate_Scale",
+            "Scaled_Base_Failure_Rate",
             "Z_phy",
+            "Spatial_Hazard_Multiplier",
             "Hazard_Multiplier",
             "Effective_Failure_Rate",
         ]
@@ -127,17 +134,25 @@ def save_params_and_logs(
             "Backup_End",
             "Backup_Status",
             "Z",
+            "Reliability_Requirement",
+            "Primary_Effective_Failure_Rate",
+            "Backup_Effective_Failure_Rate",
+            "Primary_Reliability_Service_Time",
+            "Backup_Reliability_Service_Time",
+            "Primary_Failure_Probability",
+            "Backup_Failure_Probability",
+            "Joint_Failure_Probability",
+            "Execution_Reliability",
+            "Reliability_Satisfied",
         ],
     )
 
     if not df_task_Assignments.empty:
-        # Final task failure means all required replica executions failed;
-        # it does not indicate that the selected servers became unavailable.
-        df_task_Assignments["Final_status"] = df_task_Assignments.apply(
-            lambda row: "failure"
-            if row["Primary_Status"] == "failure" and row["Backup_Status"] == "failure"
-            else "success",
-            axis=1,
+        # Final status is the task-level reliability-threshold outcome.
+        df_task_Assignments["Final_status"] = np.where(
+            df_task_Assignments["Reliability_Satisfied"].astype(bool),
+            "success",
+            "failure",
         )
     else:
         df_task_Assignments["Final_status"] = []

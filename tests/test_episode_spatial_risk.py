@@ -57,6 +57,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             SPATIAL_CORRELATION_LENGTH_KM=0.5,
             SPATIAL_RISK_BETA_P=beta,
             SPATIAL_RISK_SEED=seed,
+            FAILURE_RATE_SCALE=1.0,
         )
 
     @staticmethod

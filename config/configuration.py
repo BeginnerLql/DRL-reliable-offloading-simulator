@@ -41,11 +41,13 @@ class parameters:
     BACKLOG_TIME_SCALE_SEC = 4.0
 
     # Episode-level quasi-static physical spatial risk field.
-    # Disabled by default to preserve the independent baseline.
-    SPATIAL_RISK_ENABLED = False
+    # Episode-level quasi-static spatial risk field used by runtime reliability.
+    SPATIAL_RISK_ENABLED = True
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
-    SPATIAL_RISK_BETA_P = None
+    SPATIAL_RISK_BETA_P = 0.8
     SPATIAL_RISK_SEED = 2026
+    # Multiplier applied to raw Excel base failure rates at runtime only.
+    FAILURE_RATE_SCALE = 10.0
 
     # ======================================================================
     # RL hyperparameters
