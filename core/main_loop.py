@@ -90,24 +90,38 @@ class MainLoop:
             self.env_state.reset()
 
             self.setServers()
-            self._initialize_episode_spatial_risk()
+            self._initialize_episode_failure_rates()
             self.env.process(self.Iteration())
             self.env.run()
 
 
-    def _initialize_episode_spatial_risk(self):
-        """Sample and store one quasi-static spatial risk field for this episode."""
-        if not params.SPATIAL_RISK_ENABLED:
-            return
-        if params.SPATIAL_RISK_BETA_P is None:
-            raise ValueError(
-                "beta_p must be explicitly configured when spatial risk is enabled."
-            )
-
+    def _initialize_episode_failure_rates(self):
+        """Initialize scaled episode hazards, optionally with spatial risk."""
         server_objects = [
             server_info["server_object"]
             for server_info in self.env_state.servers.values()
         ]
+        server_ids = sorted(server.server_id for server in server_objects)
+        base_failure_rates = np.array([
+            self.env_state.get_server_by_id(server_id).failure_rate
+            for server_id in server_ids
+        ], dtype=float)
+        failure_rate_scale = float(params.FAILURE_RATE_SCALE)
+        if not np.isfinite(failure_rate_scale) or failure_rate_scale <= 0.0:
+            raise ValueError("FAILURE_RATE_SCALE must be a finite positive number")
+        scaled_base_failure_rates = failure_rate_scale * base_failure_rates
+
+        if not params.SPATIAL_RISK_ENABLED:
+            self.env_state.set_episode_effective_failure_rates(
+                server_ids,
+                scaled_base_failure_rates,
+            )
+            return
+
+        if params.SPATIAL_RISK_BETA_P is None:
+            raise ValueError(
+                "beta_p must be explicitly configured when spatial risk is enabled."
+            )
         server_ids, distance_matrix = build_distance_matrix(server_objects)
         correlation_matrix = build_spatial_correlation_matrix(
             distance_matrix,
@@ -118,14 +132,6 @@ class MainLoop:
             correlation_matrix,
             rng=self.spatial_risk_rng,
         )
-        base_failure_rates = np.array([
-            self.env_state.get_server_by_id(server_id).failure_rate
-            for server_id in server_ids
-        ], dtype=float)
-        failure_rate_scale = float(params.FAILURE_RATE_SCALE)
-        if not np.isfinite(failure_rate_scale) or failure_rate_scale <= 0.0:
-            raise ValueError("FAILURE_RATE_SCALE must be a finite positive number")
-        scaled_base_failure_rates = failure_rate_scale * base_failure_rates
         effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
             scaled_base_failure_rates,
             spatial_risk_field,
@@ -139,9 +145,7 @@ class MainLoop:
             effective_failure_rates,
         )
 
-        for index, server_id in enumerate(
-            self.env_state.spatial_risk_server_ids
-        ):
+        for index, server_id in enumerate(server_ids):
             base_failure_rate = float(
                 self.env_state.get_server_by_id(server_id).failure_rate
             )
@@ -180,12 +184,15 @@ class MainLoop:
                 "scaled_base_failure_rate": scaled_base_failure_rate,
                 "z_phy": float(self.env_state.spatial_risk_field[index]),
                 "spatial_hazard_multiplier": float(spatial_hazard_multiplier),
-                # Backward-compatible name; it is the spatial-only multiplier
-                # relative to the scaled base rate, not relative to raw Excel lambda.
+                # Legacy alias: this is the spatial-only multiplier relative to
+                # scaled lambda, never relative to raw Excel lambda.
                 "hazard_multiplier": float(spatial_hazard_multiplier),
                 "effective_failure_rate": effective_failure_rate,
             })
 
+    def _initialize_episode_spatial_risk(self):
+        """Backward-compatible entry point for episode hazard initialization."""
+        return self._initialize_episode_failure_rates()
 
     def _sample_interarrival_time(self):
         """Sample one inter-arrival time for the common Poisson workload."""

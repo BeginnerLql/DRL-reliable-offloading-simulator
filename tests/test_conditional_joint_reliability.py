@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from unittest.mock import patch
 
 from core.spatial_risk import build_spatial_correlation_matrix
 from tools.analyze_conditional_joint_reliability import (
@@ -96,6 +97,26 @@ class ConditionalJointReliabilityTests(unittest.TestCase):
         beta_zero = self._calculation(beta_p=0.0)
         expected_rates = np.broadcast_to(self.base_rates, (4, len(self.base_rates)))
         self.assertTrue(np.array_equal(beta_zero["effective_rates"], expected_rates))
+
+    def test_offline_default_scale_is_independent_of_runtime_config(self):
+        from config.params import params
+        with patch.object(params, "FAILURE_RATE_SCALE", 10.0):
+            runtime_config_result = self._calculation()
+        expected = np.vstack([
+            self.base_rates * np.exp(
+                0.8 * field - 0.8**2 / 2.0
+            )
+            for field in runtime_config_result["spatial_fields"]
+        ])
+        self.assertTrue(np.allclose(runtime_config_result["effective_rates"], expected))
+        explicit_scale_result = self._calculation(failure_rate_scale=10.0)
+        expected_explicit = np.vstack([
+            10.0 * self.base_rates * np.exp(
+                0.8 * field - 0.8**2 / 2.0
+            )
+            for field in explicit_scale_result["spatial_fields"]
+        ])
+        self.assertTrue(np.allclose(explicit_scale_result["effective_rates"], expected_explicit))
 
     def test_correlation_matrix_is_symmetric_with_unit_diagonal(self):
         self.assertTrue(

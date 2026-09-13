@@ -172,6 +172,34 @@ class EnvironmentState:
             for index, server_id in enumerate(ordered_server_ids)
         }
 
+    def set_episode_effective_failure_rates(self, server_ids, effective_failure_rates):
+        """Store episode runtime hazards independently of spatial-risk metadata."""
+        try:
+            ordered_server_ids = list(server_ids)
+            effective = np.asarray(effective_failure_rates, dtype=float)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("episode effective failure rates must be numeric") from exc
+        if not ordered_server_ids:
+            raise ValueError("server_ids must not be empty")
+        if len(set(ordered_server_ids)) != len(ordered_server_ids):
+            raise ValueError("server_ids must not contain duplicates")
+        if set(ordered_server_ids) != set(self.servers):
+            raise ValueError("server_ids must match the current EnvironmentState servers")
+        if effective.shape != (len(ordered_server_ids),):
+            raise ValueError("effective_failure_rates has an invalid shape")
+        if not np.isfinite(effective).all() or (effective < 0.0).any():
+            raise ValueError("effective_failure_rates must be finite and non-negative")
+        self.effective_failure_rates = {
+            server_id: float(effective[index])
+            for index, server_id in enumerate(ordered_server_ids)
+        }
+        # This setter is also used for the spatial-off ablation, so do not
+        # leave stale spatial metadata attached to the episode.
+        self.spatial_risk_server_ids = None
+        self.spatial_distance_matrix = None
+        self.spatial_correlation_matrix = None
+        self.spatial_risk_field = None
+
     def get_active_failure_rate(self, server_id):
         """Return episode-effective or baseline transient fault arrival rate."""
         server_object = self.get_server_by_id(server_id)
