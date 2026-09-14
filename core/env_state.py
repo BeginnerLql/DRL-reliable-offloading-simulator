@@ -317,7 +317,9 @@ class EnvironmentState:
             params.INPUT_DATA_SIZE_RANGE_MB[1],
         )
         normalized_computation_demand = self.normalize(
-            task.computation_demand, params.Low_demand, params.High_demand
+            task.computation_demand,
+            params.COMPUTATION_DEMAND_RANGE_MI[0],
+            params.COMPUTATION_DEMAND_RANGE_MI[1],
         )
         normalized_reliability_requirement = self.normalize_reliability_requirement(
             task.reliability_requirement

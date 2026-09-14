@@ -24,7 +24,12 @@ class parameters:
     # Compatibility alias for older state/test code; formal Excel uses the
     # explicit Input_Data_Size_MB column.
     TASK_SIZE_RANGE = INPUT_DATA_SIZE_RANGE_MB
-    Low_demand, High_demand = 1, 100 # MI (Normal(mean=50, std=16) implied)
+    # Formal computation-demand model: discrete uniform integer MI values.
+    COMPUTATION_DEMAND_RANGE_MI = (5, 50)
+    COMPUTATION_DEMAND_SEED = 2030
+    # Legacy aliases retained for older callers; the formal semantic source is
+    # COMPUTATION_DEMAND_RANGE_MI above.
+    Low_demand, High_demand = COMPUTATION_DEMAND_RANGE_MI
     taskno = 200
     
     # ======================================================================

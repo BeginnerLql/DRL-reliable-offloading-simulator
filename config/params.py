@@ -25,6 +25,8 @@ class params:
     INPUT_DATA_SIZE_RANGE_MB = parameters.INPUT_DATA_SIZE_RANGE_MB
     INPUT_DATA_SIZE_SEED = parameters.INPUT_DATA_SIZE_SEED
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
+    COMPUTATION_DEMAND_RANGE_MI = parameters.COMPUTATION_DEMAND_RANGE_MI
+    COMPUTATION_DEMAND_SEED = parameters.COMPUTATION_DEMAND_SEED
     Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
     taskno = parameters.taskno
     # Poisson task-arrival rate, unit: tasks/s

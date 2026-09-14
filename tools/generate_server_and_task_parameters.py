@@ -5,12 +5,10 @@
 
 import math
 import os
-import random
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.stats import truncnorm
 
 from config.configuration import parameters
 from config.paths import DATA_DIR, ensure_dirs
@@ -32,6 +30,22 @@ FIXED_PROCESSING_FREQUENCIES = tuple(parameters.FIXED_EDGE_PROCESSING_FREQUENCIE
 FIXED_UPLINK_RATES_MBPS = (18, 30, 22, 36, 16, 28, 40, 24)
 RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
 RELIABILITY_REQUIREMENT_SEED = 2026
+
+
+def generate_computation_demands(
+    num_tasks: int,
+    seed: int = parameters.COMPUTATION_DEMAND_SEED,
+) -> list[int]:
+    """Return independent discrete-uniform computation demands in MI."""
+    if isinstance(num_tasks, (bool, np.bool_)) or not isinstance(num_tasks, (int, np.integer)):
+        raise ValueError("num_tasks must be a positive integer")
+    if num_tasks <= 0:
+        raise ValueError("num_tasks must be a positive integer")
+
+    lower, upper = parameters.COMPUTATION_DEMAND_RANGE_MI
+    rng = np.random.default_rng(seed)
+    # numpy's integer upper bound is exclusive, so add one to include 50.
+    return rng.integers(int(lower), int(upper) + 1, size=int(num_tasks)).astype(int).tolist()
 
 
 def generate_reliability_requirements(
@@ -262,25 +276,19 @@ def generate_task_params(filename: str = "task_parameters.xlsx"):
     NUM_TASKS = parameters.taskno
     INPUT_DATA_SIZE_RANGE_MB = parameters.INPUT_DATA_SIZE_RANGE_MB
     input_data_rng = np.random.default_rng(parameters.INPUT_DATA_SIZE_SEED)
+    computation_demands = generate_computation_demands(NUM_TASKS)
     reliability_requirements = generate_reliability_requirements(NUM_TASKS)
-
-    a, b = parameters.Low_demand, parameters.High_demand
-    mu = (a + b) / 2
-    sigma = (b - a) / 6
-    lower, upper = (a - mu) / sigma, (b - mu) / sigma
 
     for task_id in range(1, NUM_TASKS + 1):
         # Input payload uses an independent deterministic RNG stream.
         input_data_size_mb = float(input_data_rng.uniform(*INPUT_DATA_SIZE_RANGE_MB))
-
-        # Computation_Demand (float)
-        computation_demand = truncnorm.rvs(lower, upper, loc=mu, scale=sigma)
+        computation_demand = computation_demands[task_id - 1]
 
         task_info.append(
             [
                 task_id,
                 input_data_size_mb,
-                float(computation_demand),
+                int(computation_demand),
                 reliability_requirements[task_id - 1],
             ]
         )
