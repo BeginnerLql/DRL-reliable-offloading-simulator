@@ -97,25 +97,22 @@ class MainLoop:
 
 
     def _initialize_episode_failure_rates(self):
-        """Initialize scaled episode hazards, optionally with spatial risk."""
+        """Initialize episode hazards from base rates and one spatial field."""
         server_objects = [
             server_info["server_object"]
             for server_info in self.env_state.servers.values()
         ]
         server_ids = sorted(server.server_id for server in server_objects)
         base_failure_rates = np.array([
-            self.env_state.get_server_by_id(server_id).failure_rate
+            self.env_state.get_server_by_id(server_id).base_failure_rate
             for server_id in server_ids
         ], dtype=float)
-        failure_rate_scale = float(params.FAILURE_RATE_SCALE)
-        if not np.isfinite(failure_rate_scale) or failure_rate_scale <= 0.0:
-            raise ValueError("FAILURE_RATE_SCALE must be a finite positive number")
-        scaled_base_failure_rates = failure_rate_scale * base_failure_rates
+        # Base rates already represent lambda_j^0 in the formal model.
 
         if not params.SPATIAL_RISK_ENABLED:
             self.env_state.set_episode_effective_failure_rates(
                 server_ids,
-                scaled_base_failure_rates,
+                base_failure_rates,
             )
             return
 
@@ -134,7 +131,7 @@ class MainLoop:
             rng=self.spatial_risk_rng,
         )
         effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
-            scaled_base_failure_rates,
+            base_failure_rates,
             spatial_risk_field,
             params.SPATIAL_RISK_BETA_P,
         )
@@ -148,24 +145,21 @@ class MainLoop:
 
         for index, server_id in enumerate(server_ids):
             base_failure_rate = float(
-                self.env_state.get_server_by_id(server_id).failure_rate
-            )
-            scaled_base_failure_rate = float(
-                failure_rate_scale * base_failure_rate
+                self.env_state.get_server_by_id(server_id).base_failure_rate
             )
             effective_failure_rate = float(
                 self.env_state.effective_failure_rates[server_id]
             )
-            if scaled_base_failure_rate == 0.0:
+            if base_failure_rate == 0.0:
                 if effective_failure_rate != 0.0:
                     raise RuntimeError(
                         "effective failure rate must remain zero when "
-                        f"scaled base failure rate is zero for server_id {server_id}"
+                        f"base failure rate is zero for server_id {server_id}"
                     )
                 spatial_hazard_multiplier = 1.0
             else:
                 spatial_hazard_multiplier = (
-                    effective_failure_rate / scaled_base_failure_rate
+                    effective_failure_rate / base_failure_rate
                 )
             if not np.isfinite(spatial_hazard_multiplier):
                 raise RuntimeError(
@@ -181,12 +175,14 @@ class MainLoop:
                 "beta_p": float(params.SPATIAL_RISK_BETA_P),
                 "spatial_risk_seed": params.SPATIAL_RISK_SEED,
                 "base_failure_rate": base_failure_rate,
-                "failure_rate_scale": failure_rate_scale,
-                "scaled_base_failure_rate": scaled_base_failure_rate,
+                # Compatibility audit field; formal runtime scaling is 1.
+                "failure_rate_scale": 1.0,
+                # Historical audit column retained as an alias of the base rate.
+                "scaled_base_failure_rate": base_failure_rate,
                 "z_phy": float(self.env_state.spatial_risk_field[index]),
                 "spatial_hazard_multiplier": float(spatial_hazard_multiplier),
                 # Legacy alias: this is the spatial-only multiplier relative to
-                # scaled lambda, never relative to raw Excel lambda.
+                # the normal-environment base rate.
                 "hazard_multiplier": float(spatial_hazard_multiplier),
                 "effective_failure_rate": effective_failure_rate,
             })
@@ -698,9 +694,7 @@ class MainLoop:
         server_info_df = pd.read_excel(excel_file)
         required_columns = {
             "Server_ID",
-            "Server_Type",
             "Processing_Frequency",
-            "Failure_Rate",
             "Latitude",
             "Longitude",
         }
@@ -710,21 +704,32 @@ class MainLoop:
                 "server_info.xlsx is missing required columns: "
                 + ", ".join(missing_columns)
             )
+        if "Base_Failure_Rate" in server_info_df.columns:
+            rate_column = "Base_Failure_Rate"
+        elif "Failure_Rate" in server_info_df.columns:
+            # Read-only compatibility for older temporary fixtures; formal
+            # server_info.xlsx uses Base_Failure_Rate.
+            rate_column = "Failure_Rate"
+        else:
+            raise ValueError(
+                "server_info.xlsx is missing required columns: Base_Failure_Rate"
+            )
 
         for _, row in server_info_df.iterrows():
             server_id = int(row["Server_ID"])
-            server_type = str(row["Server_Type"])
             processing_frequency = float(row["Processing_Frequency"])
-            failure_rate = float(row["Failure_Rate"])
+            base_failure_rate = float(row[rate_column])
             latitude = float(row["Latitude"])
             longitude = float(row["Longitude"])
 
+            # Server_Type is retained only as a compatibility column for the
+            # unfinished communication/reporting code. All formal nodes are Edge.
             server = Server(
                 self.env,
-                server_type,
+                "Edge",
                 server_id,
                 processing_frequency,
-                failure_rate,
+                base_failure_rate,
                 latitude,
                 longitude,
             )

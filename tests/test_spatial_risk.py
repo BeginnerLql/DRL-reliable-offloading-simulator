@@ -285,7 +285,7 @@ class SpatialRiskTests(unittest.TestCase):
         base_rates = np.array([0.001, 0.002])
         spatial_risk = np.array([1.0, -1.0])
         beta = 0.5
-        expected = base_rates * np.exp(beta * spatial_risk - 0.5 * beta**2)
+        expected = base_rates * np.exp(beta * spatial_risk)
         actual = map_spatial_risk_to_effective_failure_rates(
             base_rates,
             spatial_risk,

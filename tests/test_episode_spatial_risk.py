@@ -57,7 +57,6 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             SPATIAL_CORRELATION_LENGTH_KM=0.5,
             SPATIAL_RISK_BETA_P=beta,
             SPATIAL_RISK_SEED=seed,
-            FAILURE_RATE_SCALE=1.0,
         )
 
     @staticmethod
@@ -66,22 +65,18 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
         task.env_state = state
         return task
 
-    def test_disabled_spatial_risk_keeps_runtime_scale(self):
+    def test_disabled_spatial_risk_uses_base_rate(self):
         state = self._build_state()
         server = state.get_server_by_id(9)
         original_rate = server.failure_rate
         loop = self._build_loop(state)
-        with patch.multiple(
-            params,
-            SPATIAL_RISK_ENABLED=False,
-            FAILURE_RATE_SCALE=10.0,
-        ):
+        with patch.object(params, "SPATIAL_RISK_ENABLED", False):
             loop._initialize_episode_spatial_risk()
 
         task = self._task_for_state(state)
         self.assertIsNone(state.spatial_risk_field)
         self.assertIsNone(state.spatial_correlation_matrix)
-        self.assertEqual(task.set_failure_rate(server), 10.0 * original_rate)
+        self.assertEqual(task.set_failure_rate(server), original_rate)
         self.assertEqual(server.failure_rate, original_rate)
 
     def test_episode_context_uses_explicit_sorted_server_id_mapping(self):
@@ -299,7 +294,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
         backup_retry_rate = task.set_failure_rate(server)
         self.assertEqual(primary_rate, backup_retry_rate)
 
-    def test_spatial_on_beta_zero_uses_scaled_base_rate(self):
+    def test_spatial_on_beta_zero_uses_base_rate(self):
         state = self._build_state(server_ids=(9,))
         loop = self._build_loop(state)
         with patch.multiple(
@@ -307,13 +302,12 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             SPATIAL_RISK_ENABLED=True,
             SPATIAL_RISK_BETA_P=0.0,
             SPATIAL_CORRELATION_LENGTH_KM=0.5,
-            FAILURE_RATE_SCALE=10.0,
         ):
             loop._initialize_episode_spatial_risk()
-        self.assertAlmostEqual(state.get_active_failure_rate(9), 0.01)
-        self.assertAlmostEqual(loop.episode_spatial_risk_log[0]["scaled_base_failure_rate"], 0.01)
+        self.assertAlmostEqual(state.get_active_failure_rate(9), 0.001)
+        self.assertAlmostEqual(loop.episode_spatial_risk_log[0]["scaled_base_failure_rate"], 0.001)
 
-    def test_spatial_on_beta_positive_uses_scaled_base_rate(self):
+    def test_spatial_on_beta_positive_uses_base_rate(self):
         state = self._build_state(server_ids=(9, 2, 5))
         loop = self._build_loop(state)
         with patch.multiple(
@@ -321,12 +315,11 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             SPATIAL_RISK_ENABLED=True,
             SPATIAL_RISK_BETA_P=0.5,
             SPATIAL_CORRELATION_LENGTH_KM=0.5,
-            FAILURE_RATE_SCALE=10.0,
         ):
             loop._initialize_episode_spatial_risk()
         raw_rates = np.array([0.002, 0.0005, 0.001])
         expected = map_spatial_risk_to_effective_failure_rates(
-            10.0 * raw_rates,
+            raw_rates,
             loop.env_state.spatial_risk_field,
             0.5,
         )
@@ -338,9 +331,9 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
     def test_spatial_off_does_not_create_fake_spatial_context(self):
         state = self._build_state(server_ids=(9,))
         loop = self._build_loop(state)
-        with patch.multiple(params, SPATIAL_RISK_ENABLED=False, FAILURE_RATE_SCALE=10.0):
+        with patch.object(params, "SPATIAL_RISK_ENABLED", False):
             loop._initialize_episode_failure_rates()
-        self.assertAlmostEqual(state.get_active_failure_rate(9), 0.01)
+        self.assertAlmostEqual(state.get_active_failure_rate(9), 0.001)
         self.assertIsNone(state.spatial_risk_field)
         self.assertIsNone(state.spatial_distance_matrix)
         self.assertIsNone(state.spatial_correlation_matrix)
@@ -355,7 +348,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
         loop = self._build_loop(state)
         with patch.object(params, "num_states", 12):
             baseline_state = state.get_state(task)
-            with patch.multiple(params, SPATIAL_RISK_ENABLED=False, FAILURE_RATE_SCALE=10.0):
+            with patch.object(params, "SPATIAL_RISK_ENABLED", False):
                 loop._initialize_episode_failure_rates()
                 scaled_state = state.get_state(task)
         self.assertTrue(np.array_equal(scaled_state, baseline_state))

@@ -135,7 +135,7 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
         self.assertEqual(task.primaryStarted, task.backupStarted)
         self.assertTrue(task.resolution_event.triggered)
 
-    def test_runtime_scale_is_logged_and_used(self):
+    def test_base_rate_is_logged_and_used_without_runtime_scale(self):
         env = simpy.Environment()
         state = EnvironmentState()
         state.add_server_and_init_environment(
@@ -151,15 +151,14 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
             SPATIAL_RISK_ENABLED=True,
             SPATIAL_RISK_BETA_P=0.0,
             SPATIAL_CORRELATION_LENGTH_KM=0.5,
-            FAILURE_RATE_SCALE=10.0,
         ):
             loop._initialize_episode_spatial_risk()
-        self.assertAlmostEqual(state.get_active_failure_rate(1), 0.01)
+        self.assertAlmostEqual(state.get_active_failure_rate(1), 0.001)
         row = loop.episode_spatial_risk_log[0]
         self.assertAlmostEqual(row["base_failure_rate"], 0.001)
-        self.assertAlmostEqual(row["failure_rate_scale"], 10.0)
-        self.assertAlmostEqual(row["scaled_base_failure_rate"], 0.01)
-        self.assertAlmostEqual(row["effective_failure_rate"], 0.01)
+        self.assertAlmostEqual(row["failure_rate_scale"], 1.0)
+        self.assertAlmostEqual(row["scaled_base_failure_rate"], 0.001)
+        self.assertAlmostEqual(row["effective_failure_rate"], 0.001)
         self.assertAlmostEqual(row["spatial_hazard_multiplier"], 1.0)
 
     def test_ppo_state_dimension_includes_reliability_requirement(self):

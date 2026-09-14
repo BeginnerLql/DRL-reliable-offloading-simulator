@@ -21,12 +21,13 @@ NUM_CLOUD_SERVERS = parameters.NUM_CLOUD_SERVERS
 TOPOLOGY_FILENAME = "eua_melbourne_cbd_site_order.csv"
 SERVER_INFO_COLUMNS = [
     "Server_ID",
-    "Server_Type",
+    "Server_Type",  # compatibility column; every formal node is Edge
     "Processing_Frequency",
-    "Failure_Rate",
+    "Base_Failure_Rate",
     "Latitude",
     "Longitude",
 ]
+FIXED_PROCESSING_FREQUENCIES = tuple(parameters.FIXED_EDGE_PROCESSING_FREQUENCIES)
 RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
 RELIABILITY_REQUIREMENT_SEED = 2026
 
@@ -50,14 +51,25 @@ def generate_reliability_requirements(
     return requirements.tolist()
 
 
-def generate_processing_frequencies(number_of_server: int, server_type: str):
-    """Generate processing frequencies for edge or cloud servers."""
-    if server_type.lower() == "edge":
-        return [round(random.uniform(*parameters.EDGE_PROCESSING_FREQ_RANGE), 2) for _ in range(number_of_server)]
-    elif server_type.lower() == "cloud":
-        return [round(random.uniform(*parameters.CLOUD_PROCESSING_FREQ_RANGE), 2) for _ in range(number_of_server)]
-    else:
-        raise ValueError("server_type must be 'edge' or 'cloud'")
+def generate_processing_frequencies(number_of_server: int, server_type: str = "Edge"):
+    """Return the fixed processing frequencies of the formal Edge nodes."""
+    if str(server_type).lower() != "edge":
+        raise ValueError("the formal server model contains Edge nodes only")
+    count = int(number_of_server)
+    if count < 0 or count > len(FIXED_PROCESSING_FREQUENCIES):
+        raise ValueError("number_of_server exceeds the fixed Edge frequency table")
+    return list(FIXED_PROCESSING_FREQUENCIES[:count])
+
+
+def base_failure_rate_from_frequency(processing_frequency: float) -> float:
+    """Compute lambda_base for a normal environment from fixed CPU capacity."""
+    frequency = float(processing_frequency)
+    f_min = float(parameters.FAILURE_RATE_FMIN)
+    f_max = float(parameters.FAILURE_RATE_FMAX)
+    exponent = float(parameters.FAILURE_RATE_OMEGA) * (
+        1.0 - frequency / f_max
+    ) / (1.0 - f_min / f_max)
+    return float(parameters.LAMBDA_REF * 10.0 ** exponent)
 
 
 def _default_topology_path() -> Path:
@@ -160,37 +172,79 @@ def assign_topology_locations(
     return pd.DataFrame(assignments)
 
 
+def _default_all_edge_assignments(topology_df: pd.DataFrame) -> pd.DataFrame:
+    """Return the current eight-node coordinate order as all-Edge records.
+
+    The former six-Edge/two-Cloud layout used topology ranks 3..8 for IDs
+    1..6 and ranks 1..2 for IDs 7..8.  Keeping that order preserves the
+    existing eight coordinates while removing the old type distinction.
+    """
+    preferred_ranks = [3, 4, 5, 6, 7, 8, 1, 2]
+    if len(topology_df) < len(preferred_ranks):
+        raise ValueError(
+            f"Not enough topology sites: need 8, found {len(topology_df)}."
+        )
+    by_rank = topology_df.set_index("Rank")
+    rows = []
+    for server_id, rank in enumerate(preferred_ranks, start=1):
+        site = by_rank.loc[rank]
+        rows.append({
+            "Server_ID": server_id,
+            "Server_Type": "Edge",
+            "Topology_Rank": rank,
+            "Latitude": float(site["Latitude"]),
+            "Longitude": float(site["Longitude"]),
+        })
+    return pd.DataFrame(rows)
+
+
+def _existing_coordinates(filename: str | os.PathLike) -> pd.DataFrame | None:
+    """Load existing coordinates so migration never moves current nodes."""
+    path = Path(filename)
+    if not path.exists():
+        return None
+    try:
+        frame = pd.read_excel(path)
+    except Exception:
+        return None
+    required = {"Server_ID", "Latitude", "Longitude"}
+    if not required.issubset(frame.columns):
+        return None
+    frame = frame[list(required)].copy()
+    frame["Server_ID"] = pd.to_numeric(frame["Server_ID"], errors="coerce")
+    frame["Latitude"] = pd.to_numeric(frame["Latitude"], errors="coerce")
+    frame["Longitude"] = pd.to_numeric(frame["Longitude"], errors="coerce")
+    if frame.isna().any().any() or frame["Server_ID"].duplicated().any():
+        return None
+    frame["Server_ID"] = frame["Server_ID"].astype(int)
+    if set(frame["Server_ID"]) != set(range(1, NUM_EDGE_SERVERS + 1)):
+        return None
+    return frame.sort_values("Server_ID").reset_index(drop=True)
+
+
 def generate_server_info(
     filename: str,
     topology_path: str | os.PathLike | None = None,
 ):
-    """Write server parameters with deterministic EUA geographic positions."""
+    """Write the fixed all-Edge server table with preserved coordinates."""
     topology_df = load_eua_topology(topology_path)
-    assignments = assign_topology_locations(
-        topology_df,
-        NUM_EDGE_SERVERS,
-        NUM_CLOUD_SERVERS,
-    )
+    existing = _existing_coordinates(filename)
+    if existing is None:
+        assignments = _default_all_edge_assignments(topology_df)
+    else:
+        assignments = existing.assign(Server_Type="Edge")
 
+    frequencies = generate_processing_frequencies(NUM_EDGE_SERVERS, "Edge")
     server_info = []
-    assignment_offset = 0
-    for server_type, count, rate_range in (
-        ("Edge", NUM_EDGE_SERVERS, parameters.EDGE_FAILURE_RATE_RANGE),
-        ("Cloud", NUM_CLOUD_SERVERS, parameters.CLOUD_FAILURE_RATE_RANGE),
-    ):
-        frequencies = generate_processing_frequencies(count, server_type)
-        type_assignments = assignments.iloc[assignment_offset:assignment_offset + count]
-        for frequency, (_, assignment) in zip(frequencies, type_assignments.iterrows()):
-            failure_rate = random.uniform(*rate_range)
-            server_info.append([
-                int(assignment["Server_ID"]),
-                server_type,
-                frequency,
-                failure_rate,
-                assignment["Latitude"],
-                assignment["Longitude"],
-            ])
-        assignment_offset += count
+    for frequency, (_, assignment) in zip(frequencies, assignments.iterrows()):
+        server_info.append([
+            int(assignment["Server_ID"]),
+            "Edge",
+            int(frequency),
+            base_failure_rate_from_frequency(frequency),
+            float(assignment["Latitude"]),
+            float(assignment["Longitude"]),
+        ])
 
     df = pd.DataFrame(server_info, columns=SERVER_INFO_COLUMNS)
     df.to_excel(filename, sheet_name="Servers", index=False)

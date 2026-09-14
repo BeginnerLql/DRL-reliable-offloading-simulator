@@ -10,9 +10,10 @@ class parameters:
     # ======================================================================
     # Infrastructure: servers
     # ======================================================================
-    NUM_EDGE_SERVERS = 6  # 7,8
-    NUM_CLOUD_SERVERS = 2  # 3,2
-    serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  # 10
+    # The formal simulator now models eight homogeneous Edge servers.
+    NUM_EDGE_SERVERS = 8
+    NUM_CLOUD_SERVERS = 0
+    serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  # 8
     # ======================================================================
     # Workload: tasks
     # ======================================================================
@@ -28,14 +29,21 @@ class parameters:
     rsu_to_cloud_bandwidth = 8  # Mb/s
 
     # ======================================================================
-    # Reliability model parameters (Edge vs Cloud)
+    # Reliability model parameters for the homogeneous Edge infrastructure.
     # ======================================================================
-    # Transient server-fault arrival-rate range, unit: 1/s.
-    EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)
-    # Transient server-fault arrival-rate range, unit: 1/s.
-    CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)
-    EDGE_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
-    CLOUD_PROCESSING_FREQ_RANGE = (30, 60)  # MIPS
+    FIXED_EDGE_PROCESSING_FREQUENCIES = (10, 11, 12, 14, 15, 17, 18, 20)  # MIPS
+    LAMBDA_REF = 0.003  # 1/s, normal-environment reference rate
+    FAILURE_RATE_OMEGA = 0.9
+    FAILURE_RATE_FMIN = 10.0
+    FAILURE_RATE_FMAX = 20.0
+    # Compatibility ranges for legacy observation normalization and tools.
+    EDGE_PROCESSING_FREQ_RANGE = (10, 20)
+    CLOUD_PROCESSING_FREQ_RANGE = (10, 20)
+    EDGE_FAILURE_RATE_RANGE = (
+        LAMBDA_REF * 10 ** FAILURE_RATE_OMEGA,
+        LAMBDA_REF,
+    )
+    CLOUD_FAILURE_RATE_RANGE = EDGE_FAILURE_RATE_RANGE
     # Fixed backlog-time normalization scale, unit: seconds.
     # Approximately one representative Edge task service time.
     BACKLOG_TIME_SCALE_SEC = 4.0
@@ -49,8 +57,6 @@ class parameters:
     # Independent random streams for environment arrivals and PPO minibatches.
     TASK_ARRIVAL_SEED = 2027
     PPO_MINIBATCH_SEED = 2028
-    # Multiplier applied to raw Excel base failure rates at runtime only.
-    FAILURE_RATE_SCALE = 10.0
     # Weight applied to the logarithmic failure-budget violation penalty.
     RELIABILITY_VIOLATION_WEIGHT = 10.0
 

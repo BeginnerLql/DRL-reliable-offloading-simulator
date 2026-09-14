@@ -11,7 +11,7 @@ class Server:
         server_type,
         server_id,
         processing_frequency,
-        failure_rate,
+        base_failure_rate,
         latitude,
         longitude,
     ):
@@ -22,10 +22,16 @@ class Server:
         self.queue = simpy.PriorityResource(env, capacity=1)
 
         self.processing_frequency = processing_frequency  # fn(t)
-        # Observable estimated transient server-fault arrival rate λ_n, unit: 1/s.
-        # A transient fault can fail the current task replica without
-        # permanently disabling this server.
-        self.failure_rate = failure_rate
+        # Normal-environment transient fault arrival rate λ_j^0, unit: 1/s.
+        # ``failure_rate`` remains a compatibility alias for older analysis
+        # code; formal runtime code uses ``base_failure_rate``.
+        try:
+            self.base_failure_rate = float(base_failure_rate)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("base_failure_rate must be a finite non-negative number") from exc
+        if not math.isfinite(self.base_failure_rate) or self.base_failure_rate < 0.0:
+            raise ValueError("base_failure_rate must be a finite non-negative number")
+        self.failure_rate = self.base_failure_rate
         self.latitude = self._validate_coordinate(latitude, "latitude", -90.0, 90.0)
         self.longitude = self._validate_coordinate(longitude, "longitude", -180.0, 180.0)
 

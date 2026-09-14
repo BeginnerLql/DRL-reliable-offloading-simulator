@@ -99,12 +99,10 @@ class ConditionalJointReliabilityTests(unittest.TestCase):
         self.assertTrue(np.array_equal(beta_zero["effective_rates"], expected_rates))
 
     def test_offline_default_scale_is_independent_of_runtime_config(self):
-        from config.params import params
-        with patch.object(params, "FAILURE_RATE_SCALE", 10.0):
-            runtime_config_result = self._calculation()
+        runtime_config_result = self._calculation()
         expected = np.vstack([
             self.base_rates * np.exp(
-                0.8 * field - 0.8**2 / 2.0
+                0.8 * field
             )
             for field in runtime_config_result["spatial_fields"]
         ])
@@ -112,7 +110,7 @@ class ConditionalJointReliabilityTests(unittest.TestCase):
         explicit_scale_result = self._calculation(failure_rate_scale=10.0)
         expected_explicit = np.vstack([
             10.0 * self.base_rates * np.exp(
-                0.8 * field - 0.8**2 / 2.0
+                0.8 * field
             )
             for field in explicit_scale_result["spatial_fields"]
         ])

@@ -68,10 +68,10 @@ class ReliabilityRequirementStateTests(unittest.TestCase):
     def test_observation_failure_features_use_nominal_server_rates(self):
         state, task = self._state_and_task(0.99)
         baseline = state.get_state(task)
-        expected_nominal = 10.0 * 0.001
-        raw_min = min(params.EDGE_FAILURE_RATE_RANGE[0], params.CLOUD_FAILURE_RATE_RANGE[0])
-        raw_max = max(params.EDGE_FAILURE_RATE_RANGE[1], params.CLOUD_FAILURE_RATE_RANGE[1])
-        expected_first = (expected_nominal - 10.0 * raw_min) / (10.0 * raw_max - 10.0 * raw_min)
+        expected_nominal = 0.001
+        expected_first = (expected_nominal - params.LAMBDA_REF) / (
+            params.LAMBDA_REF * 10 ** params.FAILURE_RATE_OMEGA - params.LAMBDA_REF
+        )
         self.assertAlmostEqual(baseline[0], expected_first)
         # Effective runtime hazards may differ, but the state must stay nominal.
         state.set_episode_effective_failure_rates(

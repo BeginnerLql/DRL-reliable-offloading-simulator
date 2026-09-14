@@ -30,7 +30,12 @@ class params:
     # Network model
     rsu_to_cloud_bandwidth = parameters.rsu_to_cloud_bandwidth
 
-    # Server capabilities
+    # Server capabilities and normal-environment failure-rate model
+    FIXED_EDGE_PROCESSING_FREQUENCIES = parameters.FIXED_EDGE_PROCESSING_FREQUENCIES
+    LAMBDA_REF = parameters.LAMBDA_REF
+    FAILURE_RATE_OMEGA = parameters.FAILURE_RATE_OMEGA
+    FAILURE_RATE_FMIN = parameters.FAILURE_RATE_FMIN
+    FAILURE_RATE_FMAX = parameters.FAILURE_RATE_FMAX
     EDGE_PROCESSING_FREQ_RANGE = parameters.EDGE_PROCESSING_FREQ_RANGE
     CLOUD_PROCESSING_FREQ_RANGE = parameters.CLOUD_PROCESSING_FREQ_RANGE
     # Fixed base failure rates (1/s)
@@ -44,7 +49,6 @@ class params:
     SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
     TASK_ARRIVAL_SEED = parameters.TASK_ARRIVAL_SEED
     PPO_MINIBATCH_SEED = parameters.PPO_MINIBATCH_SEED
-    FAILURE_RATE_SCALE = parameters.FAILURE_RATE_SCALE
     RELIABILITY_VIOLATION_WEIGHT = parameters.RELIABILITY_VIOLATION_WEIGHT
 
     # RL observation: three server features per node plus task size,

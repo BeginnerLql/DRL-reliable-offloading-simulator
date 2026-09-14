@@ -58,7 +58,7 @@ class EUAServerLocationTests(unittest.TestCase):
             ten_cloud_positions[["Latitude", "Longitude"]],
         )
 
-    def test_generated_server_info_has_coordinates_and_edge_first_ids(self):
+    def test_generated_server_info_has_fixed_all_edge_nodes(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             topology_path = root / "topology.csv"
@@ -72,7 +72,9 @@ class EUAServerLocationTests(unittest.TestCase):
         self.assertNotIn("Site_ID", server_info.columns)
         self.assertEqual(server_info["Server_ID"].tolist(), list(range(1, 9)))
         self.assertEqual(server_info["Server_ID"].nunique(), 8)
-        self.assertEqual(server_info["Server_Type"].tolist(), ["Edge"] * 6 + ["Cloud"] * 2)
+        self.assertEqual(server_info["Server_Type"].tolist(), ["Edge"] * 8)
+        self.assertEqual(server_info["Processing_Frequency"].tolist(), [10, 11, 12, 14, 15, 17, 18, 20])
+        self.assertTrue((server_info["Base_Failure_Rate"].diff().dropna() < 0).all())
 
         expected_ranks = list(range(3, 9)) + [1, 2]
         for row, rank in zip(server_info.itertuples(index=False), expected_ranks):

@@ -326,15 +326,14 @@ def map_spatial_risk_to_effective_failure_rates(
 
     For each node, this implements
 
-    ``lambda_eff_j = lambda_0_j * exp(beta_p * Z_phy_j - beta_p**2 / 2)``.
+    ``lambda_eff_j = lambda_0_j * exp(beta_p * Z_phy_j)``.
 
-    ``lambda_0_j`` is the base transient fault arrival rate in ``1/s`` and
-    ``Z_phy`` is a latent standardized physical environmental risk field.  For
+    ``lambda_0_j`` is the normal-environment rate in ``1/s`` and ``Z_phy``
+    is a latent standardized physical environmental risk field.  For
     ``beta_p > 0``, larger ``Z_phy_j`` produces a larger effective rate, while
-    smaller values produce a smaller rate.  The ``-beta_p**2 / 2`` term gives
-    ``E[lambda_eff_j] = lambda_0_j`` when ``Z_phy_j ~ N(0, 1)``; it does not
-    preserve the marginal task-failure probability.  In particular, ``Z_phy_j
-    = 0`` does not generally recover ``lambda_0_j`` when ``beta_p > 0``.
+    smaller values produce a smaller rate.  Since ``lambda_0_j`` is defined at
+    normal environment, ``Z_phy_j = 0`` exactly recovers ``lambda_0_j``; no
+    lognormal mean correction is applied.
 
     This is a pure numerical mapping.  It does not read or modify ``Server``,
     task, or simulator state.
@@ -348,10 +347,7 @@ def map_spatial_risk_to_effective_failure_rates(
     beta = _validate_beta_p(beta_p)
 
     with np.errstate(over="ignore", invalid="ignore", under="ignore"):
-        exponent = (
-            np.float64(beta) * risk_field
-            - np.float64(0.5) * np.square(np.float64(beta))
-        )
+        exponent = np.float64(beta) * risk_field
     if not np.isfinite(exponent).all():
         raise ValueError("effective failure rate became non-finite")
 
