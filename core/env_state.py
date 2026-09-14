@@ -308,8 +308,13 @@ class EnvironmentState:
             for backlog_time in backlog_times
         ], dtype=np.float32)
 
+        input_data_size_mb = getattr(task, "input_data_size_mb", None)
+        if input_data_size_mb is None:
+            input_data_size_mb = getattr(task, "task_size")
         normalized_task_size = self.normalize(
-            task.task_size, params.TASK_SIZE_RANGE[0], params.TASK_SIZE_RANGE[1]
+            input_data_size_mb,
+            params.INPUT_DATA_SIZE_RANGE_MB[0],
+            params.INPUT_DATA_SIZE_RANGE_MB[1],
         )
         normalized_computation_demand = self.normalize(
             task.computation_demand, params.Low_demand, params.High_demand

@@ -19,6 +19,20 @@ from config.paths import DATA_DIR
 RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
 
 
+def get_upload_time(input_data_size_mb, uplink_rate_mbps):
+    """Return upload time in seconds for MB over an Mbps uplink."""
+    try:
+        data_size = float(input_data_size_mb)
+        rate = float(uplink_rate_mbps)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("input_data_size_mb and uplink_rate_mbps must be numeric") from exc
+    if not math.isfinite(data_size) or data_size < 0.0:
+        raise ValueError("input_data_size_mb must be finite and non-negative")
+    if not math.isfinite(rate) or rate <= 0.0:
+        raise ValueError("uplink_rate_mbps must be finite and positive")
+    return 8.0 * data_size / rate
+
+
 class Task:
 
     def __init__(self, env, state, id, params_file: str = "task_parameters.xlsx"):
@@ -68,10 +82,17 @@ class Task:
         task_info_df = pd.read_excel(resolved)
         required_columns = {
             "Task_ID",
-            "Task_Size",
             "Computation_Demand",
             "Reliability_Requirement",
         }
+        input_column = "Input_Data_Size_MB"
+        if input_column not in task_info_df.columns:
+            # Read-only compatibility for old temporary fixtures. The formal
+            # generated workbook uses Input_Data_Size_MB exclusively.
+            if "Task_Size" in task_info_df.columns:
+                input_column = "Task_Size"
+            else:
+                required_columns.add(input_column)
         missing_columns = sorted(required_columns.difference(task_info_df.columns))
         if missing_columns:
             raise ValueError(
@@ -84,7 +105,9 @@ class Task:
             raise ValueError(
                 f"task_parameters.xlsx must contain exactly one row for Task_ID {self.id}"
             )
-        self.task_size = task_row["Task_Size"].values[0]
+        self.input_data_size_mb = float(task_row[input_column].values[0])
+        if not math.isfinite(self.input_data_size_mb) or self.input_data_size_mb < 0.0:
+            raise ValueError("Input_Data_Size_MB must be finite and non-negative")
         self.computation_demand = task_row["Computation_Demand"].values[0]
 
         reliability_requirement = float(task_row["Reliability_Requirement"].values[0])
@@ -104,7 +127,16 @@ class Task:
                 + ", ".join(str(value) for value in RELIABILITY_REQUIREMENT_LEVELS)
             )
         self.reliability_requirement = reliability_requirement
-        self.teta = None  
+        self.teta = None
+
+    @property
+    def task_size(self):
+        """Compatibility alias for the persisted input data size."""
+        return self.input_data_size_mb
+
+    @task_size.setter
+    def task_size(self, value):
+        self.input_data_size_mb = float(value)
 
     def initialize_reliability_evaluation(self, primary_node, backup_node):
         """Compute task reliability once for the selected action."""
@@ -191,7 +223,8 @@ class Task:
         # Retry is allowed because the preceding fault is transient and has
         # negligible recovery time in this model.
         if self.backupNode == self.primaryNode: # Retry strategy
-            # no inpDelay
+            # A retry is a new replica and also uploads its input before CPU.
+            yield self.env.timeout(inpDelay)
             backup_service_time = self.primary_service_time # as primary
             self.env_state.register_waiting_replica(
                 self.backupNode.server_id, self, "backup", backup_service_time
@@ -271,18 +304,12 @@ class Task:
             self.resolution_event.succeed(float(self.env.now))
 
     def calc_input_output_delay(self, server_object):
-        if server_object.server_type == "Edge":
-            # Calculate input delay for Edge
-            
-            inpDelay = 0
-        else:
-            # Calculate input delay for Cloud
-            inpDelay = self.task_size / params.rsu_to_cloud_bandwidth
-
-
-        # Output delay is the same as input delay
-        outDelay = inpDelay   
-        return inpDelay, outDelay
+        # All formal nodes are Edge and each replica uploads its input before
+        # requesting CPU. Results are assumed small, so download is zero.
+        return get_upload_time(
+            self.input_data_size_mb,
+            server_object.uplink_rate_mbps,
+        ), 0.0
     
     
     def set_failure_rate(self, server_object):

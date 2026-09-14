@@ -61,6 +61,7 @@ class ServerGeographyTests(unittest.TestCase):
             "Server_Type": ["Edge", "Edge", "Cloud"],
             "Processing_Frequency": [10.0, 11.0, 40.0],
             "Failure_Rate": [0.001, 0.002, 0.0005],
+            "Uplink_Rate": [18.0, 30.0, 22.0],
             "Latitude": [-37.81517, -37.813175, -37.814395],
             "Longitude": [144.97476, 144.952919, 144.963537],
         })

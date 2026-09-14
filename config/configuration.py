@@ -18,7 +18,12 @@ class parameters:
     # Workload: tasks
     # ======================================================================
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
-    TASK_SIZE_RANGE = (10, 100)  # heter
+    # Persisted task input payload, independent of computation demand.
+    INPUT_DATA_SIZE_RANGE_MB = (0.5, 2.0)
+    INPUT_DATA_SIZE_SEED = 2029
+    # Compatibility alias for older state/test code; formal Excel uses the
+    # explicit Input_Data_Size_MB column.
+    TASK_SIZE_RANGE = INPUT_DATA_SIZE_RANGE_MB
     Low_demand, High_demand = 1, 100 # MI (Normal(mean=50, std=16) implied)
     taskno = 200
     

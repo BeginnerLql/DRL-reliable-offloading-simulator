@@ -14,6 +14,7 @@ class Server:
         base_failure_rate,
         latitude,
         longitude,
+        uplink_rate_mbps=20.0,
     ):
         self.env = env
         self.server_type = server_type
@@ -32,6 +33,14 @@ class Server:
         if not math.isfinite(self.base_failure_rate) or self.base_failure_rate < 0.0:
             raise ValueError("base_failure_rate must be a finite non-negative number")
         self.failure_rate = self.base_failure_rate
+        try:
+            self.uplink_rate_mbps = float(uplink_rate_mbps)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("uplink_rate_mbps must be a finite positive number") from exc
+        if not math.isfinite(self.uplink_rate_mbps) or self.uplink_rate_mbps <= 0.0:
+            raise ValueError("uplink_rate_mbps must be a finite positive number")
+        # Short alias used by the task communication helper.
+        self.uplink_rate = self.uplink_rate_mbps
         self.latitude = self._validate_coordinate(latitude, "latitude", -90.0, 90.0)
         self.longitude = self._validate_coordinate(longitude, "longitude", -180.0, 180.0)
 

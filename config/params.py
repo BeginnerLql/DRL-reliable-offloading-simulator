@@ -22,6 +22,8 @@ class params:
     serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  
 
     # Workload: tasks
+    INPUT_DATA_SIZE_RANGE_MB = parameters.INPUT_DATA_SIZE_RANGE_MB
+    INPUT_DATA_SIZE_SEED = parameters.INPUT_DATA_SIZE_SEED
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
     Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
     taskno = parameters.taskno

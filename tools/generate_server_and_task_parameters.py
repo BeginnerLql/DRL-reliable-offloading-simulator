@@ -24,10 +24,12 @@ SERVER_INFO_COLUMNS = [
     "Server_Type",  # compatibility column; every formal node is Edge
     "Processing_Frequency",
     "Base_Failure_Rate",
+    "Uplink_Rate",
     "Latitude",
     "Longitude",
 ]
 FIXED_PROCESSING_FREQUENCIES = tuple(parameters.FIXED_EDGE_PROCESSING_FREQUENCIES)
+FIXED_UPLINK_RATES_MBPS = (18, 30, 22, 36, 16, 28, 40, 24)
 RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
 RELIABILITY_REQUIREMENT_SEED = 2026
 
@@ -242,6 +244,7 @@ def generate_server_info(
             "Edge",
             int(frequency),
             base_failure_rate_from_frequency(frequency),
+            float(FIXED_UPLINK_RATES_MBPS[int(assignment["Server_ID"]) - 1]),
             float(assignment["Latitude"]),
             float(assignment["Longitude"]),
         ])
@@ -253,11 +256,12 @@ def generate_server_info(
 def generate_task_params(filename: str = "task_parameters.xlsx"):
     """
     Generate task parameters Excel:
-      Task_ID, Task_Size, Computation_Demand, Reliability_Requirement
+      Task_ID, Input_Data_Size_MB, Computation_Demand, Reliability_Requirement
     """
     task_info = []
     NUM_TASKS = parameters.taskno
-    TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
+    INPUT_DATA_SIZE_RANGE_MB = parameters.INPUT_DATA_SIZE_RANGE_MB
+    input_data_rng = np.random.default_rng(parameters.INPUT_DATA_SIZE_SEED)
     reliability_requirements = generate_reliability_requirements(NUM_TASKS)
 
     a, b = parameters.Low_demand, parameters.High_demand
@@ -266,8 +270,8 @@ def generate_task_params(filename: str = "task_parameters.xlsx"):
     lower, upper = (a - mu) / sigma, (b - mu) / sigma
 
     for task_id in range(1, NUM_TASKS + 1):
-        # Task_Size (integer)
-        task_size = np.random.randint(TASK_SIZE_RANGE[0], TASK_SIZE_RANGE[1] + 1)
+        # Input payload uses an independent deterministic RNG stream.
+        input_data_size_mb = float(input_data_rng.uniform(*INPUT_DATA_SIZE_RANGE_MB))
 
         # Computation_Demand (float)
         computation_demand = truncnorm.rvs(lower, upper, loc=mu, scale=sigma)
@@ -275,7 +279,7 @@ def generate_task_params(filename: str = "task_parameters.xlsx"):
         task_info.append(
             [
                 task_id,
-                task_size,
+                input_data_size_mb,
                 float(computation_demand),
                 reliability_requirements[task_id - 1],
             ]
@@ -285,7 +289,7 @@ def generate_task_params(filename: str = "task_parameters.xlsx"):
         task_info,
         columns=[
             "Task_ID",
-            "Task_Size",
+            "Input_Data_Size_MB",
             "Computation_Demand",
             "Reliability_Requirement",
         ],

@@ -695,6 +695,7 @@ class MainLoop:
         required_columns = {
             "Server_ID",
             "Processing_Frequency",
+            "Uplink_Rate",
             "Latitude",
             "Longitude",
         }
@@ -719,6 +720,7 @@ class MainLoop:
             server_id = int(row["Server_ID"])
             processing_frequency = float(row["Processing_Frequency"])
             base_failure_rate = float(row[rate_column])
+            uplink_rate_mbps = float(row["Uplink_Rate"])
             latitude = float(row["Latitude"])
             longitude = float(row["Longitude"])
 
@@ -732,6 +734,7 @@ class MainLoop:
                 base_failure_rate,
                 latitude,
                 longitude,
+                uplink_rate_mbps,
             )
             self.env_state.add_server_and_init_environment(server)
 

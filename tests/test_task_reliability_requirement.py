@@ -40,7 +40,7 @@ class TaskReliabilityRequirementTests(unittest.TestCase):
             list(task_df.columns),
             [
                 "Task_ID",
-                "Task_Size",
+                "Input_Data_Size_MB",
                 "Computation_Demand",
                 "Reliability_Requirement",
             ],
@@ -50,7 +50,8 @@ class TaskReliabilityRequirementTests(unittest.TestCase):
             Counter(task_df["Reliability_Requirement"].tolist()),
             Counter({0.9: 50, 0.99: 50, 0.999: 50, 0.9999: 50}),
         )
-        self.assertTrue(np.isfinite(task_df["Task_Size"]).all())
+        self.assertTrue(np.isfinite(task_df["Input_Data_Size_MB"]).all())
+        self.assertTrue(task_df["Input_Data_Size_MB"].between(0.5, 2.0).all())
         self.assertTrue(np.isfinite(task_df["Computation_Demand"]).all())
 
     def test_task_reads_requirement_and_diagnostic_loader_ignores_extra_column(self):
