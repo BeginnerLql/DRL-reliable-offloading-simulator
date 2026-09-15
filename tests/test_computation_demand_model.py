@@ -88,7 +88,7 @@ class ComputationDemandModelTests(unittest.TestCase):
         self.assertAlmostEqual(max(service_times), 50 / 10)
 
     def test_dimensions_remain_unchanged(self):
-        self.assertEqual(params.num_states, 27)
+        self.assertEqual(params.num_states, 35)
         self.assertEqual(params.num_actions, 28)
 
 

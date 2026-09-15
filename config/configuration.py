@@ -37,6 +37,8 @@ class parameters:
     # ======================================================================
     # RSU-to-cloud backhaul bandwidth (Mb/s).
     rsu_to_cloud_bandwidth = 8  # Mb/s
+    # Fixed Edge uplink-rate range used only for RL observation normalization.
+    UPLINK_RATE_RANGE_MBPS = (16.0, 40.0)
 
     # ======================================================================
     # Reliability model parameters for the homogeneous Edge infrastructure.

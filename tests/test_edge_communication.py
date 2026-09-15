@@ -103,7 +103,7 @@ class EdgeCommunicationTests(unittest.TestCase):
         self.assertEqual(first, second)
 
     def test_dimensions_are_unchanged(self):
-        self.assertEqual(params.num_states, 27)
+        self.assertEqual(params.num_states, 35)
         self.assertEqual(params.num_actions, 28)
 
 

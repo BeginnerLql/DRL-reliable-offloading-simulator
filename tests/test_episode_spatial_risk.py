@@ -228,7 +228,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             reliability_requirement=0.9,
         )
         loop = self._build_loop(state)
-        with patch.object(params, "num_states", 12):
+        with patch.object(params, "num_states", 15):
             baseline_state = state.get_state(task)
             with self._enabled_patch(beta=0.5):
                 loop._initialize_episode_spatial_risk()
@@ -346,7 +346,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             reliability_requirement=0.9
         )
         loop = self._build_loop(state)
-        with patch.object(params, "num_states", 12):
+        with patch.object(params, "num_states", 15):
             baseline_state = state.get_state(task)
             with patch.object(params, "SPATIAL_RISK_ENABLED", False):
                 loop._initialize_episode_failure_rates()

@@ -336,8 +336,11 @@ class EnvironmentState:
         failure_rates = []
         frequencies = []
         backlog_times = []
+        uplink_rates = []
 
-        for server_id, server_info in self.servers.items():
+        # Every block uses the same deterministic Server_ID order.
+        for server_id in sorted(self.servers):
+            server_info = self.servers[server_id]
             server_object = server_info['server_object']
             # The policy observes the known normal-environment base hazard,
             # not the episode-specific spatial realization Z or lambda_eff.
@@ -347,6 +350,7 @@ class EnvironmentState:
             backlog_times.append(
                 self.get_server_backlog_time(server_id, task.env.now)
             )
+            uplink_rates.append(server_object.uplink_rate_mbps)
 
         min_failure_rate = params.LAMBDA_REF
         max_failure_rate = params.LAMBDA_REF * 10 ** params.FAILURE_RATE_OMEGA
@@ -362,6 +366,11 @@ class EnvironmentState:
             backlog_time / (backlog_time + params.BACKLOG_TIME_SCALE_SEC)
             for backlog_time in backlog_times
         ], dtype=np.float32)
+        normalized_uplink_rates = self.normalize(
+            np.array(uplink_rates),
+            params.UPLINK_RATE_RANGE_MBPS[0],
+            params.UPLINK_RATE_RANGE_MBPS[1],
+        )
 
         input_data_size_mb = getattr(task, "input_data_size_mb", None)
         if input_data_size_mb is None:
@@ -384,6 +393,7 @@ class EnvironmentState:
             normalized_failure_rates,
             normalized_processing_frequencies,
             normalized_backlog_times,
+            normalized_uplink_rates,
             [
                 normalized_task_size,
                 normalized_computation_demand,

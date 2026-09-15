@@ -26,7 +26,7 @@ class DualReplicaActionSpaceTests(unittest.TestCase):
         loop = self._loop()
         expected = list(combinations(range(1, 9), 2))
 
-        self.assertEqual(params.num_states, 27)
+        self.assertEqual(params.num_states, 35)
         self.assertEqual(params.num_actions, 28)
         self.assertEqual(len(loop.action_pairs), 28)
         self.assertEqual(loop.action_pairs, expected)

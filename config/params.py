@@ -33,6 +33,7 @@ class params:
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
     # Network model
     rsu_to_cloud_bandwidth = parameters.rsu_to_cloud_bandwidth
+    UPLINK_RATE_RANGE_MBPS = parameters.UPLINK_RATE_RANGE_MBPS
 
     # Server capabilities and normal-environment failure-rate model
     FIXED_EDGE_PROCESSING_FREQUENCIES = parameters.FIXED_EDGE_PROCESSING_FREQUENCIES
@@ -55,9 +56,10 @@ class params:
     PPO_MINIBATCH_SEED = parameters.PPO_MINIBATCH_SEED
     RELIABILITY_VIOLATION_WEIGHT = parameters.RELIABILITY_VIOLATION_WEIGHT
 
-    # RL observation: three server features per node plus task size,
+    # RL observation: four server features per node (base failure rate,
+    # processing frequency, CPU backlog, and uplink rate) plus task size,
     # computation demand, and reliability requirement.
-    num_states = 3 * serverNo + 3
+    num_states = 4 * serverNo + 3
     # Unordered pairs of two distinct Edge servers.
     num_actions = serverNo * (serverNo - 1) // 2
     

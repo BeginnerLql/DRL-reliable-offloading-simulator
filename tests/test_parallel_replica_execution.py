@@ -184,7 +184,7 @@ class ParallelReplicaExecutionTests(unittest.TestCase):
             task = Task(simpy.Environment(), EnvironmentState(), 1, params_file=path)
         self.assertFalse(hasattr(task, "z"))
         self.assertEqual(params.num_actions, 28)
-        self.assertEqual(params.num_states, 27)
+        self.assertEqual(params.num_states, 35)
 
 
 if __name__ == "__main__":
