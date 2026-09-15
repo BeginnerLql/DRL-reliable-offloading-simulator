@@ -10,7 +10,13 @@ class EnvironmentState:
     def __init__(self):
         self.servers = {}  # Server objects and CPU backlog metadata.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
-        self.num_completed_tasks = 0  # Number of completed tasks at all servers
+        # Task resolution and replica completion are different lifecycle events.
+        self.num_resolved_tasks = 0
+        self.num_completed_replicas = 0
+        # Compatibility alias: historically this counter was used by callers
+        # as a task counter. It now has task-resolution semantics.
+        self.num_completed_tasks = 0
+        self.replica_completion_log = []
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None
@@ -94,9 +100,54 @@ class EnvironmentState:
         assert backlog_time >= -1e-8
         return backlog_time
 
+    def record_replica_completion(
+        self, server_id, task, replica_label, finish_time, **metadata
+    ):
+        """Record one actual replica completion exactly once.
+
+        This counter is deliberately independent from task-level resolution:
+        a two-replica task contributes two records even though it resolves at
+        the first result.
+        """
+        key = (task.id, str(replica_label))
+        recorded = getattr(task, "_replica_completion_records", None)
+        if recorded is None:
+            recorded = set()
+            task._replica_completion_records = recorded
+        if key in recorded:
+            return False
+        finish_time = float(finish_time)
+        if not np.isfinite(finish_time):
+            raise ValueError("finish_time must be finite")
+        recorded.add(key)
+        entry = {
+            "task_id": task.id,
+            "server_id": int(server_id),
+            "replica_label": str(replica_label),
+            "finish_time": finish_time,
+        }
+        entry.update(metadata)
+        self.replica_completion_log.append(entry)
+        self.num_completed_replicas += 1
+        return True
+
+    def record_task_resolution(self, task):
+        """Record reward bookkeeping for a task exactly once."""
+        if getattr(task, "resolution_bookkeeping_done", False):
+            return False
+        task.resolution_bookkeeping_done = True
+        self.num_resolved_tasks += 1
+        self.num_completed_tasks = self.num_resolved_tasks
+        return True
+
     def complete_task(self, server_id, task, selection, execute_time):
-        """Record a completed replica without changing CPU backlog metadata."""
-        self.num_completed_tasks += 1
+        """Compatibility wrapper for legacy callers.
+
+        Formal replica processes must call :meth:`record_replica_completion`;
+        this legacy name retains task-resolution counter semantics and never
+        increments the replica counter.
+        """
+        return self.record_task_resolution(task)
 
     def get_server_by_id(self, server_id):
         """Get a server object by its ID."""
@@ -247,7 +298,10 @@ class EnvironmentState:
         """Reset the environment state."""
         self.servers = {}
         self.tasks= {}
+        self.num_resolved_tasks = 0
+        self.num_completed_replicas = 0
         self.num_completed_tasks = 0
+        self.replica_completion_log = []
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None

@@ -102,7 +102,8 @@ class PPOOutcomeTimestampTests(unittest.TestCase):
         self.assertEqual(self.assigned_rewards, [(1, 2.0), (2, 2.0), (3, 2.0)])
         self.assertAlmostEqual(self.loop.ppo_last_resolved_outcome_time, 101.2)
         self.assertEqual(self.loop.pendingList, [])
-        self.assertEqual(self.loop.env_state.tasks, {})
+        # First-result bookkeeping retains each task until both replicas finish.
+        self.assertEqual(set(self.loop.env_state.tasks), {1, 2, 3})
 
 
 if __name__ == "__main__":

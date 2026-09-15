@@ -100,7 +100,8 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
         self.assertTrue(task.resolution_event.triggered)
         self.assertIsNone(state.servers[1]["running_replica"])
         self.assertIsNone(state.servers[2]["running_replica"])
-        self.assertEqual(state.num_completed_tasks, 2)
+        self.assertEqual(state.num_completed_replicas, 2)
+        self.assertEqual(state.num_resolved_tasks, 0)
         with self.assertRaisesRegex(ValueError, "distinct Edge servers"):
             task.initialize_reliability_evaluation(server_a, server_a)
 

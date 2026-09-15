@@ -140,7 +140,8 @@ class ParallelReplicaExecutionTests(unittest.TestCase):
         self.assertAlmostEqual(task_b.primaryFinished, 4.4)
         self.assertIsNone(state.servers[2]["running_replica"])
         self.assertEqual(state.servers[2]["waiting_replicas"], [])
-        self.assertEqual(state.num_completed_tasks, 4)
+        self.assertEqual(state.num_completed_replicas, 4)
+        self.assertEqual(state.num_resolved_tasks, 0)
 
     def test_same_server_pair_is_rejected_at_task_execution(self):
         env = simpy.Environment()

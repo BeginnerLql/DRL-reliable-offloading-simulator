@@ -68,6 +68,7 @@ class MainLoop:
         self.log_data = []
         self.task_Assignments_info = []
         self.episode_spatial_risk_log = []
+        self.replica_completion_log = []
 
         # PPO-only arrival-driven SMDP bookkeeping.
         self.ppo_last_decision_state = None
@@ -97,6 +98,7 @@ class MainLoop:
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
             self.env_state.reset()
+            self.replica_completion_log = self.env_state.replica_completion_log
 
             self.setServers()
             self._initialize_episode_failure_rates()
@@ -409,8 +411,19 @@ class MainLoop:
             return 0.0
         return math.log10(ratio)
 
+    def _mark_task_resolution(self, task):
+        """Mark reward bookkeeping complete exactly once for a resolved task."""
+        recorder = getattr(self.env_state, "record_task_resolution", None)
+        if callable(recorder):
+            return recorder(task)
+        # Compatibility for lightweight test registries and legacy callers.
+        if getattr(task, "resolution_bookkeeping_done", False):
+            return False
+        task.resolution_bookkeeping_done = True
+        return True
+
     def _finalize_resolved_task(self, task_counter, reward, delay):
-        """Record common episode metrics and remove one resolved task."""
+        """Record metrics, then defer state cleanup until both replicas finish."""
         task = self.env_state.get_task_by_id(task_counter)
         self.episodic_reward += reward
         self.episodic_delay += delay
@@ -454,8 +467,11 @@ class MainLoop:
                 task.backupNode.server_id,
             )
         )
+        self._mark_task_resolution(task)
         self.pendingList.remove(task_counter)
-        self.env_state.remove_task(task_counter)
+        try_finalize = getattr(task, "try_finalize_lifecycle", None)
+        if callable(try_finalize):
+            try_finalize()
 
     def _get_task_outcome_time(self, task):
         """Return the first actual replica completion timestamp."""
@@ -512,8 +528,10 @@ class MainLoop:
     # REWARD CALCULATION
     # ---------------------------
     def calcReward(self, taskID):
-        """Return final reward and delay for a resolved task."""
+        """Return final reward and delay for a resolved task once only."""
         task = self.env_state.get_task_by_id(taskID)
+        if getattr(task, "resolution_bookkeeping_done", False):
+            return None, None
         primary_started = task.primaryStarted
         finish_times = [
             timestamp for timestamp in (task.primaryFinished, task.backupFinished)
@@ -635,7 +653,10 @@ class MainLoop:
                     task.backupNode.server_id,
                 )
             )
-            self.env_state.remove_task(t)
+            self._mark_task_resolution(task)
+            try_finalize = getattr(task, "try_finalize_lifecycle", None)
+            if callable(try_finalize):
+                try_finalize()
 
     # ---------------------------
     # SERVERS 

@@ -70,10 +70,18 @@ class Task:
         self.reliability_violation = None
         self.reliability_penalty = None
 
-        # Task-level event used by the episode drain. It is triggered once
-        # when either parallel replica first completes; the slower replica is
-        # allowed to continue running independently.
+        # Task-level lifecycle: resolution is the first result; completion is
+        # the point at which both replica processes have actually finished.
+        self.resolved = False
+        self.first_result_time = None
+        self.first_finished_server_id = None
+        self.all_replicas_finished = False
+        self.all_replicas_finish_time = None
+        self.resolution_bookkeeping_done = False
+        self._lifecycle_cleanup_done = False
+        self._replica_completion_records = set()
         self.resolution_event = self.env.event()
+        self.all_replicas_done_event = self.env.event()
 
         # Resolve params_file:
         # - If an absolute path is passed, use it.
@@ -176,6 +184,23 @@ class Task:
         # The task process waits for both replicas so the slower one can finish
         # and release CPU resources, while resolution_event fires at first finish.
         yield self.env.all_of([primary_process, backup_process])
+        finish_times = [
+            timestamp for timestamp in (self.primaryFinished, self.backupFinished)
+            if timestamp is not None
+        ]
+        if len(finish_times) != 2:
+            raise RuntimeError(
+                f"Task {self.id} completed without two replica finish timestamps"
+            )
+        self.all_replicas_finished = True
+        self.all_replicas_finish_time = float(max(finish_times))
+        all_done_event = getattr(self, "all_replicas_done_event", None)
+        if all_done_event is None:
+            all_done_event = self.env.event()
+            self.all_replicas_done_event = all_done_event
+        if not all_done_event.triggered:
+            all_done_event.succeed(self.all_replicas_finish_time)
+        self.try_finalize_lifecycle()
 
     
     def primary(self):
@@ -211,10 +236,13 @@ class Task:
         self.primaryFinished = self.env.now
         
         #print(f"Task {self.id} {'succeeded' if self.primaryStat == 'success' else 'failed'} on primary server {self.primaryNode.server_id}")
-        self.env_state.complete_task(self.primaryNode.server_id, self, 'primary', self.primary_service_time)
+        self.env_state.record_replica_completion(
+            self.primaryNode.server_id, self, "primary", self.primaryFinished,
+            service_time=float(self.primary_service_time),
+        )
         
         self.teta= 1.5 * (self.primary_service_time + inpDelay + outDelay + Q_time)
-        self._signal_resolution_if_ready()
+        self._signal_resolution_if_ready(self.primaryNode.server_id)
 
     def backup(self):
 
@@ -245,19 +273,41 @@ class Task:
         self.backupFinished = self.env.now
         
         #print(f"Task {self.id} {'succeeded' if self.backupStat == 'success' else 'failed'} on backup server {self.backupNode.server_id}")
-        self.env_state.complete_task(self.backupNode.server_id, self, "backup", backup_service_time)
-        self._signal_resolution_if_ready()
+        self.env_state.record_replica_completion(
+            self.backupNode.server_id, self, "backup", self.backupFinished,
+            service_time=float(backup_service_time),
+        )
+        self._signal_resolution_if_ready(self.backupNode.server_id)
 
     def _is_resolved(self):
         """Return whether either parallel replica has produced a result."""
         return self.primaryFinished is not None or self.backupFinished is not None
 
-    def _signal_resolution_if_ready(self):
-        """Signal the task-level resolution event at most once."""
+    def _signal_resolution_if_ready(self, finished_server_id=None):
+        """Signal first-result resolution once and retain its provenance."""
         if self.resolution_event.triggered:
-            return
-        if self._is_resolved():
-            self.resolution_event.succeed(float(self.env.now))
+            return False
+        if not self._is_resolved():
+            return False
+        self.resolved = True
+        self.first_result_time = float(self.env.now)
+        self.first_finished_server_id = finished_server_id
+        self.resolution_event.succeed(self.first_result_time)
+        return True
+
+    def try_finalize_lifecycle(self):
+        """Remove a task only after reward bookkeeping and both replicas finish."""
+        if getattr(self, "_lifecycle_cleanup_done", False):
+            return False
+        if not (
+            getattr(self, "resolution_bookkeeping_done", False)
+            and getattr(self, "all_replicas_finished", False)
+        ):
+            return False
+        self._lifecycle_cleanup_done = True
+        if self.env_state.get_task_by_id(self.id) is not None:
+            self.env_state.remove_task(self.id)
+        return True
 
     def calc_input_output_delay(self, server_object):
         # All formal nodes are Edge and each replica uploads its input before
