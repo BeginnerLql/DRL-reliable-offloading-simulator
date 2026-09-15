@@ -107,6 +107,7 @@ def run_simulation():
         ml.log_data,
         ml.task_Assignments_info,
         ml.episode_spatial_risk_log,
+        ml.replica_completion_log,
     )
 
 

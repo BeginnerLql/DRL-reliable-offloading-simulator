@@ -122,6 +122,7 @@ class EnvironmentState:
         recorded.add(key)
         entry = {
             "task_id": task.id,
+            "action_index": getattr(task, "action_index", None),
             "server_id": int(server_id),
             "replica_label": str(replica_label),
             "finish_time": finish_time,

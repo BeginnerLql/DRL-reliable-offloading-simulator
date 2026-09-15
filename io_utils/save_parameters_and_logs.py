@@ -35,6 +35,16 @@ RELIABILITY_DIAGNOSTIC_COLUMNS = [
     "Parallel_Mode_Rate",
 ]
 
+REPLICA_COMPLETION_COLUMNS = [
+    "Episode",
+    "Task_ID",
+    "Action_Index",
+    "Server_ID",
+    "Replica_Label",
+    "Finish_Time",
+    "Service_Time",
+]
+
 PAIR_DIAGNOSTIC_COLUMNS = [
     "Reliability_Requirement",
     "Primary",
@@ -134,6 +144,7 @@ def save_params_and_logs(
     log_data,
     task_Assignments_info,
     episode_spatial_risk_log=None,
+    replica_completion_log=None,
 ):
     # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
@@ -229,6 +240,76 @@ def save_params_and_logs(
                 + ", ".join(missing_spatial_columns)
             )
         df_spatial_risk = df_spatial_risk[spatial_risk_columns]
+
+    # ---------------------------
+    # ReplicaCompletions dataframe (optional input, fixed output schema)
+    # ---------------------------
+    replica_completion_internal_columns = [
+        "episode",
+        "task_id",
+        "action_index",
+        "server_id",
+        "replica_label",
+        "finish_time",
+        "service_time",
+    ]
+    raw_replica_log = (
+        [] if replica_completion_log is None else list(replica_completion_log)
+    )
+    if not raw_replica_log:
+        df_replica_completions = pd.DataFrame(
+            columns=REPLICA_COMPLETION_COLUMNS
+        )
+    else:
+        df_replica_raw = pd.DataFrame(raw_replica_log)
+        missing_replica_columns = sorted(
+            set(replica_completion_internal_columns).difference(
+                df_replica_raw.columns
+            )
+        )
+        if missing_replica_columns:
+            raise ValueError(
+                "replica_completion_log is missing required fields: "
+                + ", ".join(missing_replica_columns)
+            )
+        df_replica_raw = df_replica_raw[replica_completion_internal_columns]
+        for numeric_column in ("finish_time", "service_time"):
+            numeric_values = pd.to_numeric(
+                df_replica_raw[numeric_column], errors="coerce"
+            )
+            if not np.isfinite(numeric_values.to_numpy(dtype=float)).all():
+                raise ValueError(
+                    f"replica_completion_log {numeric_column} must be finite"
+                )
+            if numeric_column == "finish_time" and (numeric_values < 0.0).any():
+                raise ValueError(
+                    "replica_completion_log finish_time must be non-negative"
+                )
+            if numeric_column == "service_time" and (numeric_values <= 0.0).any():
+                raise ValueError(
+                    "replica_completion_log service_time must be positive"
+                )
+        if (
+            pd.to_numeric(df_replica_raw["finish_time"], errors="coerce")
+            < pd.to_numeric(df_replica_raw["service_time"], errors="coerce")
+        ).any():
+            raise ValueError(
+                "replica_completion_log finish_time must be >= service_time"
+            )
+        df_replica_completions = df_replica_raw.rename(
+            columns={
+                "episode": "Episode",
+                "task_id": "Task_ID",
+                "action_index": "Action_Index",
+                "server_id": "Server_ID",
+                "replica_label": "Replica_Label",
+                "finish_time": "Finish_Time",
+                "service_time": "Service_Time",
+            }
+        )[REPLICA_COMPLETION_COLUMNS].sort_values(
+            ["Episode", "Task_ID", "Finish_Time", "Server_ID"],
+            kind="mergesort",
+        ).reset_index(drop=True)
 
     # ---------------------------
     # TaskAssignments dataframe
@@ -345,6 +426,9 @@ def save_params_and_logs(
         summary_df.to_excel(writer, sheet_name="Summary", index=False)
         reliability_diagnostics_df.to_excel(writer, sheet_name="ReliabilityDiagnostics", index=False)
         pair_diagnostics_df.to_excel(writer, sheet_name="PairDiagnostics", index=False)
+        df_replica_completions.to_excel(
+            writer, sheet_name="ReplicaCompletions", index=False
+        )
         if df_spatial_risk is not None:
             df_spatial_risk.to_excel(writer, sheet_name="SpatialRisk", index=False)
 

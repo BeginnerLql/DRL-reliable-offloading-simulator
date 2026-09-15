@@ -98,12 +98,19 @@ class MainLoop:
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
             self.env_state.reset()
-            self.replica_completion_log = self.env_state.replica_completion_log
 
             self.setServers()
             self._initialize_episode_failure_rates()
             self.env.process(self.Iteration())
             self.env.run()
+
+            # EnvironmentState owns only the current episode's log. Copy each
+            # entry into the experiment-level log exactly once after SimPy has
+            # drained all replica processes.
+            for entry in self.env_state.replica_completion_log:
+                entry_copy = dict(entry)
+                entry_copy["episode"] = self.this_episode
+                self.replica_completion_log.append(entry_copy)
 
 
     def _initialize_episode_failure_rates(self):
