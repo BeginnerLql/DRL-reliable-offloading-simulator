@@ -138,28 +138,41 @@ def compute_distributions(servers_df: pd.DataFrame, tasks_df: pd.DataFrame):
     })
 
     # --- Strategy selection distribution ---
-    # Strategy selection is defined for every task-level decision, including
-    # Z=0 tasks whose backup did not actually start.
-    retry_count = len(
-        episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] == episode_df["Backup"])]
+    # Formal results record one action_index and two distinct server IDs for
+    # every task. All such actions use parallel dual-replica execution; the
+    # legacy Z categories below are retained only for historical result files.
+    has_formal_pair_actions = (
+        "action_index" in episode_df.columns
+        and episode_df["action_index"].notna().any()
     )
-    recovery_block_count = len(
-        episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] != episode_df["Backup"])]
-    )
-    first_result_count = len(episode_df[episode_df["Z"] == 1])
-
-    total = len(episode_df)
-    if total <= 0:
-        retry_pct = recovery_block_pct = first_result_pct = 0
+    if has_formal_pair_actions:
+        strategy_selection_df = pd.DataFrame({
+            "Strategy": ["Parallel Dual Replica"],
+            "Percentage": [100.0 if len(episode_df) else 0.0],
+        })
     else:
-        retry_pct = (retry_count / total) * 100
-        recovery_block_pct = (recovery_block_count / total) * 100
-        first_result_pct = (first_result_count / total) * 100
+        # Historical strategy selection is defined for every task-level
+        # decision, including Z=0 tasks whose backup did not start.
+        retry_count = len(
+            episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] == episode_df["Backup"])]
+        )
+        recovery_block_count = len(
+            episode_df[(episode_df["Z"] == 0) & (episode_df["Primary"] != episode_df["Backup"])]
+        )
+        first_result_count = len(episode_df[episode_df["Z"] == 1])
 
-    strategy_selection_df = pd.DataFrame({
-        "Strategy": ["Retry", "Recovery Block", "First Result"],
-        "Percentage": [retry_pct, recovery_block_pct, first_result_pct]
-    })
+        total = len(episode_df)
+        if total <= 0:
+            retry_pct = recovery_block_pct = first_result_pct = 0
+        else:
+            retry_pct = (retry_count / total) * 100
+            recovery_block_pct = (recovery_block_count / total) * 100
+            first_result_pct = (first_result_count / total) * 100
+
+        strategy_selection_df = pd.DataFrame({
+            "Strategy": ["Retry", "Recovery Block", "First Result"],
+            "Percentage": [retry_pct, recovery_block_pct, first_result_pct]
+        })
 
     return task_distribution_df, strategy_selection_df
 

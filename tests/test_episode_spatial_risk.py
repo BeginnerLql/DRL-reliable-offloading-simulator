@@ -283,7 +283,7 @@ class EpisodeSpatialRiskTests(unittest.TestCase):
             loop._initialize_episode_spatial_risk()
         self.assertEqual(loop.episode_spatial_risk_log, [])
 
-    def test_same_server_retry_uses_same_episode_hazard(self):
+    def test_same_server_lookup_uses_same_episode_hazard(self):
         state = self._build_state(server_ids=(9,))
         loop = self._build_loop(state)
         with self._enabled_patch(beta=0.5):

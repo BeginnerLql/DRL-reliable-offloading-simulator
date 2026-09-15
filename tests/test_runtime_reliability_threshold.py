@@ -49,26 +49,27 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
         task.initialize_reliability_evaluation(primary, backup)
         self.assertFalse(task.reliability_satisfied)
 
-    def test_same_server_retry_uses_p_squared(self):
+    def test_same_server_pair_is_rejected(self):
         task = Task.__new__(Task)
         task.computation_demand = 10.0
         task.reliability_requirement = 0.99
         task.env_state = SimpleNamespace(get_active_failure_rate=lambda server_id: 0.1)
         server = SimpleNamespace(server_id=1, processing_frequency=10.0)
-        task.initialize_reliability_evaluation(server, server)
-        expected_p = 1.0 - math.exp(-0.1)
-        self.assertAlmostEqual(task.joint_failure_probability, expected_p ** 2)
+        with self.assertRaisesRegex(ValueError, "distinct Edge servers"):
+            task.initialize_reliability_evaluation(server, server)
 
     def test_no_runtime_bernoulli_sampling_remains(self):
         source = inspect.getsource(Task.primary) + inspect.getsource(Task.backup)
         self.assertNotIn("random.uniform", source)
         self.assertNotIn("fault_prob", source)
 
-    def test_z0_primary_completion_is_nominal_and_backup_standby(self):
+    def test_parallel_replicas_both_execute_and_same_server_is_rejected(self):
         env = simpy.Environment()
         state = EnvironmentState()
-        server = Server(env, "Edge", 1, 10.0, 0.5, -37.8, 144.9)
-        state.add_server_and_init_environment(server)
+        server_a = Server(env, "Edge", 1, 10.0, 0.5, -37.8, 144.9)
+        server_b = Server(env, "Edge", 2, 20.0, 0.5, -37.81, 144.91)
+        state.add_server_and_init_environment(server_a)
+        state.add_server_and_init_environment(server_b)
         task = Task.__new__(Task)
         task.env = env
         task.env_state = state
@@ -77,49 +78,12 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
         task.computation_demand = 10.0
         task.reliability_requirement = 0.9
         task.primaryNode = task.backupNode = None
-        task.z = None
         task.primaryStarted = task.primaryFinished = task.primaryStat = None
         task.primary_service_time = None
         task.backupStarted = task.backupFinished = task.backupStat = None
         task.resolution_event = env.event()
         task.teta = None
-        task.primary_effective_failure_rate = None
-        task.backup_effective_failure_rate = None
-        task.primary_service_time_for_reliability = None
-        task.backup_service_time_for_reliability = None
-        task.primary_failure_probability = None
-        task.backup_failure_probability = None
-        task.joint_failure_probability = None
-        task.execution_reliability = None
-        task.reliability_satisfied = None
-        task.initialize_reliability_evaluation(server, server)
-        env.process(task.execute_task(server, server, 0))
-        env.run()
-        self.assertEqual(task.primaryStat, "success")
-        self.assertIsNone(task.backupStarted)
-        self.assertTrue(task.resolution_event.triggered)
-
-    def test_z1_runs_both_nominal_replicas(self):
-        env = simpy.Environment()
-        state = EnvironmentState()
-        primary = Server(env, "Edge", 1, 10.0, 0.001, -37.8, 144.9)
-        backup = Server(env, "Edge", 2, 10.0, 0.001, -37.81, 144.91)
-        state.add_server_and_init_environment(primary)
-        state.add_server_and_init_environment(backup)
-        task = Task.__new__(Task)
-        task.env = env
-        task.env_state = state
-        task.id = 1
-        task.task_size = 1.0
-        task.computation_demand = 10.0
-        task.reliability_requirement = 0.9
-        task.primaryNode = task.backupNode = None
-        task.z = None
-        task.primaryStarted = task.primaryFinished = task.primaryStat = None
-        task.primary_service_time = None
-        task.backupStarted = task.backupFinished = task.backupStat = None
-        task.resolution_event = env.event()
-        task.teta = None
+        task.action_index = 0
         for name in (
             "primary_effective_failure_rate", "backup_effective_failure_rate",
             "primary_service_time_for_reliability", "backup_service_time_for_reliability",
@@ -127,13 +91,42 @@ class RuntimeReliabilityThresholdTests(unittest.TestCase):
             "joint_failure_probability", "execution_reliability", "reliability_satisfied",
         ):
             setattr(task, name, None)
-        task.initialize_reliability_evaluation(primary, backup)
-        env.process(task.execute_task(primary, backup, 1))
+        task.initialize_reliability_evaluation(server_a, server_b)
+        env.process(task.execute_task(server_a, server_b))
         env.run()
         self.assertEqual(task.primaryStat, "success")
         self.assertEqual(task.backupStat, "success")
         self.assertEqual(task.primaryStarted, task.backupStarted)
         self.assertTrue(task.resolution_event.triggered)
+        self.assertIsNone(state.servers[1]["running_replica"])
+        self.assertIsNone(state.servers[2]["running_replica"])
+        self.assertEqual(state.num_completed_tasks, 2)
+        with self.assertRaisesRegex(ValueError, "distinct Edge servers"):
+            task.initialize_reliability_evaluation(server_a, server_a)
+
+    def test_pair_reliability_is_symmetric_and_independent_of_upload(self):
+        task, server_a, server_b = self._analytic_task(requirement=0.9, demand=10.0)
+        task.initialize_reliability_evaluation(server_a, server_b)
+        expected_a = 1.0 - math.exp(-0.1 * 1.0)
+        expected_b = 1.0 - math.exp(-0.2 * 0.5)
+        expected = 1.0 - expected_a * expected_b
+        forward = (
+            task.primary_failure_probability,
+            task.backup_failure_probability,
+            task.joint_failure_probability,
+            task.execution_reliability,
+        )
+        task.initialize_reliability_evaluation(server_b, server_a)
+        reverse = (
+            task.primary_failure_probability,
+            task.backup_failure_probability,
+            task.joint_failure_probability,
+            task.execution_reliability,
+        )
+        self.assertAlmostEqual(forward[2], expected_a * expected_b)
+        self.assertAlmostEqual(forward[3], expected)
+        self.assertAlmostEqual(forward[2], reverse[2])
+        self.assertAlmostEqual(forward[3], reverse[3])
 
     def test_base_rate_is_logged_and_used_without_runtime_scale(self):
         env = simpy.Environment()

@@ -58,7 +58,8 @@ class params:
     # RL observation: three server features per node plus task size,
     # computation demand, and reliability requirement.
     num_states = 3 * serverNo + 3
-    num_actions = (serverNo*serverNo)+(serverNo*(serverNo-1))//2 # 92 actions for 8 servers
+    # Unordered pairs of two distinct Edge servers.
+    num_actions = serverNo * (serverNo - 1) // 2
     
     # ----------- DDPG ----------------
     std_dev_ddpg = parameters.std_dev_ddpg

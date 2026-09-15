@@ -20,7 +20,6 @@ class ReliabilityViolationRewardTests(unittest.TestCase):
             primaryStarted=0.0,
             primaryFinished=delay,
             backupFinished=None,
-            z=0,
             reliability_requirement=requirement,
             joint_failure_probability=joint_failure_probability,
             reliability_satisfied=satisfied,
@@ -114,7 +113,7 @@ class ReliabilityViolationRewardTests(unittest.TestCase):
 
     def test_state_action_and_default_weight_are_unchanged_or_configured(self):
         self.assertEqual(params.num_states, 3 * params.serverNo + 3)
-        self.assertEqual(params.num_actions, 92)
+        self.assertEqual(params.num_actions, 28)
         self.assertEqual(params.RELIABILITY_VIOLATION_WEIGHT, 10.0)
 
 

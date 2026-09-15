@@ -1,7 +1,7 @@
 # mainLoop.py  (multi-model: DDPG / DQN / PPO)
 # - MainLoop signature simplified: no external buffer
-# - DDPG uses model.policy() -> continuous scores -> argmax -> (X,Y,Z), and trains via model.buffer
-# - DQN/PPO use model.select_action(state, epsilon) -> discrete action index -> (X,Y,Z)
+# - DDPG uses model.policy() -> continuous scores -> argmax -> pair, and trains via model.buffer
+# - DQN/PPO use model.select_action(state, epsilon) -> discrete action index -> pair
 # - PPO trains once at end of episode; DQN trains online
 
 from core.server import Server
@@ -9,6 +9,9 @@ from core.task import Task
 from core.env_state import EnvironmentState
 from config.params import params
 from config.paths import DATA_DIR
+from itertools import combinations
+import operator
+
 from core.spatial_risk import (
     build_distance_matrix,
     build_spatial_correlation_matrix,
@@ -41,8 +44,13 @@ class MainLoop:
         self.this_episode = 0
 
         self.G_state = []
-        self.G_action = None  # DDPG: list of floats | DQN/PPO: int action index
-        self.index_of_actions = self.generate_combinations()
+        self.G_action = None  # DDPG: score vector | DQN/PPO: pair action index
+        self.action_pairs = self.generate_combinations()
+        self.index_of_actions = self.action_pairs
+        if num_actions != len(self.action_pairs):
+            raise ValueError(
+                f"num_actions must equal the {len(self.action_pairs)} available server pairs"
+            )
 
         self.episodic_reward = 0
         self.episodic_delay = 0
@@ -252,23 +260,27 @@ class MainLoop:
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
                 self.add_train()
 
-            # -------- action selection --------
+            # -------- pair action selection --------
             if self.model_name == "ddpg":
-                # DDPG outputs continuous scores over actions.
+                # DDPG outputs continuous scores over the shared pair actions.
                 action_scores = self.model.policy(self.G_state)
                 self.G_action = action_scores.numpy().tolist()
                 self.G_action = self.model.addNoise(
                     self.G_action, self.this_episode, self.total_episodes
                 )
-                X, Y, Z = self.extract_parameters_from_action(self.G_action)
+                action_index = self.action_index_from_scores(self.G_action)
             else:
-                # DQN/PPO output a discrete action index.
+                # DQN/PPO output a discrete action index over the same pairs.
                 eps = self.get_epsilon(self.this_episode)
-                action_index = self.model.select_action(self.G_state, eps)
-                self.G_action = int(action_index)
-                X, Y, Z = self.extract_parameters_from_index(self.G_action)
+                action_index = self._validate_action_index(
+                    self.model.select_action(self.G_state, eps)
+                )
+                self.G_action = action_index
 
-            # Reliability is evaluated once from the selected action and the
+            X, Y = self.extract_parameters_from_index(action_index)
+            task.action_index = action_index
+
+            # Reliability is evaluated once from the selected pair and the
             # episode-effective hazards, before any replica process starts.
             task.initialize_reliability_evaluation(X, Y)
 
@@ -281,7 +293,7 @@ class MainLoop:
                 # Store the legacy task-centric transition for DQN/DDPG.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
-            self.env.process(task.execute_task(X, Y, Z))
+            self.env.process(task.execute_task(X, Y))
             self.pendingList.append(self.taskCounter)
             self.taskCounter += 1
 
@@ -418,7 +430,7 @@ class MainLoop:
                 task.backupStarted,
                 task.backupFinished,
                 task.backupStat,
-                task.z,
+                None,
                 getattr(task, "reliability_requirement", None),
                 getattr(task, "primary_effective_failure_rate", None),
                 getattr(task, "backup_effective_failure_rate", None),
@@ -437,80 +449,21 @@ class MainLoop:
                 getattr(task, "base_reward", None),
                 getattr(task, "reliability_violation", None),
                 getattr(task, "reliability_penalty", None),
+                getattr(task, "action_index", None),
+                task.primaryNode.server_id,
+                task.backupNode.server_id,
             )
         )
         self.pendingList.remove(task_counter)
         self.env_state.remove_task(task_counter)
 
     def _get_task_outcome_time(self, task):
-        """Return the timestamp when ``task`` became finally resolved."""
-        primary_stat = task.primaryStat
-        backup_stat = task.backupStat
-        primary_finished = task.primaryFinished
-        backup_finished = task.backupFinished
-
-        if task.z == 0:
-            if (
-                primary_stat == "success"
-                and backup_stat is None
-                and primary_finished is not None
-            ):
-                return float(primary_finished)
-            if (
-                primary_stat == "failure"
-                and backup_stat == "success"
-                and backup_finished is not None
-            ):
-                return float(backup_finished)
-            if (
-                primary_stat == "failure"
-                and backup_stat == "failure"
-                and backup_finished is not None
-            ):
-                return float(backup_finished)
-            return None
-
-        # Parallel first-result mode: one successful replica resolves the
-        # task immediately, while two failures require both timestamps.
-        if (
-            primary_stat == "success"
-            and backup_stat == "success"
-            and primary_finished is not None
-            and backup_finished is not None
-        ):
-            return float(min(primary_finished, backup_finished))
-        if (
-            primary_stat == "success"
-            and backup_stat == "failure"
-            and primary_finished is not None
-        ):
-            return float(primary_finished)
-        if (
-            primary_stat == "failure"
-            and backup_stat == "success"
-            and backup_finished is not None
-        ):
-            return float(backup_finished)
-        if (
-            primary_stat == "failure"
-            and backup_stat == "failure"
-            and primary_finished is not None
-            and backup_finished is not None
-        ):
-            return float(max(primary_finished, backup_finished))
-        if (
-            primary_stat == "success"
-            and backup_stat is None
-            and primary_finished is not None
-        ):
-            return float(primary_finished)
-        if (
-            primary_stat is None
-            and backup_stat == "success"
-            and backup_finished is not None
-        ):
-            return float(backup_finished)
-        return None
+        """Return the first actual replica completion timestamp."""
+        finish_times = [
+            timestamp for timestamp in (task.primaryFinished, task.backupFinished)
+            if timestamp is not None
+        ]
+        return float(min(finish_times)) if finish_times else None
 
     def _get_ppo_terminal_time(self):
         """Use the latest actual outcome timestamp for PPO terminal timing."""
@@ -566,14 +519,9 @@ class MainLoop:
             timestamp for timestamp in (task.primaryFinished, task.backupFinished)
             if timestamp is not None
         ]
-        if task.z == 0:
-            if task.primaryFinished is None or primary_started is None:
-                return None, None
-            delay = task.primaryFinished - primary_started
-        else:
-            if not finish_times or primary_started is None:
-                return None, None
-            delay = min(finish_times) - primary_started
+        if not finish_times or primary_started is None:
+            return None, None
+        delay = min(finish_times) - primary_started
 
         if task.reliability_satisfied is None:
             return None, None
@@ -663,7 +611,7 @@ class MainLoop:
                     task.backupStarted,
                     task.backupFinished,
                     task.backupStat,
-                    task.z,
+                    None,
                     getattr(task, "reliability_requirement", None),
                     getattr(task, "primary_effective_failure_rate", None),
                     getattr(task, "backup_effective_failure_rate", None),
@@ -682,6 +630,9 @@ class MainLoop:
                     getattr(task, "base_reward", None),
                     getattr(task, "reliability_violation", None),
                     getattr(task, "reliability_penalty", None),
+                    getattr(task, "action_index", None),
+                    task.primaryNode.server_id,
+                    task.backupNode.server_id,
                 )
             )
             self.env_state.remove_task(t)
@@ -741,35 +692,49 @@ class MainLoop:
     # ---------------------------
     # ACTION DECODING
     # ---------------------------
+    def _validate_action_index(self, action_index):
+        if isinstance(action_index, (bool, np.bool_)):
+            raise ValueError("action_index must be an integer")
+        try:
+            index = operator.index(action_index)
+        except TypeError as exc:
+            raise ValueError("action_index must be an integer") from exc
+        if not 0 <= index < len(self.action_pairs):
+            raise IndexError(
+                f"action_index {action_index} is out of range [0, {len(self.action_pairs) - 1}]"
+            )
+        return index
+
+    def action_index_from_scores(self, action_scores):
+        """Return the argmax index from a DDPG score vector."""
+        scores = np.asarray(action_scores, dtype=float).reshape(-1)
+        if scores.size != len(self.action_pairs):
+            raise ValueError(
+                f"action score vector must have length {len(self.action_pairs)}"
+            )
+        if not np.isfinite(scores).all():
+            raise ValueError("action score vector must contain finite values")
+        return int(np.argmax(scores))
+
     def extract_parameters_from_index(self, action_index: int):
-        primary_server_id, backup_server_id, z_parameter = self.index_of_actions[int(action_index)]
-        primary_server = self.env_state.get_server_by_id(primary_server_id)
-        backup_server = self.env_state.get_server_by_id(backup_server_id)
-        return primary_server, backup_server, z_parameter
+        index = self._validate_action_index(action_index)
+        server_j_id, server_k_id = self.action_pairs[index]
+        server_j = self.env_state.get_server_by_id(server_j_id)
+        server_k = self.env_state.get_server_by_id(server_k_id)
+        if server_j is None or server_k is None:
+            raise RuntimeError(f"Action {index} references an unknown server pair")
+        return server_j, server_k
 
     def extract_parameters_from_action(self, action_scores_list):
-        # DDPG: choose argmax index from continuous scores
-        if not action_scores_list:
-            raise ValueError("Action scores list is empty")
-        max_index = int(action_scores_list.index(max(action_scores_list)))
-        return self.extract_parameters_from_index(max_index)
+        """Decode a DDPG score vector into its selected distinct pair."""
+        return self.extract_parameters_from_index(
+            self.action_index_from_scores(action_scores_list)
+        )
 
     # ---------------------------
-    # ACTION INDEX LIST 
+    # ACTION INDEX LIST
     # ---------------------------
     @staticmethod
     def generate_combinations():
-        numberOfServers = params.serverNo
-        index_of_actions = []
-
-        # z=0: ordered pairs (including i==j)
-        for i in range(1, numberOfServers + 1):
-            for j in range(1, numberOfServers + 1):
-                index_of_actions.append((i, j, 0))
-
-        # z=1: unique pairs (i<j)
-        for i in range(1, numberOfServers + 1):
-            for j in range(i + 1, numberOfServers + 1):
-                index_of_actions.append((i, j, 1))
-
-        return index_of_actions
+        """Return deterministic unordered pairs of distinct server IDs."""
+        return list(combinations(range(1, params.serverNo + 1), 2))

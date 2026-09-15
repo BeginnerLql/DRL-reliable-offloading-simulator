@@ -41,9 +41,11 @@ class Task:
         self.id = id
         
         # Other attributes
+        # Compatibility names: primaryNode/backupNode represent symmetric
+        # replica A/replica B in the formal pair-action model.
         self.primaryNode = None
         self.backupNode = None
-        self.z = None
+        self.action_index = None
 
         self.primaryStarted = None
         self.primaryFinished = None
@@ -68,9 +70,9 @@ class Task:
         self.reliability_violation = None
         self.reliability_penalty = None
 
-        # Task-level event used by the episode drain. This is triggered once
-        # when the current primary/backup semantics produce a final outcome;
-        # it is not a replica CPU-completion event.
+        # Task-level event used by the episode drain. It is triggered once
+        # when either parallel replica first completes; the slower replica is
+        # allowed to continue running independently.
         self.resolution_event = self.env.event()
 
         # Resolve params_file:
@@ -139,7 +141,9 @@ class Task:
         self.input_data_size_mb = float(value)
 
     def initialize_reliability_evaluation(self, primary_node, backup_node):
-        """Compute task reliability once for the selected action."""
+        """Compute pair reliability once for two distinct selected nodes."""
+        if primary_node.server_id == backup_node.server_id:
+            raise ValueError("dual replicas must use distinct Edge servers")
         self.primaryNode = primary_node
         self.backupNode = backup_node
         primary_rate = float(self.set_failure_rate(primary_node))
@@ -155,26 +159,23 @@ class Task:
         self.backup_service_time_for_reliability = backup_service_time
         self.primary_failure_probability = -math.expm1(-primary_rate * primary_service_time)
         self.backup_failure_probability = -math.expm1(-backup_rate * backup_service_time)
-        # Same-server retry uses the same hazard with conditionally independent
-        # transient retry outcomes, so the joint term is p_j * p_k (p^2 for retry).
+        # The selected pair uses the existing conditional product model.
         self.joint_failure_probability = self.primary_failure_probability * self.backup_failure_probability
         self.execution_reliability = 1.0 - self.joint_failure_probability
         self.reliability_satisfied = self.execution_reliability >= self.reliability_requirement
 
-    def execute_task(self, X, Y, Z):
-
-        self.primaryNode=X
-        self.backupNode=Y
-        self.z = Z
-        if self.z == 0:
-            # Sequential mode retains its action semantics, but reliability is
-            # assessed analytically and the primary completion resolves it.
-            self.primaryStarted = self.env.now
-            yield self.env.process(self.primary())
-        else: ## z==1
-            self.primaryStarted = self.backupStarted = self.env.now
-            self.env.process(self.primary())
-            self.env.process(self.backup())
+    def execute_task(self, X, Y):
+        """Run two distinct replicas in parallel and wait for both processes."""
+        if X.server_id == Y.server_id:
+            raise ValueError("dual replicas must use distinct Edge servers")
+        self.primaryNode = X
+        self.backupNode = Y
+        self.primaryStarted = self.backupStarted = self.env.now
+        primary_process = self.env.process(self.primary())
+        backup_process = self.env.process(self.backup())
+        # The task process waits for both replicas so the slower one can finish
+        # and release CPU resources, while resolution_event fires at first finish.
+        yield self.env.all_of([primary_process, backup_process])
 
     
     def primary(self):
@@ -217,48 +218,25 @@ class Task:
 
     def backup(self):
 
-        inpDelay , outDelay = self.calc_input_output_delay(self.backupNode)
-
-        # Use PriorityRequest if backupNode is the same as primaryNode.
-        # Retry is allowed because the preceding fault is transient and has
-        # negligible recovery time in this model.
-        if self.backupNode == self.primaryNode: # Retry strategy
-            # A retry is a new replica and also uploads its input before CPU.
-            yield self.env.timeout(inpDelay)
-            backup_service_time = self.primary_service_time # as primary
-            self.env_state.register_waiting_replica(
-                self.backupNode.server_id, self, "backup", backup_service_time
+        inpDelay, outDelay = self.calc_input_output_delay(self.backupNode)
+        # Replica B is symmetric with replica A: upload first, then request
+        # its own CPU queue with the same priority.
+        yield self.env.timeout(inpDelay)
+        backup_service_time = self.computation_demand / self.backupNode.processing_frequency
+        self.env_state.register_waiting_replica(
+            self.backupNode.server_id, self, "backup", backup_service_time
+        )
+        with self.backupNode.queue.request(priority=1) as req:
+            yield req
+            self.env_state.start_replica_execution(
+                self.backupNode.server_id, self, "backup",
+                backup_service_time, self.env.now
             )
-            with self.backupNode.queue.request(priority=0) as req: # high priority
-                yield req
-                self.env_state.start_replica_execution(
-                    self.backupNode.server_id, self, "backup",
-                    backup_service_time, self.env.now
-                )
-                yield self.env.timeout(backup_service_time)
-                self.env_state.complete_replica_execution(
-                    self.backupNode.server_id, self, "backup"
-                )
-
-        else: # recovery block or first result strategy
-            yield self.env.timeout(inpDelay)
-            backup_service_time = self.computation_demand / self.backupNode.processing_frequency # may differ from primary according to frequency of backup server
-            self.env_state.register_waiting_replica(
-                self.backupNode.server_id, self, "backup", backup_service_time
+            yield self.env.timeout(backup_service_time)
+            self.env_state.complete_replica_execution(
+                self.backupNode.server_id, self, "backup"
             )
-            with self.backupNode.queue.request(priority=1) as req:
-                yield req
-                self.env_state.start_replica_execution(
-                    self.backupNode.server_id, self, "backup",
-                    backup_service_time, self.env.now
-                )
-                yield self.env.timeout(backup_service_time)
-                self.env_state.complete_replica_execution(
-                    self.backupNode.server_id, self, "backup"
-                )
 
-            
-        
         # Replica completion is nominal; task-level threshold is stored in
         # reliability_satisfied and applied by MainLoop reward bookkeeping.
         yield self.env.timeout(outDelay)
@@ -271,30 +249,8 @@ class Task:
         self._signal_resolution_if_ready()
 
     def _is_resolved(self):
-        """Return whether the selected execution semantics have a result.
-
-        Runtime replicas are nominally successful; the legacy failure cases are
-        retained only so old synthetic event tests remain interpretable.
-        """
-        if self.z == 0:
-            return (
-                (self.primaryStat == "success" and self.primaryFinished is not None)
-                or (
-                    self.primaryStat == "failure"
-                    and self.backupStat in {"success", "failure"}
-                    and self.backupFinished is not None
-                )
-            )
-        return (
-            (self.primaryStat == "success" and self.primaryFinished is not None)
-            or (self.backupStat == "success" and self.backupFinished is not None)
-            or (
-                self.primaryStat == "failure"
-                and self.backupStat == "failure"
-                and self.primaryFinished is not None
-                and self.backupFinished is not None
-            )
-        )
+        """Return whether either parallel replica has produced a result."""
+        return self.primaryFinished is not None or self.backupFinished is not None
 
     def _signal_resolution_if_ready(self):
         """Signal the task-level resolution event at most once."""

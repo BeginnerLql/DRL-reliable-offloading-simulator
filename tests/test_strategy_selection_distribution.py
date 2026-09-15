@@ -61,6 +61,24 @@ class StrategySelectionDistributionTests(unittest.TestCase):
         self.assertAlmostEqual(percentages["First Result"], 40.0)
         self.assertAlmostEqual(sum(percentages.values()), 100.0)
 
+    def test_formal_pair_results_use_single_parallel_strategy(self):
+        tasks_df = pd.DataFrame([
+            {
+                "task_id": task_id,
+                "episode": 1,
+                "Primary": 1,
+                "Backup": 2,
+                "Z": None,
+                "action_index": task_id,
+                "Backup_Start": 0.4,
+            }
+            for task_id in range(28)
+        ])
+        _, strategy_df = compute_distributions(self._servers_df(), tasks_df)
+        self.assertEqual(strategy_df.to_dict("records"), [
+            {"Strategy": "Parallel Dual Replica", "Percentage": 100.0}
+        ])
+
     def test_z0_primary_success_without_backup_start_is_counted(self):
         tasks_df = pd.DataFrame([
             {

@@ -8,12 +8,11 @@ from core.main_loop import MainLoop
 from core.task import Task
 
 
-def _task_with_event(env, z, primary_stat=None, backup_stat=None,
+def _task_with_event(env, primary_stat=None, backup_stat=None,
                      primary_finished=None, backup_finished=None):
     task = Task.__new__(Task)
     task.env = env
     task.resolution_event = env.event()
-    task.z = z
     task.primaryStat = primary_stat
     task.backupStat = backup_stat
     task.primaryFinished = primary_finished
@@ -22,30 +21,26 @@ def _task_with_event(env, z, primary_stat=None, backup_stat=None,
 
 
 class TaskResolutionEventTests(unittest.TestCase):
-    def test_resolution_conditions(self):
+    def test_resolution_fires_when_either_replica_finishes(self):
         cases = [
-            (0, "success", None, 3.0, None, True),
-            (0, "failure", None, 3.0, None, False),
-            (0, "failure", "success", 3.0, 7.0, True),
-            (0, "failure", "failure", 3.0, 8.0, True),
-            (1, "success", None, 5.0, None, True),
-            (1, None, "success", None, 6.0, True),
-            (1, "failure", None, 4.0, None, False),
-            (1, "failure", "failure", 4.0, 7.0, True),
+            (3.0, None, True),
+            (None, 6.0, True),
+            (3.0, 6.0, True),
+            (None, None, False),
         ]
-        for z, primary_stat, backup_stat, primary_finished, backup_finished, expected in cases:
-            with self.subTest(z=z, primary=primary_stat, backup=backup_stat):
+        for primary_finished, backup_finished, expected in cases:
+            with self.subTest(primary=primary_finished, backup=backup_finished):
                 env = simpy.Environment()
                 task = _task_with_event(
-                    env, z, primary_stat, backup_stat,
-                    primary_finished, backup_finished,
+                    env, primary_finished=primary_finished,
+                    backup_finished=backup_finished,
                 )
                 task._signal_resolution_if_ready()
                 self.assertEqual(task.resolution_event.triggered, expected)
 
     def test_resolution_event_is_one_shot_and_carries_timestamp(self):
         env = simpy.Environment()
-        task = _task_with_event(env, 1, "success", None, 5.0, None)
+        task = _task_with_event(env, "success", None, 5.0, None)
         env._now = 5.0
 
         task._signal_resolution_if_ready()
@@ -57,8 +52,8 @@ class TaskResolutionEventTests(unittest.TestCase):
 
     def test_drain_waits_for_resolution_events(self):
         env = simpy.Environment()
-        task_a = _task_with_event(env, 0)
-        task_b = _task_with_event(env, 0)
+        task_a = _task_with_event(env)
+        task_b = _task_with_event(env)
         tasks = {1: task_a, 2: task_b}
 
         class Registry:

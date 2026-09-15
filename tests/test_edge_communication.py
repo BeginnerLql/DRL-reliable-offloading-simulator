@@ -50,12 +50,14 @@ class EdgeCommunicationTests(unittest.TestCase):
     def test_upload_completes_before_cpu_and_does_not_extend_cpu_service(self):
         env = simpy.Environment()
         state = EnvironmentState()
-        server = Server(env, "Edge", 1, 10.0, 0.001, -37.8, 144.9, 20.0)
-        state.add_server_and_init_environment(server)
+        server_a = Server(env, "Edge", 1, 10.0, 0.001, -37.8, 144.9, 20.0)
+        server_b = Server(env, "Edge", 2, 10.0, 0.001, -37.81, 144.91, 20.0)
+        state.add_server_and_init_environment(server_a)
+        state.add_server_and_init_environment(server_b)
         events = []
-        state.register_waiting_replica = lambda *args: events.append(("queued", env.now))
-        state.start_replica_execution = lambda *args: events.append(("cpu_start", env.now))
-        state.complete_replica_execution = lambda *args: events.append(("cpu_end", env.now))
+        state.register_waiting_replica = lambda sid, *args: events.append(("queued", sid, env.now))
+        state.start_replica_execution = lambda sid, *args: events.append(("cpu_start", sid, env.now))
+        state.complete_replica_execution = lambda sid, *args: events.append(("cpu_end", sid, env.now))
         state.complete_task = lambda *args: None
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "task_parameters.xlsx"
@@ -66,39 +68,43 @@ class EdgeCommunicationTests(unittest.TestCase):
                 "Reliability_Requirement": [0.9],
             }).to_excel(path, index=False)
             task = Task(env, state, 1, params_file=path)
-            task.initialize_reliability_evaluation(server, server)
-            env.process(task.execute_task(server, server, 0))
+            task.initialize_reliability_evaluation(server_a, server_b)
+            env.process(task.execute_task(server_a, server_b))
             env.run()
 
-        self.assertAlmostEqual(events[0][1], 0.4)
-        self.assertAlmostEqual(events[1][1], 0.4)
-        self.assertAlmostEqual(events[2][1], 1.4)
+        self.assertEqual(sorted(round(row[2], 6) for row in events if row[0] == "queued"), [0.4, 0.4])
+        self.assertEqual(sorted(round(row[2], 6) for row in events if row[0] == "cpu_start"), [0.4, 0.4])
+        self.assertEqual(sorted(round(row[2], 6) for row in events if row[0] == "cpu_end"), [1.4, 1.4])
         self.assertAlmostEqual(task.primaryFinished, 1.4)
+        self.assertAlmostEqual(task.backupFinished, 1.4)
         self.assertAlmostEqual(task.primary_service_time, 1.0)
         self.assertAlmostEqual(task.primary_service_time_for_reliability, 1.0)
 
     def test_reliability_exposure_does_not_use_input_size_or_uplink(self):
         env = simpy.Environment()
         state = EnvironmentState()
-        server = Server(env, "Edge", 1, 10.0, 0.1, -37.8, 144.9, 16.0)
-        state.add_server_and_init_environment(server)
+        server_a = Server(env, "Edge", 1, 10.0, 0.1, -37.8, 144.9, 16.0)
+        server_b = Server(env, "Edge", 2, 10.0, 0.2, -37.81, 144.91, 16.0)
+        state.add_server_and_init_environment(server_a)
+        state.add_server_and_init_environment(server_b)
         task = Task.__new__(Task)
         task.env = env
         task.env_state = state
         task.computation_demand = 10.0
         task.reliability_requirement = 0.9
         task.input_data_size_mb = 0.5
-        task.initialize_reliability_evaluation(server, server)
+        task.initialize_reliability_evaluation(server_a, server_b)
         first = (task.primary_failure_probability, task.execution_reliability)
         task.input_data_size_mb = 2.0
-        server.uplink_rate_mbps = 40.0
-        task.initialize_reliability_evaluation(server, server)
+        server_a.uplink_rate_mbps = 40.0
+        server_b.uplink_rate_mbps = 40.0
+        task.initialize_reliability_evaluation(server_a, server_b)
         second = (task.primary_failure_probability, task.execution_reliability)
         self.assertEqual(first, second)
 
     def test_dimensions_are_unchanged(self):
         self.assertEqual(params.num_states, 27)
-        self.assertEqual(params.num_actions, 92)
+        self.assertEqual(params.num_actions, 28)
 
 
 if __name__ == "__main__":

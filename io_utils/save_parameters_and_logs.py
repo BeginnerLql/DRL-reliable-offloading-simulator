@@ -68,7 +68,10 @@ def build_reliability_diagnostics(task_assignments_df):
         excess = pd.to_numeric(group["Reliability_Excess"], errors="coerce")
         shortfall = pd.to_numeric(group["Reliability_Shortfall"], errors="coerce")
         joint_failure = pd.to_numeric(group["Joint_Failure_Probability"], errors="coerce")
-        parallel_mask = pd.to_numeric(group["Z"], errors="coerce").eq(1)
+        if "action_index" in group.columns and group["action_index"].notna().any():
+            parallel_mask = group["action_index"].notna()
+        else:
+            parallel_mask = pd.to_numeric(group["Z"], errors="coerce").eq(1)
         rows.append({
             "Reliability_Requirement": requirement,
             "Task_Count": task_count,
@@ -260,14 +263,29 @@ def save_params_and_logs(
         "Base_Reward",
         "Reliability_Violation_Log10",
         "Reliability_Penalty",
+        "action_index",
+        "server_j",
+        "server_k",
     ]
     reward_diagnostic_columns = [
         "Base_Reward",
         "Reliability_Violation_Log10",
         "Reliability_Penalty",
     ]
+    normalized_assignment_rows = []
+    for assignment in task_Assignments_info:
+        row = list(assignment)
+        if len(row) == 29:
+            # Compatibility with historical callers that predate action metadata.
+            row.extend([None, None, None])
+        if len(row) != len(task_assignment_columns):
+            raise ValueError(
+                "TaskAssignments rows must contain either 29 legacy fields or "
+                f"{len(task_assignment_columns)} fields"
+            )
+        normalized_assignment_rows.append(row)
     df_task_Assignments = pd.DataFrame(
-        task_Assignments_info,
+        normalized_assignment_rows,
         columns=task_assignment_columns,
     )
 
@@ -282,7 +300,10 @@ def save_params_and_logs(
         df_task_Assignments["Final_status"] = []
     # Preserve the existing 27-column prefix and append new diagnostics at the end.
     df_task_Assignments = df_task_Assignments[
-        task_assignment_columns[:26] + ["Final_status"] + reward_diagnostic_columns
+        task_assignment_columns[:26]
+        + ["Final_status"]
+        + reward_diagnostic_columns
+        + ["action_index", "server_j", "server_k"]
     ]
 
     reliability_diagnostics_df = build_reliability_diagnostics(df_task_Assignments)

@@ -90,7 +90,7 @@ class ReliabilityRequirementStateTests(unittest.TestCase):
         )
         self.assertEqual(agent.policy_net.hidden_layers[0].in_features, 27)
         self.assertEqual(agent.value_net.hidden_layers[0].in_features, 27)
-        self.assertEqual(params.num_actions, 92)
+        self.assertEqual(params.num_actions, 28)
 
 
 if __name__ == "__main__":

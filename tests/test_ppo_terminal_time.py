@@ -16,11 +16,10 @@ class _TaskRegistry:
         self.tasks.pop(task_id, None)
 
 
-def _task(task_id, z, primary_stat, backup_stat, primary_finished, backup_finished):
+def _task(task_id, primary_stat, backup_stat, primary_finished, backup_finished):
     node = SimpleNamespace(server_id=1)
     return SimpleNamespace(
         id=task_id,
-        z=z,
         primaryStat=primary_stat,
         backupStat=backup_stat,
         primaryFinished=primary_finished,
@@ -48,28 +47,28 @@ class PPOOutcomeTimestampTests(unittest.TestCase):
     def test_parallel_outcome_timestamps(self):
         cases = [
             ("success", "success", 5.0, 8.0, 5.0),
-            ("failure", "success", 4.0, 6.0, 6.0),
-            ("failure", "failure", 4.0, 7.0, 7.0),
+            ("failure", "success", 4.0, 6.0, 4.0),
+            ("failure", "failure", 4.0, 7.0, 4.0),
             ("success", "failure", 5.0, 8.0, 5.0),
             ("success", None, 5.0, None, 5.0),
             (None, "success", None, 8.0, 8.0),
         ]
         for primary_stat, backup_stat, primary_finished, backup_finished, expected in cases:
             task = _task(
-                1, 1, primary_stat, backup_stat,
+                1, primary_stat, backup_stat,
                 primary_finished, backup_finished,
             )
             self.assertEqual(self.loop._get_task_outcome_time(task), expected)
 
-    def test_sequential_outcome_timestamps(self):
+    def test_pair_resolution_uses_first_completion_regardless_of_replica_label(self):
         cases = [
             ("success", None, 3.0, None, 3.0),
-            ("failure", "success", 3.0, 7.0, 7.0),
-            ("failure", "failure", 3.0, 8.0, 8.0),
+            ("failure", "success", 3.0, 7.0, 3.0),
+            ("failure", "failure", 3.0, 8.0, 3.0),
         ]
         for primary_stat, backup_stat, primary_finished, backup_finished, expected in cases:
             task = _task(
-                1, 0, primary_stat, backup_stat,
+                1, primary_stat, backup_stat,
                 primary_finished, backup_finished,
             )
             self.assertEqual(self.loop._get_task_outcome_time(task), expected)
@@ -89,9 +88,9 @@ class PPOOutcomeTimestampTests(unittest.TestCase):
 
     def test_resolved_outcomes_conserve_interval_reward_and_latest_time(self):
         tasks = [
-            _task(1, 0, "success", None, 100.4, None),
-            _task(2, 0, "success", None, 100.8, None),
-            _task(3, 0, "success", None, 101.2, None),
+            _task(1, "success", None, 100.4, None),
+            _task(2, "success", None, 100.8, None),
+            _task(3, "success", None, 101.2, None),
         ]
         self.loop.env_state = _TaskRegistry(tasks)
         self.loop.pendingList = [1, 2, 3]

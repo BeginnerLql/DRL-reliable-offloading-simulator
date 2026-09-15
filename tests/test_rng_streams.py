@@ -107,7 +107,7 @@ class IndependentRngStreamTests(unittest.TestCase):
         self.assertEqual(params.PPO_MINIBATCH_SEED, 2028)
         self.assertEqual(params.SPATIAL_RISK_SEED, 2026)
         self.assertEqual(params.num_states, 27)
-        self.assertEqual(params.num_actions, 92)
+        self.assertEqual(params.num_actions, 28)
 
 
 if __name__ == "__main__":

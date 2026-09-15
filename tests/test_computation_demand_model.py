@@ -89,7 +89,7 @@ class ComputationDemandModelTests(unittest.TestCase):
 
     def test_dimensions_remain_unchanged(self):
         self.assertEqual(params.num_states, 27)
-        self.assertEqual(params.num_actions, 92)
+        self.assertEqual(params.num_actions, 28)
 
 
 if __name__ == "__main__":
