@@ -83,6 +83,7 @@ class params:
     epsilon_start_dqn = parameters.epsilon_start_dqn
     epsilon_end_dqn = parameters.epsilon_end_dqn
     epsilon_decay_dqn = parameters.epsilon_decay_dqn
+    PPO_ACTOR_MODE = parameters.PPO_ACTOR_MODE
     # ----------- PPO --------------
     hidden_layers_ppo = parameters.hidden_layers_ppo
     af_ppo = parameters.af_ppo

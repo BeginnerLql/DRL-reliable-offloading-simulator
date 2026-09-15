@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from itertools import combinations
 from torch.distributions import Categorical
 
 
@@ -42,6 +43,171 @@ class PPOPolicyNetwork(nn.Module):
         # Returns action logits (Categorical distribution will be formed from logits)
         x = self.hidden_layers(x)
         return self.output_layer(x)  # logits
+
+
+class PPOPairScoringPolicyNetwork(nn.Module):
+    """Shared scorer for unordered server-pair actions.
+
+    The observation remains a block-layout state. Each pair is represented by
+    the symmetric feature vector [mean, abs-difference, rho, task] and all
+    action scores are produced by one shared scorer network.
+    """
+
+    node_feature_dim = 4
+    task_feature_dim = 3
+    pair_feature_dim = 12
+
+    def __init__(
+        self,
+        input_dim,
+        output_dim,
+        hidden_layers,
+        num_servers,
+        pair_correlations,
+        activation='tanh',
+    ):
+        super().__init__()
+        try:
+            num_servers = int(num_servers)
+        except (TypeError, ValueError) as exc:
+            raise ValueError('num_servers must be a positive integer') from exc
+        if num_servers < 2:
+            raise ValueError('num_servers must be at least 2')
+        expected_input_dim = self.node_feature_dim * num_servers + self.task_feature_dim
+        if int(input_dim) != expected_input_dim:
+            raise ValueError(
+                'pair_scoring actor expects num_states == '
+                f'4 * num_servers + 3 ({expected_input_dim}), got {input_dim}'
+            )
+        expected_actions = num_servers * (num_servers - 1) // 2
+        if int(output_dim) != expected_actions:
+            raise ValueError(
+                'pair_scoring actor expects num_actions == '
+                f'num_servers * (num_servers - 1) // 2 ({expected_actions}), '
+                f'got {output_dim}'
+            )
+        correlations = np.asarray(pair_correlations, dtype=float)
+        if correlations.ndim != 1 or correlations.shape[0] != expected_actions:
+            raise ValueError(
+                'pair_correlations must have shape '
+                f'({expected_actions},), got {correlations.shape}'
+            )
+        if not np.isfinite(correlations).all():
+            raise ValueError('pair_correlations must contain only finite values')
+        if (correlations < -1e-10).any() or (correlations > 1.0 + 1e-10).any():
+            raise ValueError('pair_correlations must lie in [0, 1]')
+        correlations = np.clip(correlations, 0.0, 1.0)
+
+        self.num_servers = num_servers
+        self.num_actions = expected_actions
+        self.input_dim = int(input_dim)
+        self.output_dim = int(output_dim)
+        self.register_buffer(
+            'pair_indices',
+            torch.tensor(list(combinations(range(num_servers), 2)), dtype=torch.long),
+        )
+        self.register_buffer(
+            'pair_correlations',
+            torch.tensor(correlations, dtype=torch.float32),
+        )
+
+        layers = []
+        prev_dim = self.pair_feature_dim
+        for hidden_dim in hidden_layers:
+            layers.append(nn.Linear(prev_dim, int(hidden_dim)))
+            if activation == 'relu':
+                layers.append(nn.ReLU())
+            elif activation == 'leaky_relu':
+                layers.append(nn.LeakyReLU())
+            elif activation == 'tanh':
+                layers.append(nn.Tanh())
+            else:
+                raise ValueError(f'Unsupported activation function: {activation}')
+            prev_dim = int(hidden_dim)
+        layers.append(nn.Linear(prev_dim, 1))
+        self.scorer = nn.Sequential(*layers)
+
+    @staticmethod
+    def compose_pair_features(node_j, node_k, spatial_risk_correlation, task_features):
+        """Compose symmetric [mean, absolute difference, rho, task] features."""
+        node_j = torch.as_tensor(node_j, dtype=torch.float32)
+        node_k = torch.as_tensor(node_k, dtype=torch.float32, device=node_j.device)
+        task_features = torch.as_tensor(
+            task_features, dtype=torch.float32, device=node_j.device
+        )
+        rho = torch.as_tensor(
+            spatial_risk_correlation, dtype=torch.float32, device=node_j.device
+        )
+        if node_j.shape != node_k.shape or node_j.shape[-1] != 4:
+            raise ValueError('node_j and node_k must have matching shape [..., 4]')
+        if task_features.shape[:-1] != node_j.shape[:-1] or task_features.shape[-1] != 3:
+            raise ValueError('task_features must have shape [..., 3]')
+        if rho.shape == node_j.shape[:-1]:
+            rho = rho.unsqueeze(-1)
+        if rho.shape != node_j.shape[:-1] + (1,):
+            raise ValueError('spatial_risk_correlation must have shape [..., 1]')
+        mean_features = (node_j + node_k) / 2.0
+        absolute_difference = torch.abs(node_j - node_k)
+        return torch.cat((mean_features, absolute_difference, rho, task_features), dim=-1)
+
+    def _batched_state(self, state):
+        state = torch.as_tensor(
+            state, dtype=torch.float32, device=self.pair_correlations.device
+        )
+        single = state.ndim == 1
+        if single:
+            state = state.unsqueeze(0)
+        if state.ndim != 2 or state.shape[-1] != self.input_dim:
+            raise ValueError(
+                f'state must have shape [{self.input_dim}] or [B, {self.input_dim}], '
+                f'got {tuple(state.shape)}'
+            )
+        return state, single
+
+    def build_node_features(self, state):
+        """Recover [failure, frequency, backlog, uplink] per node."""
+        state, single = self._batched_state(state)
+        n = self.num_servers
+        node_features = torch.stack(
+            (
+                state[:, 0:n],
+                state[:, n : 2 * n],
+                state[:, 2 * n : 3 * n],
+                state[:, 3 * n : 4 * n],
+            ),
+            dim=-1,
+        )
+        return node_features[0] if single else node_features
+
+    def build_pair_features(self, state):
+        """Build pair features in the fixed action-index order."""
+        state, single = self._batched_state(state)
+        n = self.num_servers
+        node_features = self.build_node_features(state)
+        if node_features.ndim == 2:
+            node_features = node_features.unsqueeze(0)
+        pair_indices = self.pair_indices.to(device=state.device)
+        node_j = node_features[:, pair_indices[:, 0], :]
+        node_k = node_features[:, pair_indices[:, 1], :]
+        task_features = state[:, 4 * n : 4 * n + 3]
+        rho = self.pair_correlations.to(device=state.device).view(1, -1)
+        rho = rho.expand(state.shape[0], -1)
+        pair_features = self.compose_pair_features(
+            node_j,
+            node_k,
+            rho,
+            task_features.unsqueeze(1).expand(-1, self.num_actions, -1),
+        )
+        return pair_features[0] if single else pair_features
+
+    def forward(self, state):
+        single = torch.as_tensor(state).ndim == 1
+        pair_features = self.build_pair_features(state)
+        if single:
+            pair_features = pair_features.unsqueeze(0)
+        logits = self.scorer(pair_features.reshape(-1, self.pair_feature_dim))
+        logits = logits.reshape(-1, self.num_actions)
+        return logits[0] if single else logits
 
 
 class PPOValueNetwork(nn.Module):
@@ -105,9 +271,45 @@ class PPOAgent:
         activation="tanh",
         min_rollout=8,          # Minimum number of transitions required before performing an update
         minibatch_seed=2028,
+        actor_mode="flat",
+        num_servers=None,
+        pair_correlations=None,
     ):
         self.device = torch.device(device)
-        self.num_actions = num_actions
+        self.num_actions = int(num_actions)
+        self.actor_mode = str(actor_mode).strip().lower()
+        if self.actor_mode not in {"flat", "pair_scoring"}:
+            raise ValueError(
+                "actor_mode must be either 'flat' or 'pair_scoring', "
+                f"got {actor_mode!r}"
+            )
+        if self.actor_mode == "pair_scoring":
+            if num_servers is None or pair_correlations is None:
+                raise ValueError(
+                    "pair_scoring mode requires num_servers and pair_correlations"
+                )
+            self.num_servers = int(num_servers)
+            expected_actions = self.num_servers * (self.num_servers - 1) // 2
+            correlations = np.asarray(pair_correlations, dtype=float)
+            if correlations.shape != (expected_actions,):
+                raise ValueError(
+                    "pair_correlations must have shape "
+                    f"({expected_actions},), got {correlations.shape}"
+                )
+            if not np.isfinite(correlations).all() or (
+                (correlations < -1e-10).any()
+                or (correlations > 1.0 + 1e-10).any()
+            ):
+                raise ValueError("pair_correlations must be finite and lie in [0, 1]")
+            if self.num_actions != expected_actions:
+                raise ValueError(
+                    "pair_scoring mode requires num_actions == "
+                    f"{expected_actions}, got {self.num_actions}"
+                )
+            self.pair_correlations = np.clip(correlations, 0.0, 1.0)
+        else:
+            self.num_servers = None
+            self.pair_correlations = None
 
         # PPO / RL hyperparameters
         self.gamma = gamma
@@ -125,12 +327,24 @@ class PPOAgent:
         # Policy networks:
         # - policy_net: trainable policy
         # - policy_old: frozen snapshot used for sampling and stable old log-prob computation
-        self.policy_net = PPOPolicyNetwork(
-            num_states, num_actions, hidden_layers, activation
+        actor_class = (
+            PPOPairScoringPolicyNetwork
+            if self.actor_mode == "pair_scoring"
+            else PPOPolicyNetwork
+        )
+        if self.actor_mode == "pair_scoring":
+            actor_kwargs = {
+                "num_servers": self.num_servers,
+                "pair_correlations": self.pair_correlations,
+            }
+        else:
+            actor_kwargs = {}
+        self.policy_net = actor_class(
+            num_states, num_actions, hidden_layers, activation=activation, **actor_kwargs
         ).to(self.device)
 
-        self.policy_old = PPOPolicyNetwork(
-            num_states, num_actions, hidden_layers, activation
+        self.policy_old = actor_class(
+            num_states, num_actions, hidden_layers, activation=activation, **actor_kwargs
         ).to(self.device)
         self.policy_old.load_state_dict(self.policy_net.state_dict())
 

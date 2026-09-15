@@ -95,6 +95,8 @@ class parameters:
     epsilon_start_dqn = 1.0
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
+    # PPO actor architecture: flat baseline or shared pair scorer.
+    PPO_ACTOR_MODE = "pair_scoring"
     # ----------- PPO --------------
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"

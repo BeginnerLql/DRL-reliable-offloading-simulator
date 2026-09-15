@@ -106,6 +106,62 @@ def build_distance_matrix(servers: Iterable[object]) -> tuple[list[object], np.n
     return ordered_ids, distance_matrix
 
 
+def extract_pair_correlations(
+    server_ids: Iterable[object],
+    correlation_matrix: object,
+    action_pairs: Iterable[tuple[object, object]],
+    tolerance: float = 1e-10,
+) -> np.ndarray:
+    """Return spatial-risk correlations in the supplied action-pair order.
+
+    ``server_ids`` defines the row/column mapping of the matrix; action pairs
+    use the same external server IDs as the simulator.  This helper is pure
+    and does not infer or alter any runtime failure rates.
+    """
+    ids = list(server_ids)
+    if not ids or len(set(ids)) != len(ids):
+        raise ValueError("server_ids must be non-empty and unique")
+    try:
+        tolerance = float(tolerance)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("tolerance must be a finite non-negative number") from exc
+    if not math.isfinite(tolerance) or tolerance < 0.0:
+        raise ValueError("tolerance must be a finite non-negative number")
+    try:
+        matrix = np.asarray(correlation_matrix, dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("correlation_matrix must be numeric") from exc
+    if matrix.ndim != 2 or matrix.shape != (len(ids), len(ids)):
+        raise ValueError(
+            "correlation_matrix must be square with one row per server_id"
+        )
+    if not np.isfinite(matrix).all():
+        raise ValueError("correlation_matrix must contain only finite values")
+    if (matrix < -tolerance).any() or (matrix > 1.0 + tolerance).any():
+        raise ValueError("correlation_matrix entries must lie in [0, 1]")
+
+    id_to_index = {server_id: index for index, server_id in enumerate(ids)}
+    pairs = list(action_pairs)
+    correlations = []
+    for pair in pairs:
+        if not isinstance(pair, (tuple, list)) or len(pair) != 2:
+            raise ValueError("each action pair must contain exactly two server IDs")
+        server_j, server_k = pair
+        if server_j == server_k:
+            raise ValueError("action pairs must contain two distinct server IDs")
+        if server_j not in id_to_index or server_k not in id_to_index:
+            raise ValueError("action pair contains an unknown server ID")
+        value = float(matrix[id_to_index[server_j], id_to_index[server_k]])
+        if not math.isfinite(value) or value < -tolerance or value > 1.0 + tolerance:
+            raise ValueError("pair spatial-risk correlations must lie in [0, 1]")
+        correlations.append(float(np.clip(value, 0.0, 1.0)))
+
+    result = np.asarray(correlations, dtype=float)
+    if result.ndim != 1 or result.shape[0] != len(pairs):
+        raise ValueError("extracted pair correlations have an invalid shape")
+    return result
+
+
 def _validated_distance_matrix(distance_matrix: object) -> np.ndarray:
     try:
         matrix = np.asarray(distance_matrix, dtype=float)
