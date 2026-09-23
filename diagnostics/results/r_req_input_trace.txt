@@ -1,0 +1,10 @@
+Feature-path audit only; no trained checkpoint is loaded.
+Source: task_parameters.xlsx -> Task.reliability_requirement -> EnvironmentState.get_state -> float32 tensor -> PairScoring.build_pair_features.
+The final 35-state coordinate is the normalized R_req; the final coordinate of each 12-feature pair vector carries it.
+R_req=0.9: stored=0.9; state[-1]=0; tensor[-1]=0; all_28_pair_features[-1]=0
+R_req=0.99: stored=0.99; state[-1]=0.333333343; tensor[-1]=0.333333343; all_28_pair_features[-1]=0.333333343
+R_req=0.999: stored=0.999; state[-1]=0.666666687; tensor[-1]=0.666666687; all_28_pair_features[-1]=0.666666687
+R_req=0.9999: stored=0.9999; state[-1]=1; tensor[-1]=1; all_28_pair_features[-1]=1
+Only the final observation coordinate changes in this controlled trace.
+No round/cast/clip collapse: four levels map to four distinct float32 values.
+No deadline feature exists in the current simulator; no action mask is applied beyond the 28 distinct unordered pair indices.

@@ -1,0 +1,25 @@
+{
+  "checkpoint_available": false,
+  "missing_outputs_due_to_checkpoint": [
+    "full action logits/probabilities",
+    "adjacent-tier TV",
+    "R_req x rho score heatmap",
+    "rho-sensitivity finite differences"
+  ],
+  "policy_data_source": "formal recorded 100 probes per trial, not reloaded weights",
+  "oracle_and_policy_probes_are_state_matched": false,
+  "baseline_delay_rows_validated": 40000,
+  "oracle_state_count": 1000,
+  "validation": {
+    "all_baseline_delays_match": true,
+    "all_hazards_match": true,
+    "all_rewards_match": true,
+    "R_req_only_changed": true,
+    "oracle_pure_no_environment_mutation": true,
+    "finite_oracle": true
+  },
+  "input_hashes": {
+    "server_info.xlsx": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+    "task_parameters.xlsx": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434"
+  }
+}

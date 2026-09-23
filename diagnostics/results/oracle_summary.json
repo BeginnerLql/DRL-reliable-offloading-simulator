@@ -1,0 +1,82 @@
+{
+  "sampled_states": 1000,
+  "legal_pairs": 28,
+  "source": "formal pair_scoring evaluation; 10 trials x 20 episodes x 5 task IDs",
+  "oracle_scope": "realized one-task reward intervention; other tasks' recorded arrivals and pair choices fixed",
+  "oracle_change_rates": {
+    "0.9->0.99": 0.001,
+    "0.99->0.999": 0.219,
+    "0.999->0.9999": 0.802,
+    "0.9->0.9999": 0.809
+  },
+  "disjoint_optimal_set_rates": {
+    "0.9->0.99": 0.0,
+    "0.99->0.999": 0.0,
+    "0.999->0.9999": 0.071,
+    "0.9->0.9999": 0.071
+  },
+  "unique_argmax_mean": 2.022,
+  "unique_argmax_median": 2.0,
+  "unique_argmax_distribution": {
+    "1": 191,
+    "2": 597,
+    "3": 211,
+    "4": 1
+  },
+  "margin_by_requirement": [
+    {
+      "R_req": 0.9,
+      "Mean": 0.0,
+      "Median": 0.0,
+      "P25": 0.0,
+      "P75": 0.0,
+      "P90": 0.0
+    },
+    {
+      "R_req": 0.99,
+      "Mean": 0.0,
+      "Median": 0.0,
+      "P25": 0.0,
+      "P75": 0.0,
+      "P90": 0.0
+    },
+    {
+      "R_req": 0.999,
+      "Mean": 0.012228246480604752,
+      "Median": 0.0,
+      "P25": 0.0,
+      "P75": 0.0,
+      "P90": 0.0
+    },
+    {
+      "R_req": 0.9999,
+      "Mean": 4.249704019949725,
+      "Median": 0.0,
+      "P25": 0.0,
+      "P75": 0.0,
+      "P90": 7.4018662709662735
+    }
+  ],
+  "best_pair_78_frequency_by_requirement": {
+    "0.9": 0.0,
+    "0.99": 0.0,
+    "0.999": 0.0,
+    "0.9999": 0.03
+  },
+  "best_pair_78_in_optimal_set_by_requirement": {
+    "0.9": 0.28,
+    "0.99": 0.28,
+    "0.999": 0.28,
+    "0.9999": 0.255
+  },
+  "optimal_tie_fraction_by_requirement": {
+    "0.9": 1.0,
+    "0.99": 1.0,
+    "0.999": 0.998,
+    "0.9999": 0.778
+  },
+  "replay_max_abs_delay_error": 1.7030821197749901e-13,
+  "replay_max_abs_hazard_error": 9.974659986866641e-17,
+  "replay_max_abs_reward_error": 7.105427357601002e-14,
+  "checkpoint_available": false
+}
