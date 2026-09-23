@@ -1,0 +1,11 @@
+Measure,tiers,states,fraction
+pair_78_exact_tier_count,0,704,0.704
+pair_78_exact_tier_count,1,16,0.016
+pair_78_exact_tier_count,2,0,0.0
+pair_78_exact_tier_count,3,41,0.041
+pair_78_exact_tier_count,4,239,0.239
+pair_78_near_0_01_tier_count,0,704,0.704
+pair_78_near_0_01_tier_count,1,16,0.016
+pair_78_near_0_01_tier_count,2,0,0.0
+pair_78_near_0_01_tier_count,3,41,0.041
+pair_78_near_0_01_tier_count,4,239,0.239

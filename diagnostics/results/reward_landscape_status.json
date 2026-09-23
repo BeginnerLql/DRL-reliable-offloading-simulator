@@ -1,0 +1,10 @@
+{
+  "original_oracle_states": 1000,
+  "original_oracle_rows": 112000,
+  "supplemental_actual_requirement_0.9_states": 200,
+  "matched_actual_policy_states": 1200,
+  "exact_reward_tolerance": 1e-10,
+  "max_original_reward_replay_error": 7.105427357601002e-14,
+  "production_code_modified": false,
+  "training_run": false
+}

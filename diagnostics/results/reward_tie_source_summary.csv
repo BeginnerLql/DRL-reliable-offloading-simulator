@@ -1,0 +1,5 @@
+R_req,states_with_ties,same_latency_all_satisfied_rate,same_latency_all_violated_rate,reliability_varies_rate,rho_varies_rate,common_server_rate,mixed_violation_indicator_rate,any_delay_lt_1_sec_rate,median_latency_span,median_reliability_span,median_rho_span
+0.9,1000,1.0,0.0,1.0,1.0,1.0,0.0,0.03,0.0,0.000550074059417649,0.2860159172825021
+0.99,1000,1.0,0.0,1.0,1.0,1.0,0.0,0.03,0.0,0.000550074059417649,0.2860159172825021
+0.999,998,1.0,0.0,1.0,1.0,1.0,0.0,0.03006012024048096,0.0,0.0004033952327293644,0.2860159172825021
+0.9999,778,1.0,0.0,1.0,1.0,1.0,0.0,0.03598971722365039,0.0,4.949372903723104e-05,0.2232262131415316

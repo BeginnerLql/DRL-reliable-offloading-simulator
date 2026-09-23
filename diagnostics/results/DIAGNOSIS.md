@@ -96,3 +96,70 @@ Oracle 强制切换 7.1% 与 policy greedy 切换 0.6% 之间仍有差距；按�
 ## 下一项最有价值的实验
 
 未来一次**同配置**正式训练运行，保存最终 Pair policy_old.state_dict 及完整评估 states，然后在同一批 state 上进行四档 R_req×rho 的 logits/probability sweep，并报告相邻 TV 与有限差分交互；这能直接区分‘输入虽有效但网络未学到交互’和‘环境边界稀少’。当前不重新训练。
+
+# Reward Landscape and Oracle Regret
+
+本节基于原 1,000 个固定状态、每状态四档需求及 28 个合法 pair 的既有 Oracle CSV；exact tie 容差为绝对 reward 差 ≤1e-10（正式结果 reward 重放最大误差 7.11e-14），无相对容差。Near-optimal 使用绝对 reward epsilon。Oracle 是单任务即时收益，不是长期 PPO return。
+
+1. **Argmax 变化主要含 tie-breaking artifact。** 之前按固定索引选单一 argmax 的 .9→.9999 变化率 80.9%，但最优集合不相交仅 7.1%；集合 Jaccard 均值 0.481、有交集比例 92.9%。
+
+2. **Exact optimal set 大小。** .9 档均值 7.00/28、median 7；.9999 档均值 3.47/28、median 3。四档详表：
+
+| R_req | States | mean | median | p10 | p25 | p75 | p90 | p95 | max | p_size_1 | p_size_gt_1 | p_size_ge_5 | p_size_ge_10 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0.9 | 1000 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 0 | 1 | 1 | 0 |
+| 0.99 | 1000 | 6.998 | 7 | 7 | 7 | 7 | 7 | 7 | 7 | 0 | 1 | 1 | 0 |
+| 0.999 | 1000 | 6.449 | 7 | 5 | 6 | 7 | 7 | 7 | 7 | 0.002 | 0.998 | 0.947 | 0 |
+| 0.9999 | 1000 | 3.468 | 3 | 1 | 2 | 5 | 6 | 7 | 7 | 0.222 | 0.778 | 0.339 | 0 |
+
+3. **Near-optimal set。** epsilon=0.01 时，.9 档均值 7.00/28、.9999 档 3.47/28。注意绝对 0.01 reward 容差很小；六种 epsilon 详见 near_optimal_set_size.csv。
+
+4. **Best-vs-second-distinct gap。** 排除所有动作完全并列的状态后才统计 second-distinct；这些全并列状态另列计数。gap 不应与原 best-vs-second（允许并列，常为 0）混淆。
+
+| R_req | States | all_actions_tied_count | states_with_second_distinct | mean | median | p10 | p25 | p75 | p90 | p95 | max |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0.9 | 1000 | 0 | 1000 | 4.9584 | 5.7642 | 1.1531 | 3.5815 | 6.2446 | 7.4019 | 7.4019 | 7.7715 |
+| 0.99 | 1000 | 0 | 1000 | 4.9584 | 5.7642 | 1.1531 | 3.5815 | 6.2446 | 7.4019 | 7.4019 | 7.7715 |
+| 0.999 | 1000 | 0 | 1000 | 5.0323 | 5.7642 | 1.1531 | 3.6809 | 6.2446 | 7.4019 | 7.4019 | 63.577 |
+| 0.9999 | 1000 | 0 | 1000 | 10.789 | 5.7642 | 1.1531 | 3.7343 | 7.4019 | 25.988 | 63.974 | 94.933 |
+
+5. **实际 Pair PPO regret。** 原 1,000 状态的实际任务等级没有 0.9（所抽 Task_ID 覆盖 .99:200、.999:200、.9999:600）。为得到四档，复用既有 EpisodeTrace/可靠性/奖励函数，额外重放 200 个真实 0.9 任务状态；这 200 个仅用于实际 policy regret，不混入原 1,000 状态的 Oracle 景观/集合分析。每个实际动作的重放 delay、reward 均与正式日志匹配。
+
+| R_req | States | source | mean_regret | median_regret | strictly_suboptimal_rate | mean_regret_given_suboptimal | median_regret_given_suboptimal | p75_regret | p90_regret | p95_regret | max_regret | exact_optimal_rate | near_1e-3_rate | near_0_01_rate | p_regret_le_1e-06 | p_regret_le_0.0001 | p_regret_le_0.001 | p_regret_le_0.01 | p_regret_le_0.05 | p_regret_le_0.1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0.9 | 200 | supplemental_0.9_states | 14.575 | 5.3185 | 0.605 | 24.092 | 19.288 | 24.322 | 38.217 | 45.845 | 122.48 | 0.395 | 0.395 | 0.395 | 0.395 | 0.395 | 0.395 | 0.395 | 0.395 | 0.395 |
+| 0.99 | 200 | original_1000_states | 15.169 | 15.38 | 0.725 | 20.923 | 21.311 | 25.878 | 34.09 | 36.549 | 47.615 | 0.275 | 0.275 | 0.275 | 0.275 | 0.275 | 0.275 | 0.275 | 0.275 | 0.28 |
+| 0.999 | 200 | original_1000_states | 17.423 | 17.55 | 0.635 | 27.439 | 27.601 | 29.176 | 41.166 | 45.151 | 55.464 | 0.365 | 0.365 | 0.365 | 0.365 | 0.365 | 0.365 | 0.365 | 0.365 | 0.365 |
+| 0.9999 | 600 | original_1000_states | 29.325 | 27.389 | 0.74333 | 39.45 | 39.026 | 48.749 | 68.872 | 74.727 | 102.28 | 0.25667 | 0.25667 | 0.25667 | 0.25667 | 0.25667 | 0.25667 | 0.25667 | 0.25667 | 0.25667 |
+
+最高档实际选中动作的无条件 mean regret 29.325、median 27.389；严格次优动作中的 mean regret 39.450。其 exact optimal rate 25.7%，在 epsilon=0.01 内的比例 25.7%。因此需看 regret 而不能仅看‘严格次优’频率。
+
+6. **(7,8) 不是稳定 near-optimal shortcut。** 最高档 exact-optimal rate 25.5%、epsilon=0.01 rate 25.5%、mean regret 26.089；四档详表：
+
+| R_req | States | exact_optimal_rate | mean_regret_given_suboptimal | near_1e-3_rate | near_0_01_rate | mean_regret | median_regret | p90_regret | p95_regret |
+|---|---|---|---|---|---|---|---|---|---|
+| 0.9 | 1000 | 0.28 | 32.113 | 0.28 | 0.28 | 23.121 | 21.368 | 51.28 | 62.621 |
+| 0.99 | 1000 | 0.28 | 32.113 | 0.28 | 0.28 | 23.121 | 21.368 | 51.28 | 62.621 |
+| 0.999 | 1000 | 0.28 | 32.113 | 0.28 | 0.28 | 23.121 | 21.368 | 51.28 | 62.621 |
+| 0.9999 | 1000 | 0.255 | 35.019 | 0.255 | 0.255 | 26.089 | 21.726 | 64.667 | 73.134 |
+
+7. **Reward 平台来源。** 当前没有 deadline；也没有 round reward 或直接 rho/correlation/energy 分量。可靠性门槛把满足阈值后的 reliability component 固定为 0，此时只由首个完成副本的 latency 决定 reward。不同 pair 共享最快副本时 latency 完全相同，即使另一副本的 reliability/rho 不同也得到 exact tie。未满足阈值时走另一延迟分支并有连续 log10 violation penalty；该分支的 `max(-3*delay,-3)` 可在 delay<1s 时截断，但不能解释主要平台。binary threshold 本身不是一个固定值 penalty。
+
+在并列最优状态中，.9 档同延迟且全满足阈值的比例 100.0%；.9999 档 100.0%。最优 pair 共有至少一台服务器的比例依次为 100.0%、100.0%。这些集合内可靠性仍有差别的比例依次为 100.0%、100.0%；rho 有差别的比例依次为 100.0%、100.0%。见 reward_tie_source_summary.csv / reward_tie_sources.csv。
+
+8. **需求间集合重叠。** 四档两两 Jaccard 见 oracle_set_overlap.csv / heatmap；(7,8) 同时属于多少档 exact / epsilon=0.01 集合见下表。
+
+| Measure | tiers | states | fraction |
+|---|---|---|---|
+| pair_78_exact_tier_count | 0 | 704 | 0.704 |
+| pair_78_exact_tier_count | 1 | 16 | 0.016 |
+| pair_78_exact_tier_count | 2 | 0 | 0 |
+| pair_78_exact_tier_count | 3 | 41 | 0.041 |
+| pair_78_exact_tier_count | 4 | 239 | 0.239 |
+| pair_78_near_0_01_tier_count | 0 | 704 | 0.704 |
+| pair_78_near_0_01_tier_count | 1 | 16 | 0.016 |
+| pair_78_near_0_01_tier_count | 2 | 0 | 0 |
+| pair_78_near_0_01_tier_count | 3 | 41 | 0.041 |
+| pair_78_near_0_01_tier_count | 4 | 239 | 0.239 |
+
+**综合判断：B 最符合数据，但有关键限定。** 高档阈值改变了不少候选 pair 的 reward，故 C 不成立；真正强制最优动作切换的原样本仅 7.1%，大量 exact tie 与需求间集合重叠，故 A 过强。B 描述的是‘某些固定 pair 可跨需求保持最优或近优’，**不能套到 (7,8)**：它的 regret 和 near-optimal 率表明当前策略的全局偏好本身仍有明显即时 reward 代价。策略与 Oracle 样本并非逐状态相同，只有实际动作 regret 采用逐状态匹配。
