@@ -1,0 +1,34 @@
+{
+  "matched_task_count": 4000,
+  "safe_set_sizes_identical_across_policies": true,
+  "greedy_and_native_baselines_match_prior_4000_rows_exactly": true,
+  "exogenous_streams_identical": true,
+  "checkpoint_unchanged": true,
+  "validated_png_count": 7,
+  "policies": {
+    "greedy": {
+      "task_count": 4000,
+      "empty_safe_count": 173,
+      "max_before_probability_sum_error": 1.4808028936386108e-07,
+      "replica_count": 8000
+    },
+    "native_sample": {
+      "task_count": 4000,
+      "empty_safe_count": 173,
+      "max_before_probability_sum_error": 1.4330726116895676e-07,
+      "replica_count": 8000
+    },
+    "masked_sample": {
+      "task_count": 4000,
+      "empty_safe_count": 173,
+      "max_before_probability_sum_error": 1.391163095831871e-07,
+      "replica_count": 8000
+    },
+    "masked_greedy": {
+      "task_count": 4000,
+      "empty_safe_count": 173,
+      "max_before_probability_sum_error": 1.4808028936386108e-07,
+      "replica_count": 8000
+    }
+  }
+}

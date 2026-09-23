@@ -1,0 +1,17 @@
+{
+  "checkpoint_sha256": {
+    "actor_final.pt": "784d696691ba43ed714da7cb9adca750d915d16af681272a05a6d8136d428c80",
+    "critic_final.pt": "a8092bae60db83e33044e8c2f26f75fc303c34cb4791d418bccb04ee9864fc9f"
+  },
+  "eval_episodes": 20,
+  "tasks_per_episode": 200,
+  "external_arrival_spatial_risk_streams_identical": true,
+  "frozen_weights_unchanged": true,
+  "action_seed": 2026,
+  "policies": [
+    "greedy",
+    "native_sample",
+    "masked_sample",
+    "masked_greedy"
+  ]
+}

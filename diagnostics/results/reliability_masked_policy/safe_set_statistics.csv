@@ -1,0 +1,17 @@
+policy,Reliability_Requirement,tasks,safe_set_empty_count,safe_set_mean_size,selected_unsafe_count,safe_set_empty_rate,selected_unsafe_rate
+greedy,0.9,1000,0,27.988,0,0.0,0.0
+greedy,0.99,1000,0,27.06,0,0.0,0.0
+greedy,0.999,1000,0,21.087,11,0.0,0.011
+greedy,0.9999,1000,173,7.551,298,0.173,0.298
+masked_greedy,0.9,1000,0,27.988,0,0.0,0.0
+masked_greedy,0.99,1000,0,27.06,0,0.0,0.0
+masked_greedy,0.999,1000,0,21.087,0,0.0,0.0
+masked_greedy,0.9999,1000,173,7.551,173,0.173,0.173
+masked_sample,0.9,1000,0,27.988,0,0.0,0.0
+masked_sample,0.99,1000,0,27.06,0,0.0,0.0
+masked_sample,0.999,1000,0,21.087,0,0.0,0.0
+masked_sample,0.9999,1000,173,7.551,173,0.173,0.173
+native_sample,0.9,1000,0,27.988,0,0.0,0.0
+native_sample,0.99,1000,0,27.06,3,0.0,0.003
+native_sample,0.999,1000,0,21.087,98,0.0,0.098
+native_sample,0.9999,1000,173,7.551,519,0.173,0.519
