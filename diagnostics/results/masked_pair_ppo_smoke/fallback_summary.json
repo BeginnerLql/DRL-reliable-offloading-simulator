@@ -1,0 +1,7 @@
+{
+  "training_empty_count": 418,
+  "training_empty_rate": 0.0209,
+  "mean_deficit_when_empty": 0.00010353085394387845,
+  "max_deficit_when_empty": 0.0007217433539958,
+  "all_empty_have_positive_deficit": true
+}

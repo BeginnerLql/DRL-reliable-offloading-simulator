@@ -269,6 +269,12 @@ class MainLoop:
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
                 self.add_train()
 
+            # A specialized policy may need the current task and episode hazard
+            # context to construct its action support. Legacy agents have no hook.
+            prepare_action = getattr(self.model, "prepare_action", None)
+            if callable(prepare_action):
+                prepare_action(task, self.env_state, self.this_episode, self.G_state)
+
             # -------- pair action selection --------
             if self.model_name == "ddpg":
                 # DDPG outputs continuous scores over the shared pair actions.

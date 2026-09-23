@@ -1,0 +1,6 @@
+{
+  "reloaded_checkpoint_default_mode": "masked_stochastic",
+  "evaluation_rows": 4000,
+  "exact_task_assignment_match": true,
+  "action_mismatch_count": 0
+}

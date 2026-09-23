@@ -1,0 +1,8 @@
+{
+  "agent_name": "reliability_masked_pair_ppo",
+  "deployment_mode": "stochastic",
+  "greedy_is_ablation_only": false,
+  "checkpoint_dir": "diagnostics/results/masked_pair_ppo_smoke",
+  "episodes": 20,
+  "tasks_per_episode": 200
+}

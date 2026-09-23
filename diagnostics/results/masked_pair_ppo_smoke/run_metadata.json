@@ -1,0 +1,24 @@
+{
+  "train_episodes": 100,
+  "eval_episodes": 20,
+  "tasks_per_episode": 200,
+  "masked_deployment_default": "stochastic",
+  "masked_greedy_ablation_only": true,
+  "external_arrival_spatial_streams_identical": true,
+  "mask_comparison": {
+    "states_compared": 1000,
+    "safe_mask_mismatch_count": 0
+  },
+  "initial_actor_critic_tensors_identical": true,
+  "legacy_training_matches_prior_formal_prefix": true,
+  "masked_actor_sha256": "a529373e846773a25de0a427e960b66983f8c1e367bf750c82822a9789eae1d5",
+  "seed_row": {
+    "Torch_Init_Seed": 3943535286,
+    "Train_Action_Seed": 4135956355,
+    "Train_Arrival_Seed": 2771798559,
+    "Train_Spatial_Seed": 1319650318,
+    "PPO_Minibatch_Seed": 1667818003,
+    "Eval_Arrival_Seed": 2423506597,
+    "Eval_Spatial_Seed": 3960158338
+  }
+}

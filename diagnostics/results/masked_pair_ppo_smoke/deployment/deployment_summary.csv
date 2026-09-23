@@ -1,0 +1,2 @@
+policy,tasks,mean_reward,mean_latency,overall_rsr,highest_rsr,feasibility_rate,empty_safe_set_rate,conditional_rsr,avoidable_violation_count,unavoidable_violation_count,mean_safe_set_size,pair_78_frequency,pair_selection_hhi,pair_selection_entropy,unique_pair_count
+masked_pair_stochastic,4000,59.53453081177961,2.0415735194309423,0.95675,0.827,0.95675,0.04325,1.0,0,173,20.9215,0.078,0.043964874999999994,3.227589182677886,28
