@@ -1,0 +1,21 @@
+{
+  "formal_trial_id": 0,
+  "training_curve_rows": 300,
+  "training_curve_max_abs_diff": {
+    "episode": 0.0,
+    "episode_reward": 0.0,
+    "rolling_reward": 0.0,
+    "rolling_delay": 0.0
+  },
+  "evaluation_task_rows": 4000,
+  "evaluation_task_assignments_exactly_equal": true,
+  "evaluation_state_rows": 4000,
+  "actor_reloaded_all_state_max_abs_logit_diff": 0.0,
+  "maximum_probability_sum_error": 1.4808028936386108e-07,
+  "diagnostic_csvs_have_no_infinities": true,
+  "validated_png_count": 7,
+  "checkpoint_sha256": {
+    "actor_final.pt": "784d696691ba43ed714da7cb9adca750d915d16af681272a05a6d8136d428c80",
+    "critic_final.pt": "a8092bae60db83e33044e8c2f26f75fc303c34cb4791d418bccb04ee9864fc9f"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "trial_id": 0,
+  "evaluation_aligned_states": 1000,
+  "training_replayed_states": 4800,
+  "training_decisions": 60000,
+  "untrained_actor_count": 100,
+  "checkpoint_reloaded_and_logits_verified": true,
+  "conditional_oracle_rho_slope_zero": true,
+  "evaluation_probabilities_finite": true
+}

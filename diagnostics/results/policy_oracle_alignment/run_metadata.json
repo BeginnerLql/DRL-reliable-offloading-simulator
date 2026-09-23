@@ -1,0 +1,25 @@
+{
+  "trial_id": 0,
+  "train_episodes": 300,
+  "eval_episodes": 20,
+  "tasks_per_episode": 200,
+  "formal_metadata_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "source_head_at_run": "5705a2c1e47496f529c4a1efb1056d8e44ace2f2",
+  "checkpoint_sha256": {
+    "actor_final.pt": "784d696691ba43ed714da7cb9adca750d915d16af681272a05a6d8136d428c80",
+    "critic_final.pt": "a8092bae60db83e33044e8c2f26f75fc303c34cb4791d418bccb04ee9864fc9f"
+  },
+  "training_rollout_rows": 60000,
+  "evaluation_state_rows": 4000,
+  "no_additional_action_mask": true,
+  "evaluation_mode": "greedy_no_sampling",
+  "formal_seed_row": {
+    "Torch_Init_Seed": 3943535286,
+    "Train_Action_Seed": 4135956355,
+    "Train_Arrival_Seed": 2771798559,
+    "Train_Spatial_Seed": 1319650318,
+    "PPO_Minibatch_Seed": 1667818003,
+    "Eval_Arrival_Seed": 2423506597,
+    "Eval_Spatial_Seed": 3960158338
+  }
+}
