@@ -1,0 +1,55 @@
+{
+  "actor_modes": [
+    "flat",
+    "pair_scoring"
+  ],
+  "actor_parameter_counts": {
+    "flat": [
+      5308
+    ],
+    "pair_scoring": [
+      2945
+    ]
+  },
+  "beta": 0.8,
+  "bootstrap_samples": 10000,
+  "bootstrap_seed": 2043,
+  "critic_parameter_counts": [
+    4417
+  ],
+  "ell": 0.5,
+  "eval_episodes": 20,
+  "evaluation_policy": "greedy",
+  "failed_runs": 0,
+  "git_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "lambda_ref": 0.003,
+  "master_seed": 31001,
+  "num_actions": 28,
+  "num_probes": 100,
+  "num_states": 35,
+  "num_trials": 10,
+  "omega": 0.9,
+  "ppo_actor_lr": 0.0001,
+  "ppo_batch_size": 64,
+  "ppo_clip_eps": 0.2,
+  "ppo_critic_lr": 0.0005,
+  "ppo_entropy_coef": 0.01,
+  "ppo_epochs": 2,
+  "ppo_gae_lambda": 0.95,
+  "ppo_gamma": 0.9,
+  "ppo_hidden_layers": [
+    64,
+    32
+  ],
+  "server_info_sha256": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+  "successful_runs": 20,
+  "task_arrival_rate": 0.5,
+  "task_parameters_sha256": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434",
+  "tasks_per_episode": 200,
+  "timestamp": "2026-09-22T06:42:30.044877+00:00",
+  "train_episodes": 300,
+  "true_rho_max": 0.3540107070824934,
+  "true_rho_mean": 0.16489702954751886,
+  "true_rho_median": 0.1615454432889019,
+  "true_rho_min": 0.021009369147363816
+}

@@ -1,0 +1,18 @@
+{
+  "policy": "pair",
+  "training_episodes": 300,
+  "evaluation_episodes": 20,
+  "tasks_per_episode": 200,
+  "deployment_modes": [
+    "pair"
+  ],
+  "formal_reference_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "ppo_actor_lr": 0.0001,
+  "ppo_critic_lr": 0.0005,
+  "ppo_entropy_coef": 0.01,
+  "ppo_gamma": 0.9,
+  "ppo_gae_lambda": 0.95,
+  "ppo_clip_eps": 0.2,
+  "ppo_epochs": 2,
+  "ppo_batch_size": 64
+}

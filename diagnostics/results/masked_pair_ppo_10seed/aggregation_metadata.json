@@ -1,0 +1,13 @@
+{
+  "trials": 10,
+  "training_episodes": 300,
+  "evaluation_episodes": 20,
+  "tasks_per_episode": 200,
+  "bootstrap_resamples": 20000,
+  "bootstrap_seed": 2043,
+  "tie_tolerance": 1e-10,
+  "statistics_unit": "training seed",
+  "legacy_reference": "diagnostics/paired_ppo_experiment/formal_10seed_300ep",
+  "masked_stochastic_is_formal_deployment": true,
+  "masked_greedy_ablation_uses_same_checkpoint": true
+}

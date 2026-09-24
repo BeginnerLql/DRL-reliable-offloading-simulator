@@ -1,0 +1,13 @@
+{
+  "trials": 10,
+  "policies_per_trial": 4,
+  "evaluated_tasks_per_policy": 4000,
+  "training_episodes_per_agent": 300,
+  "masked_updates_per_seed": 300,
+  "masked_deployments_share_checkpoint": true,
+  "masked_deployments_share_safe_masks": true,
+  "masked_selected_actions_in_effective_support": true,
+  "fallback_max_reliability": true,
+  "nonfinite_values_found": false,
+  "masked_avoidable_violations": 0
+}

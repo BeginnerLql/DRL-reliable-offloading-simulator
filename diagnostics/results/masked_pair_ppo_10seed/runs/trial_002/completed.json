@@ -1,0 +1,40 @@
+{
+  "trial_id": 2,
+  "runs": [
+    {
+      "trial_id": 2,
+      "policy": "flat",
+      "task_count": 4000,
+      "actor_sha256": "4a1d1e8924276ae7b7dd46e59c752685007f7a8902cd2be787d44689060f23ca",
+      "critic_sha256": "542900581777baaef97e636b37c402462e76629b1dcce86bd61b705908fcba91",
+      "eval_action_seed": 2293171022
+    },
+    {
+      "trial_id": 2,
+      "policy": "pair",
+      "task_count": 4000,
+      "actor_sha256": "f4bbdab8ece60dca4adbd93693d1e5cfece0a4cd4978bc466131cda32279c23c",
+      "critic_sha256": "4b4ad4df68187fb18ac1ca4b99fb12655abb7f10db655aab69148e471758fd03",
+      "eval_action_seed": 2293171022
+    },
+    {
+      "trial_id": 2,
+      "policy": "masked_stochastic",
+      "task_count": 4000,
+      "actor_sha256": "7b5a112d576fb8b8482f841a52d832ca15a79b4a2ca3a526a6491f890211fcab",
+      "critic_sha256": "2f8f6f2f0e3fe3d8977bb70857a63d22ca4e92ac2abdbc7d28f30a2511632e8e",
+      "eval_action_seed": 2293171022
+    },
+    {
+      "trial_id": 2,
+      "policy": "masked_greedy",
+      "task_count": 4000,
+      "actor_sha256": "7b5a112d576fb8b8482f841a52d832ca15a79b4a2ca3a526a6491f890211fcab",
+      "critic_sha256": "2f8f6f2f0e3fe3d8977bb70857a63d22ca4e92ac2abdbc7d28f30a2511632e8e",
+      "eval_action_seed": 2293171022
+    }
+  ],
+  "external_train_trace_paired": true,
+  "external_eval_trace_paired": true,
+  "legacy_training_evaluation_reproduced": true
+}

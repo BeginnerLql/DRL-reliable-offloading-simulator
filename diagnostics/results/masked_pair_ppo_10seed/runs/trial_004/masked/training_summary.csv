@@ -1,0 +1,2 @@
+trial_id,policy,first30_mean_episode_reward,last30_mean_episode_reward,final_episode_reward,first30_masked_entropy,last30_masked_entropy,first30_pair_hhi,last30_pair_hhi,final30_top1_frequency,mean_safe_set_size,empty_safe_set_rate,ratio_min,ratio_max,max_first_ratio_error
+4,masked,12202.799975403197,12323.623335722556,12686.337163473523,2.8982973755896086,2.695392881562312,0.05023,0.07345666666666664,0.1633333333333333,21.808799999999998,0.021633333333333334,0.9776703119277954,1.0147993564605713,0.0

@@ -1,0 +1,11 @@
+{
+  "Trial_ID": 7,
+  "Torch_Init_Seed": 2533770461,
+  "Train_Action_Seed": 827260491,
+  "Train_Arrival_Seed": 2748321498,
+  "Train_Spatial_Seed": 2244402405,
+  "PPO_Minibatch_Seed": 3972047515,
+  "Eval_Arrival_Seed": 3140262569,
+  "Eval_Spatial_Seed": 2503817415,
+  "Eval_Action_Seed": 3745849670
+}
