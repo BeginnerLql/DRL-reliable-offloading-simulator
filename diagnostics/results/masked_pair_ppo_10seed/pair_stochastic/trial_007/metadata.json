@@ -1,0 +1,20 @@
+{
+  "trial_id": 7,
+  "policy": "Pair PPO native stochastic, no reliability mask",
+  "checkpoint_actor_sha256": "5427e4b60144143725e342e2abce7abe7a4584f67b6b63e0c5aa89ded843a3a2",
+  "checkpoint_critic_sha256": "204b701aab1c12e2c0ea231ebeb148dbfef2f90f01b301c9154acc441669c487",
+  "action_rng_seed": 2125829243,
+  "action_rng_tag": 1346455890,
+  "distribution": "Categorical(logits=policy_old(state)); implemented by multinomial(softmax(logits))",
+  "temperature": 1.0,
+  "reliability_mask_applied": false,
+  "posthoc_feasibility_rule": "Task.initialize_reliability_evaluation; execution_reliability >= reliability_requirement",
+  "evaluation_episodes": 20,
+  "tasks_per_episode": 200,
+  "evaluated_tasks": 4000,
+  "greedy_replay_matches_formal_pair_results": true,
+  "arrival_stream_matches_greedy_replay": true,
+  "spatial_risk_stream_matches_greedy_replay": true,
+  "training_performed": false,
+  "formal_reference_commit": "7ddef1af40aef6e42c91f692946fda847a465024"
+}

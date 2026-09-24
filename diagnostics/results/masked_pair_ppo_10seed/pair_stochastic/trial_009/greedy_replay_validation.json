@@ -1,0 +1,8 @@
+{
+  "trial_id": 9,
+  "tasks_compared": 4000,
+  "action_mismatch_count": 0,
+  "reward_max_abs_error": 1.4210854715202004e-14,
+  "latency_max_abs_error": 1.7763568394002505e-15,
+  "reliability_max_abs_error": 1.1102230246251565e-16
+}
