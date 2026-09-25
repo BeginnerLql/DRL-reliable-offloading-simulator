@@ -1,0 +1,18 @@
+{
+  "trial_id": 0,
+  "training_action_count": 60000,
+  "training_action_sequence_exact": true,
+  "per_episode_reward_exact_with_atol_1e-9": true,
+  "per_episode_delay_exact_with_atol_1e-9": true,
+  "evaluation_episode_metrics": {
+    "masked_stochastic": {
+      "episode_metrics_exact": true,
+      "episodes": 20
+    },
+    "masked_greedy": {
+      "episode_metrics_exact": true,
+      "episodes": 20
+    }
+  },
+  "counterfactual_training_rows": 0
+}

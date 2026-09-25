@@ -1,0 +1,14 @@
+{
+  "held_out_state_count": 1000,
+  "horizons": [
+    5,
+    10,
+    20,
+    50
+  ],
+  "training_counterfactual_leakage": false,
+  "decision": "C. ACTION VALUE IS NOT LEARNED RELIABLY",
+  "q_training_seed_count": 1,
+  "formal_10seed_started": false,
+  "evaluation_smoke_only": true
+}

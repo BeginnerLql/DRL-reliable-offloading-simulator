@@ -1,0 +1,76 @@
+{
+  "trial_id": 0,
+  "seed_plan": {
+    "Trial_ID": 0,
+    "Torch_Init_Seed": 3943535286,
+    "Train_Action_Seed": 4135956355,
+    "Train_Arrival_Seed": 2771798559,
+    "Train_Spatial_Seed": 1319650318,
+    "PPO_Minibatch_Seed": 1667818003,
+    "Eval_Arrival_Seed": 2423506597,
+    "Eval_Spatial_Seed": 3960158338
+  },
+  "smoke_stage": true,
+  "q_config": {
+    "learning_rate": 0.001,
+    "target_tau": 0.005,
+    "target_update_interval": 1,
+    "updates_per_rollout": 4,
+    "max_grad_norm": 1.0,
+    "initialization_seed": 845219,
+    "visitation_epsilon": 1e-08
+  },
+  "ppo_formal_reference_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "training_samples": 60000,
+  "training_q_updates": 1200,
+  "counterfactual_files_used_for_training": false,
+  "training_policy_distributions_saved_at_decision_time": true,
+  "regression": {
+    "actor_weights_exact": true,
+    "value_weights_exact": true,
+    "training_reward_and_delay_exact": true,
+    "training_episode_metrics_exact": true,
+    "per_decision_training_action_sequence_reference_available": true,
+    "training_action_sequence_exact": true
+  },
+  "evaluation_regression": {
+    "masked_stochastic": {
+      "actions_exact": true,
+      "rewards_exact": true,
+      "task_count": 4000,
+      "mean_reward": 60.55369681812354,
+      "mean_latency": 2.0214231522299113
+    },
+    "masked_greedy": {
+      "actions_exact": true,
+      "rewards_exact": true,
+      "task_count": 4000,
+      "mean_reward": 49.128905252451425,
+      "mean_latency": 3.05216232655757
+    },
+    "evaluation_episode_metrics_exact": true
+  },
+  "q_stability": {
+    "all_metrics_finite": true,
+    "max_abs_q": 43.45502471923828,
+    "minimum_pair_visits": 797,
+    "unvisited_pairs": 0,
+    "selected_action_q_std_last_episode": 0.0024042038712650537
+  },
+  "evaluation": {
+    "masked_stochastic": {
+      "actions_exact": true,
+      "rewards_exact": true,
+      "task_count": 4000,
+      "mean_reward": 60.55369681812354,
+      "mean_latency": 2.0214231522299113
+    },
+    "masked_greedy": {
+      "actions_exact": true,
+      "rewards_exact": true,
+      "task_count": 4000,
+      "mean_reward": 49.128905252451425,
+      "mean_latency": 3.05216232655757
+    }
+  }
+}
