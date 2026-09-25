@@ -1,0 +1,6 @@
+{
+  "trial_id": 6,
+  "matched_reference_actions": true,
+  "matched_safe_masks": true,
+  "matched_task_outcomes": true
+}

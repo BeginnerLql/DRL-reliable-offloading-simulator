@@ -1,0 +1,22 @@
+comparison,metric,direction,n_seeds,bootstrap_samples,mean_delta_ppo_minus_baseline,ci95_low,ci95_high,ppo_wins,baseline_wins,ties,bootstrap_seed
+Masked PPO stochastic vs Safe Min-Latency,mean_reward,higher,10,20000,-4.211827451810306,-4.350530779309839,-4.07183046926082,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,mean_latency,lower,10,20000,0.1655780562816664,0.15918634657342093,0.17218416459311608,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,p95_latency,lower,10,20000,0.4639069335782331,0.43847237284773577,0.48783278420372905,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,overall_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Min-Latency,highest_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Min-Latency,pair_selection_hhi,lower,10,20000,-0.024345899999999997,-0.027722969687499998,-0.020716425312500005,10,0,0,2043
+Masked PPO stochastic vs Safe Min-Latency,maximum_mean_queue_length,lower,10,20000,0.003103707634983019,-0.004444907209668625,0.01102083361983704,4,6,0,2043
+Masked PPO stochastic vs Max-Reliability,mean_reward,higher,10,20000,16.526533007042804,15.767072184567814,17.261439061832014,10,0,0,2043
+Masked PPO stochastic vs Max-Reliability,mean_latency,lower,10,20000,-1.5230775458338213,-1.6767831939512547,-1.3748293192268701,10,0,0,2043
+Masked PPO stochastic vs Max-Reliability,p95_latency,lower,10,20000,-5.2868474949521636,-6.031530929870471,-4.5548561429138505,10,0,0,2043
+Masked PPO stochastic vs Max-Reliability,overall_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Max-Reliability,highest_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Max-Reliability,pair_selection_hhi,lower,10,20000,-0.22949098749999997,-0.278101323125,-0.17974841968750008,10,0,0,2043
+Masked PPO stochastic vs Max-Reliability,maximum_mean_queue_length,lower,10,20000,-1.0383000221564134,-1.278176906618745,-0.8238589655747194,10,0,0,2043
+Masked PPO stochastic vs Safe Random,mean_reward,higher,10,20000,1.442434019089203,1.3309320826730868,1.5539544599342225,10,0,0,2043
+Masked PPO stochastic vs Safe Random,mean_latency,lower,10,20000,-0.0629757890298704,-0.06785967793325325,-0.05829635965394437,10,0,0,2043
+Masked PPO stochastic vs Safe Random,p95_latency,lower,10,20000,-0.1567626194963684,-0.19539662811651845,-0.12337908367837408,10,0,0,2043
+Masked PPO stochastic vs Safe Random,overall_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Random,highest_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Random,pair_selection_hhi,lower,10,20000,0.014792275000000021,0.011851910625000031,0.01813041250000002,0,10,0,2043
+Masked PPO stochastic vs Safe Random,maximum_mean_queue_length,lower,10,20000,0.028516320255477418,0.02229092600036462,0.03627577800512065,0,10,0,2043
