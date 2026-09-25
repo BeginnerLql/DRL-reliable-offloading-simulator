@@ -1,0 +1,14 @@
+analysis,horizon,n,correlation,cross_validated_r2
+critic_value_from_current_observable_state,0,1000,-0.0296042773351707,0.12243123775608644
+critic_value_vs_ppo_branch_return,5,1000,0.08610870022689641,
+critic_value_vs_ppo_future_latency,5,1000,-0.019968383843798766,
+critic_value_vs_ppo_future_queue_length,5,1000,-0.06130945170797745,
+critic_value_vs_ppo_future_backlog,5,1000,-0.02859862264232189,
+critic_value_vs_ppo_branch_return,10,1000,0.11955698935846384,
+critic_value_vs_ppo_future_latency,10,1000,-0.04761286698776589,
+critic_value_vs_ppo_future_queue_length,10,1000,-0.10549151093345985,
+critic_value_vs_ppo_future_backlog,10,1000,-0.0755869205955452,
+critic_value_vs_ppo_branch_return,20,1000,0.1377630837600803,
+critic_value_vs_ppo_future_latency,20,1000,-0.05490337522231503,
+critic_value_vs_ppo_future_queue_length,20,1000,-0.08895557574637307,
+critic_value_vs_ppo_future_backlog,20,1000,-0.04681761358465393,

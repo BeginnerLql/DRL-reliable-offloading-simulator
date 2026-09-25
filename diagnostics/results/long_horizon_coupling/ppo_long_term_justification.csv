@@ -1,0 +1,11 @@
+action_source,horizon,eligible_deviations,justified_deviation_count,long_term_justified_deviation_rate
+PPO high probability,1,86,4,0.046511627906976744
+PPO high probability,5,86,12,0.13953488372093023
+PPO high probability,10,86,11,0.12790697674418605
+PPO high probability,20,86,11,0.12790697674418605
+PPO high probability,50,86,11,0.12790697674418605
+PPO sampled,1,576,6,0.010416666666666666
+PPO sampled,5,576,82,0.1423611111111111
+PPO sampled,10,576,88,0.1527777777777778
+PPO sampled,20,576,88,0.1527777777777778
+PPO sampled,50,576,88,0.1527777777777778

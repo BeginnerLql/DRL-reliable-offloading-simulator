@@ -1,0 +1,4 @@
+model,horizon,n_candidate_actions,grouped_5fold_r2
+grouped_ordinary_least_squares,5,20834,0.10317685793646714
+grouped_ordinary_least_squares,10,20834,0.10668093761935804
+grouped_ordinary_least_squares,20,20834,0.10056094768243407

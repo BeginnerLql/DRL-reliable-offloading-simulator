@@ -1,0 +1,84 @@
+{
+  "source_formal_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "formal_reference_metadata_sha256": null,
+  "server_info_sha256": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+  "task_parameters_sha256": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434",
+  "diagnostic_script_sha256": "87b28dac25b9034c5c9b41abf7caecea93584b045f076185043c5af6c504616a",
+  "formal_trial_count": 10,
+  "sampled_state_count": 1000,
+  "states_per_trial": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "evaluation_stream_seeds": [
+    {
+      "Trial_ID": 0,
+      "Eval_Arrival_Seed": 2423506597,
+      "Eval_Spatial_Seed": 3960158338
+    },
+    {
+      "Trial_ID": 1,
+      "Eval_Arrival_Seed": 4043962209,
+      "Eval_Spatial_Seed": 2612271498
+    },
+    {
+      "Trial_ID": 2,
+      "Eval_Arrival_Seed": 2017672492,
+      "Eval_Spatial_Seed": 2957188839
+    },
+    {
+      "Trial_ID": 3,
+      "Eval_Arrival_Seed": 2546089818,
+      "Eval_Spatial_Seed": 3735038650
+    },
+    {
+      "Trial_ID": 4,
+      "Eval_Arrival_Seed": 1497692198,
+      "Eval_Spatial_Seed": 1055097318
+    },
+    {
+      "Trial_ID": 5,
+      "Eval_Arrival_Seed": 2751659313,
+      "Eval_Spatial_Seed": 3468984453
+    },
+    {
+      "Trial_ID": 6,
+      "Eval_Arrival_Seed": 1043718295,
+      "Eval_Spatial_Seed": 1794308211
+    },
+    {
+      "Trial_ID": 7,
+      "Eval_Arrival_Seed": 3140262569,
+      "Eval_Spatial_Seed": 2503817415
+    },
+    {
+      "Trial_ID": 8,
+      "Eval_Arrival_Seed": 2002949442,
+      "Eval_Spatial_Seed": 3766312230
+    },
+    {
+      "Trial_ID": 9,
+      "Eval_Arrival_Seed": 2514310370,
+      "Eval_Spatial_Seed": 439308977
+    }
+  ],
+  "horizons": [
+    1,
+    5,
+    10,
+    20,
+    50
+  ],
+  "gamma": 0.9,
+  "max_reliability_counterfactual_actions": "all safe actions; max-reliability fallback actions only for empty safe sets",
+  "downstream_policy": "frozen stochastic Masked Pair PPO",
+  "simulator_reward_policy_or_environment_modified": false
+}

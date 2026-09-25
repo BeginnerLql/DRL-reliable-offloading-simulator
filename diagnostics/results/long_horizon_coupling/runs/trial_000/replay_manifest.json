@@ -1,0 +1,20 @@
+{
+  "trial_id": 0,
+  "num_states": 100,
+  "counterfactual_actions": 1559,
+  "formal_eval_replay_actions_match": true,
+  "actor_sha256": "f8e729db614052e3acd20aab6c12f7e1ef6698668f750eb0d77e9eceae9404d0",
+  "critic_sha256": "7a674efd2dffd689af1d920fc89fa23b81d1a88e9f4269c5db832e3db8228019",
+  "prefix_snapshot_external_stream_replay_checks": 1559,
+  "branch_intervention_count": 1559,
+  "horizons": [
+    1,
+    5,
+    10,
+    20,
+    50
+  ],
+  "gamma": 0.9,
+  "downstream_policy": "frozen_masked_pair_ppo_stochastic",
+  "episode": 1
+}
