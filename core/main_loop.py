@@ -528,7 +528,11 @@ class MainLoop:
                     "Resolved PPO task has no valid outcome timestamp"
                 )
 
-            self.model.assign_task_reward(task_counter, task_reward)
+            record_outcome = getattr(self.model, "record_task_outcome", None)
+            if callable(record_outcome):
+                record_outcome(task_counter, task_reward, task_outcome_time)
+            else:
+                self.model.assign_task_reward(task_counter, task_reward)
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time
             else:

@@ -67,8 +67,8 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
     agent_name = "reliability_masked_pair_ppo"
 
     def __init__(self, *args, deployment_mode="stochastic", frozen=False, **kwargs):
-        if kwargs.get("actor_mode") != "pair_scoring":
-            raise ValueError("ReliabilityMaskedPairPPOAgent requires pair_scoring Actor")
+        if kwargs.get("actor_mode") not in {"pair_scoring", "pair_context"}:
+            raise ValueError("ReliabilityMaskedPairPPOAgent requires a pair Actor")
         super().__init__(*args, **kwargs)
         if deployment_mode not in ("stochastic", "greedy"):
             raise ValueError("deployment_mode must be stochastic or greedy")
@@ -277,9 +277,7 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
                 self.optimizer_policy.zero_grad(set_to_none=True)
                 self.optimizer_value.zero_grad(set_to_none=True)
                 total_loss.backward()
-                nn.utils.clip_grad_norm_(
-                    list(self.policy_net.parameters()) + list(self.value_net.parameters()), self.max_grad_norm
-                )
+                self._clip_gradients()
                 self.optimizer_policy.step()
                 self.optimizer_value.step()
         self.policy_old.load_state_dict(self.policy_net.state_dict())
@@ -290,3 +288,10 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
             "mean_masked_entropy": entropy_sum/minibatches,
         })
         self.clear_rollout()
+
+    def _clip_gradients(self):
+        """Legacy shared clipping; the versioned agent can override this hook."""
+        nn.utils.clip_grad_norm_(
+            list(self.policy_net.parameters()) + list(self.value_net.parameters()),
+            self.max_grad_norm,
+        )

@@ -210,6 +210,41 @@ class PPOPairScoringPolicyNetwork(nn.Module):
         return logits[0] if single else logits
 
 
+class PPOContextPairScoringPolicyNetwork(PPOPairScoringPolicyNetwork):
+    """Versioned scorer preserving node tuples and full observed context.
+
+    Symmetry is imposed on scores, not independently on feature coordinates.
+    Legacy 12-feature pair_scoring checkpoints keep their original class.
+    """
+
+    def __init__(self, input_dim, output_dim, hidden_layers, num_servers,
+                 pair_correlations, activation="tanh"):
+        self.pair_feature_dim = 12 + 4 * int(num_servers)
+        super().__init__(input_dim, output_dim, hidden_layers, num_servers,
+                         pair_correlations, activation)
+
+    def build_pair_features(self, state):
+        state, single = self._batched_state(state)
+        nodes = self.build_node_features(state)
+        j, k = self.pair_indices[:, 0], self.pair_indices[:, 1]
+        n, count = self.num_servers, self.num_actions
+        features = torch.cat((
+            nodes[:, j], nodes[:, k],
+            self.pair_correlations.view(1, count, 1).expand(len(state), -1, -1),
+            state[:, None, 4*n:].expand(-1, count, -1),
+            state[:, None, :4*n].expand(-1, count, -1),
+        ), dim=-1)
+        return features[0] if single else features
+
+    def score_pair_features(self, features):
+        reversed_nodes = torch.cat((features[..., 4:8], features[..., :4],
+                                    features[..., 8:]), dim=-1)
+        return (self.scorer(features) + self.scorer(reversed_nodes)).squeeze(-1) / 2
+
+    def forward(self, state):
+        return self.score_pair_features(self.build_pair_features(state))
+
+
 class PPOValueNetwork(nn.Module):
     # Critic network: maps state -> scalar value V(s)
     def __init__(self, input_dim, hidden_layers, activation="tanh"):
@@ -278,12 +313,12 @@ class PPOAgent:
         self.device = torch.device(device)
         self.num_actions = int(num_actions)
         self.actor_mode = str(actor_mode).strip().lower()
-        if self.actor_mode not in {"flat", "pair_scoring"}:
+        if self.actor_mode not in {"flat", "pair_scoring", "pair_context"}:
             raise ValueError(
-                "actor_mode must be either 'flat' or 'pair_scoring', "
+                "actor_mode must be flat, pair_scoring or pair_context, "
                 f"got {actor_mode!r}"
             )
-        if self.actor_mode == "pair_scoring":
+        if self.actor_mode in {"pair_scoring", "pair_context"}:
             if num_servers is None or pair_correlations is None:
                 raise ValueError(
                     "pair_scoring mode requires num_servers and pair_correlations"
@@ -327,12 +362,12 @@ class PPOAgent:
         # Policy networks:
         # - policy_net: trainable policy
         # - policy_old: frozen snapshot used for sampling and stable old log-prob computation
-        actor_class = (
-            PPOPairScoringPolicyNetwork
-            if self.actor_mode == "pair_scoring"
-            else PPOPolicyNetwork
-        )
-        if self.actor_mode == "pair_scoring":
+        actor_class = {
+            "flat": PPOPolicyNetwork,
+            "pair_scoring": PPOPairScoringPolicyNetwork,
+            "pair_context": PPOContextPairScoringPolicyNetwork,
+        }[self.actor_mode]
+        if self.actor_mode in {"pair_scoring", "pair_context"}:
             actor_kwargs = {
                 "num_servers": self.num_servers,
                 "pair_correlations": self.pair_correlations,

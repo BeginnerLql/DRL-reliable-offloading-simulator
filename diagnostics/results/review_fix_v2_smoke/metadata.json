@@ -1,0 +1,27 @@
+{
+  "agent_name": "context_masked_pair_ppo_v2",
+  "options": {
+    "actor_mode": "pair_context",
+    "credit_mode": "event_interval",
+    "gradient_clipping": "independent"
+  },
+  "seed_row": {
+    "Trial_ID": 0,
+    "Torch_Init_Seed": 479243620,
+    "Train_Action_Seed": 777531807,
+    "Train_Arrival_Seed": 188892308,
+    "Train_Spatial_Seed": 3026267445,
+    "PPO_Minibatch_Seed": 1826584539,
+    "Eval_Arrival_Seed": 3242416260,
+    "Eval_Spatial_Seed": 549321307
+  },
+  "train_episodes": 3,
+  "eval_episodes": 3,
+  "deployment": "stochastic",
+  "checkpoint_source": null,
+  "data_sha256": {
+    "server_info.xlsx": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+    "task_parameters.xlsx": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434"
+  },
+  "purpose": "functional smoke only; no effectiveness claim"
+}

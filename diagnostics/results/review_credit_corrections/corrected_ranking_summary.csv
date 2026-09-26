@@ -1,0 +1,13 @@
+reference,method,top1_hit,best_set_intersection,mean_regret
+FutureEvent,CenteredAdvantage,0.759,0.759,2.8571728037755553
+FutureEvent,OldQ,0.766,0.766,2.657746373571017
+FutureEvent,PPOActor,0.667,0.667,4.727896929469398
+FutureEvent,SafeMin,0.82,0.835,2.08481633131841
+OwnEvent,CenteredAdvantage,0.543,0.543,3.134832358128245
+OwnEvent,OldQ,0.583,0.583,5.715519597342825
+OwnEvent,PPOActor,0.878,0.878,2.4049251416388553
+OwnEvent,SafeMin,0.948,0.999,0.965312595173654
+TotalEvent,CenteredAdvantage,0.467,0.467,5.312943653672463
+TotalEvent,OldQ,0.53,0.53,7.694204462682503
+TotalEvent,PPOActor,0.619,0.619,6.453760562876915
+TotalEvent,SafeMin,0.826,0.874,2.371067418260725

@@ -782,7 +782,9 @@ def _write_report(conflict, externality, gae_summary, ranking_summary,
     (OUT / "ASYNC_TASK_CREDIT_AUDIT.md").write_text(report)
     (OUT / "async_credit_decision.json").write_text(json.dumps({
         "primary": primary, "secondary": secondary,
-        "future_externality_worth_learning": worthwhile,
+        "future_externality_worth_learning": None,
+        "observed_sample_path_externality": worthwhile,
+        "evidence_scope": "single continuation per action; causal root cause unresolved",
         "recommend_externality_aware_counterfactual_advantage": recommend_externality,
         "recommend_change_current_gae_temporal_semantics": recommend_temporal,
         "evidence": {
@@ -923,7 +925,8 @@ def _ranking_rows(state_id, actions, methods, references):
                 "candidate_count": len(actions),
                 "spearman": _safe_correlation(scores, ref, rank=True),
                 "pearson": _safe_correlation(scores, ref),
-                "top1_hit": bool(bool(method_best & ref_opt)),
+                "top1_hit": bool(best_position in ref_opt),
+                "best_set_intersects_reference": bool(method_best & ref_opt),
                 "top3_optimal_overlap": len(top3 & ref_opt) / max(1, len(top3)),
                 "top5_optimal_overlap": len(top5 & ref_opt) / max(1, len(top5)),
                 "top3_reference_overlap": len(top3 & ref_top3) / max(1, len(top3)),
@@ -1343,24 +1346,16 @@ def _write_report(conflict, externality, gae_summary, ranking_summary, strata_su
     safe_conflict_regret = float(safe_total.loc[safe_total.conflict_state, "regret"].mean()) if len(conflict_rows) else 0.0
     dec_evt_rank = float(conflict.spearman.median())
     dec_evt_jaccard = float(conflict.optimal_set_jaccard.mean())
-    if mean_future < 1e-3 and disjoint_rate < .05 and safe_conflict_regret < .01:
-        primary, secondary = "A", "None"
-        why = "Future spread, optimal-set conflict, and SafeMin conflict regret are all small under the fixed tie/regret tolerances."
-    elif dec_evt_rank < .8 or dec_evt_jaccard < .8:
-        primary, secondary = "C", "B" if mean_future >= 1e-3 and raw_future < raw_own else "E"
-        why = "Decision-index and event-time return rankings/optimal sets differ materially."
-    elif mean_future >= 1e-3 and disjoint_rate >= .05 and safe_conflict_regret >= .01 and raw_future < raw_own:
-        primary, secondary = "B", "None"
-        why = "Future spread, own/total conflicts, and SafeMin conflict regret are present, while raw PPO GAE aligns less with future than own advantage."
-    elif raw_future >= .2:
-        primary, secondary = "D", "None"
-        why = "Raw PPO GAE has material alignment with the future component."
-    else:
-        primary, secondary = "E", "B" if mean_future >= 1e-3 else "A"
-        why = "Evidence is mixed across externality size, conflict, baseline regret, and GAE alignment."
+    # One shared continuation per action is a sample-path contrast, not E[Q].
+    # Low GAE/sample-return correlation cannot establish a causal root cause.
+    primary, secondary = "E", "None"
+    why = ("Descriptive single-continuation evidence only: expected-action ranking "
+           "and the causal source of the PPO performance gap remain unresolved. "
+           "Historical pending-task effects are excluded from this legacy decomposition; "
+           "use review_credit_diagnostics.py for the supplemental causal accounting.")
     worthwhile = bool(mean_future >= 1e-3 and disjoint_rate >= .05 and safe_conflict_regret >= .01)
-    rec_externality = bool(worthwhile and raw_future < raw_own)
-    rec_temporal = bool(primary == "C")
+    rec_externality = False  # require replicated continuation evidence first
+    rec_temporal = False
 
     req = conflict.groupby("requirement").agg(states=("state_id", "nunique"), future_spread_mean=("future_event_spread", "mean"), conflict_rate=("conflict_state", "mean"), own_total_jaccard=("own_total_optimal_jaccard", "mean")).reset_index()
     load = conflict.groupby("load").agg(states=("state_id", "nunique"), future_spread_mean=("future_event_spread", "mean"), conflict_rate=("conflict_state", "mean")).reset_index()
@@ -1402,14 +1397,16 @@ def _write_report(conflict, externality, gae_summary, ranking_summary, strata_su
         "## Conclusion and go/no-go", "",
         f"Primary = **{primary}**, secondary = **{secondary}**. {why}",
         f"Evidence: mean future spread={mean_future:.4f}; own/total disjoint={disjoint_rate:.1%}; conflict SafeMin regret={safe_conflict_regret:.4f}; raw GAE own/future rho={raw_own:.4f}/{raw_future:.4f}; median decision/event rho={dec_evt_rank:.4f}; optimal-set Jaccard={dec_evt_jaccard:.3f}.",
-        f"Worthwhile long-term externality: **{'YES' if worthwhile else 'NO'}**. Recommend Externality-Aware/Counterfactual Advantage: **{'YES' if rec_externality else 'NO'}**. Recommend changing current PPO temporal GAE semantics: **{'YES' if rec_temporal else 'NO'}**.", "",
+        f"Observed sample-path externality: **{'YES' if worthwhile else 'NO'}**. Recommend Externality-Aware/Counterfactual Advantage: **{'YES' if rec_externality else 'NO'}**. Recommend changing current PPO temporal GAE semantics: **{'YES' if rec_temporal else 'NO'}**.", "",
         "## Figures", "",
         "- Own vs future spread: `own_vs_future_spread.png`", "- Future/own ratio: `future_own_spread_ratio.png`", "- Optimal-set conflict: `own_total_optimal_conflict.png`", "- SafeMin/PPO regret: `safemin_total_regret_conflicts.png`, `ppo_total_regret_conflicts.png`", "- GAE alignment: `gae_component_alignment.png`", "- Decision/event landscape: `decision_vs_event_total.png`", "- Load: `future_spread_by_load.png`", "- Task-distance accumulation: `externality_accumulation_by_task_distance.png`", "- Coupled/easy: `coupled_easy_externality_spread.png`", "- Top-5 cases: `representative_top5_action_components.png`", "",
     ]
     (OUT / "ASYNC_TASK_CREDIT_AUDIT.md").write_text("\n".join(map(str, lines)))
     decision = {
         "primary": primary, "secondary": secondary,
-        "future_externality_worth_learning": worthwhile,
+        "future_externality_worth_learning": None,
+        "observed_sample_path_externality": worthwhile,
+        "evidence_scope": "single continuation per action; causal root cause unresolved",
         "recommend_externality_aware_counterfactual_advantage": rec_externality,
         "recommend_change_current_gae_temporal_semantics": rec_temporal,
         "evidence": {"mean_future_event_spread": mean_future, "own_total_disjoint_rate": disjoint_rate,
