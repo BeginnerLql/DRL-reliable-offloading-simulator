@@ -1,0 +1,18 @@
+{
+  "training_actions_keyed_exact": true,
+  "training_reward_exact": true,
+  "training_delay_exact": true,
+  "q_online_and_target_weights_exact": true,
+  "masked_stochastic_and_greedy_regression": {
+    "masked_stochastic/evaluation_task_assignments.csv": true,
+    "masked_stochastic/evaluation_decisions.csv": true,
+    "masked_stochastic/evaluation_episode_metrics.csv": true,
+    "masked_stochastic/server_load.csv": true,
+    "masked_greedy/evaluation_task_assignments.csv": true,
+    "masked_greedy/evaluation_decisions.csv": true,
+    "masked_greedy/evaluation_episode_metrics.csv": true,
+    "masked_greedy/server_load.csv": true
+  },
+  "task_reward_delay_rsr_mask_and_queue_trajectory_exact": true,
+  "reward_formula_or_simulator_source_changed": false
+}

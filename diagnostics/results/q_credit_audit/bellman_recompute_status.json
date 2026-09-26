@@ -1,0 +1,20 @@
+{
+  "target_recompute_sample_count": 1000,
+  "max_abs_error": 1.3163534333671123e-05,
+  "mean_abs_error": 2.4397731760412713e-06,
+  "all_sampled_next_states_match": true,
+  "all_sampled_masks_match_collection": true,
+  "all_sampled_pi_old_match_collection": true,
+  "all_snapshot_hashes_match": true,
+  "terminal_count": 6,
+  "all_terminal_rows_no_bootstrap": true,
+  "max_discount_semantic_error": 1.1365368013382948e-07,
+  "nonfinite_target_q": 0,
+  "full_run_terminal_count": 300,
+  "full_run_terminal_no_bootstrap": true,
+  "one_terminal_per_episode": true,
+  "all_next_state_alignments": true,
+  "all_collection_masks_align": true,
+  "all_collection_policy_distributions_align": true,
+  "recompute_tolerance_pass": true
+}

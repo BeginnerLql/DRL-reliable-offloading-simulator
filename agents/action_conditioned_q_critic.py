@@ -135,6 +135,8 @@ class ActionValueCritic:
             parameter.requires_grad_(False)
         self.optimizer = torch.optim.Adam(self.online.parameters(), lr=self.config.learning_rate)
         self.update_count = 0
+        self.audit_optimizer_steps = False
+        self.optimizer_audit_rows = []
 
     @torch.no_grad()
     def soft_update_target(self):
@@ -211,8 +213,38 @@ class ActionValueCritic:
             grad_norm = nn.utils.clip_grad_norm_(self.online.parameters(), self.config.max_grad_norm)
             if not torch.isfinite(torch.as_tensor(grad_norm)):
                 raise FloatingPointError("Q gradient norm became non-finite")
+            if self.audit_optimizer_steps:
+                params_before = [parameter.detach().clone() for parameter in self.online.parameters()]
+                parameter_norm_before = torch.sqrt(sum(
+                    parameter.detach().pow(2).sum() for parameter in self.online.parameters()
+                ))
             self.optimizer.step()
             self.update_count += 1
+            if self.audit_optimizer_steps:
+                with torch.no_grad():
+                    selected_after = selected_action_values(
+                        self.online(tensors["states"]), tensors["actions"]
+                    )
+                    parameter_norm_after = torch.sqrt(sum(
+                        parameter.detach().pow(2).sum() for parameter in self.online.parameters()
+                    ))
+                    update_norm = torch.sqrt(sum(
+                        (parameter.detach() - previous).pow(2).sum()
+                        for parameter, previous in zip(self.online.parameters(), params_before)
+                    ))
+                self.optimizer_audit_rows.append({
+                    "episode": episode,
+                    "update_count": int(self.update_count),
+                    "rollout_update_index": int(update_idx),
+                    "loss": float(loss.detach().cpu()),
+                    "gradient_norm_before_clip": float(torch.as_tensor(grad_norm).detach().cpu()),
+                    "parameter_norm_before": float(parameter_norm_before.detach().cpu()),
+                    "parameter_norm_after": float(parameter_norm_after.detach().cpu()),
+                    "parameter_update_norm": float(update_norm.detach().cpu()),
+                    "selected_q_mean_before": float(selected.detach().mean().cpu()),
+                    "selected_q_mean_after": float(selected_after.mean().cpu()),
+                    "target_mean": float(targets.mean().cpu()),
+                })
             if self.update_count % int(self.config.target_update_interval) == 0:
                 self.soft_update_target()
             losses.append(float(loss.detach().cpu()))

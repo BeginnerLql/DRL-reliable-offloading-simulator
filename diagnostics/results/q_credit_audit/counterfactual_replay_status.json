@@ -1,0 +1,10 @@
+[
+  {
+    "held_out_state_count":1000,
+    "state_action_branch_count":20834,
+    "q_h1_exact_replay_match_count":20834,
+    "q_h20_q_h50_alignment_count":20834,
+    "trials_completed":10,
+    "counterfactual_targets_used_for_training":false
+  }
+]
