@@ -1,0 +1,5 @@
+state_variant,k,n_test,conditional_global_variance_ratio,mean_neighbor_distance,estimator
+S0,20,12000,0.7706076339425206,0.8730216738345832,Mean within 20 TRAIN-neighbor MC-return variance / global TEST variance.
+S1,20,12000,0.8227251983259722,3.3142278814131365,Mean within 20 TRAIN-neighbor MC-return variance / global TEST variance.
+S2,20,12000,0.8045700490795463,1.716434056276947,Mean within 20 TRAIN-neighbor MC-return variance / global TEST variance.
+S3,20,12000,0.8398244122618249,4.3417671165847525,Mean within 20 TRAIN-neighbor MC-return variance / global TEST variance.

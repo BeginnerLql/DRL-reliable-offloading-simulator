@@ -1,0 +1,34 @@
+{
+  "primary_classification": "B",
+  "classification_name": "RELIABILITY CONTEXT IS MISSING STATE",
+  "secondary_classification": null,
+  "test_r2_delta": {
+    "S1": 0.020171150990602307,
+    "S2": -0.012120624169902394,
+    "S3": 0.018821899705391
+  },
+  "conditional_variance_relative_reduction_s3": -0.08982103897048477,
+  "coupled_h20_alignment_gain_s3": 0.03448275862068961,
+  "mask_alias_rate_top_nearest_close_s0": 0.5102143757881463,
+  "safe_mask_alias_rate_top_nearest_close_s0": 0.5104665825977301,
+  "mean_mask_alias_return_gap": 101.2000447182384,
+  "mean_inflight_alias_return_gap": 100.59508803560637,
+  "mean_neither_alias_return_gap": 94.57148572165733,
+  "s0_neighbor_pairs": 3965,
+  "s0_neighbor_pair_share_of_test": 0.3304166666666667,
+  "formal_state_expansion_recommended": false,
+  "formal_ppo_retraining_recommended": false,
+  "formal_actor_or_simulator_modified": false,
+  "single_formal_seed_descriptive_only": true,
+  "decision_thresholds": {
+    "material_test_r2_gain": 0.02,
+    "strong_both_state_r2_gain": 0.05,
+    "conditional_variance_relative_reduction": 0.1,
+    "coupled_h20_alignment_gain": 0.02,
+    "backlog_similarity_l2": 0.1,
+    "flight_standardized_l2": 1.0
+  },
+  "strong_both_state_gate": false,
+  "predictive_gain_without_coupled_gae_gate": false,
+  "conclusion_limit": "A single frozen evaluation seed and supervised diagnostics do not establish that state aliasing causes the Safe Min-Latency performance gap."
+}

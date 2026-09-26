@@ -1,0 +1,21 @@
+{
+  "actor_file_sha256_before": "f8e729db614052e3acd20aab6c12f7e1ef6698668f750eb0d77e9eceae9404d0",
+  "actor_file_sha256_after": "f8e729db614052e3acd20aab6c12f7e1ef6698668f750eb0d77e9eceae9404d0",
+  "actor_parameter_sha256_before": "cb3a2e1ab140f2e0cd2a716056c5e5bde653d76ce5d51c9a6235a2aadf5b7643",
+  "actor_parameter_sha256_after": "cb3a2e1ab140f2e0cd2a716056c5e5bde653d76ce5d51c9a6235a2aadf5b7643",
+  "critic_file_sha256_before": "7a674efd2dffd689af1d920fc89fa23b81d1a88e9f4269c5db832e3db8228019",
+  "critic_file_sha256_after": "7a674efd2dffd689af1d920fc89fa23b81d1a88e9f4269c5db832e3db8228019",
+  "formal_policy_parameter_mismatch_count": 0,
+  "formal_critic_parameter_mismatch_count": 0,
+  "protected_source_hash_mismatch_count": 0,
+  "action_mismatch": 0,
+  "state_mismatch": 0,
+  "mask_mismatch": 0,
+  "probability_mismatch": 0,
+  "reliability_mismatch": 0,
+  "reward_max_abs_diff": 0.0,
+  "delay_max_abs_diff": 0.0,
+  "episodes": 300,
+  "decision_count": 60000,
+  "upload_lifecycle_count": 120000
+}
