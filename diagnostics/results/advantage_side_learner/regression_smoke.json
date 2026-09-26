@@ -1,0 +1,14 @@
+{
+  "episodes": 8,
+  "tasks_per_episode": 200,
+  "action_count": 1600,
+  "action_mismatch": 0,
+  "reward_max_abs_diff": 0.0,
+  "delay_max_abs_diff": 0.0,
+  "effective_mask_mismatch": 0,
+  "actor_hash_match": true,
+  "critic_hash_match": true,
+  "side_updates": 8,
+  "side_targets_captured": 1600,
+  "passed": true
+}

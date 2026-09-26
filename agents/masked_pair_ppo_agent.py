@@ -81,6 +81,10 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
         self.selection_archive = []
         self.update_diagnostics = []
         self._current_episode = None
+        # Optional read-only diagnostic tap. Normal PPO runs leave this unset.
+        self.advantage_target_observer = None
+        self._pending_old_policy_probabilities = {}
+        self.rollout_old_policy_probabilities = []
 
     def prepare_action(self, task, env_state, episode, state):
         if self.current_decision is not None:
@@ -110,10 +114,16 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
             action_tensor = torch.tensor(action, dtype=torch.long, device=self.device)
             old_log_prob = float(dist.log_prob(action_tensor).item())
             entropy = float(dist.entropy().item())
+            old_policy_probabilities = (
+                dist.probs.detach().cpu().numpy().astype(np.float32, copy=True)
+                if self.advantage_target_observer is not None else None
+            )
         task_id = context["task_id"]
         if task_id in self.pending_decisions:
             raise RuntimeError("Duplicate pending task decision")
         self.pending_decisions[task_id] = (context["effective_mask"].copy(), old_log_prob, action, context["state"])
+        if old_policy_probabilities is not None:
+            self._pending_old_policy_probabilities[task_id] = old_policy_probabilities
         selected_reliability = float(context["reliabilities"][action])
         record = {
             "episode": context["episode"], "task_id": task_id,
@@ -146,12 +156,20 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
             raise
         self.old_log_probs[-1] = log_prob  # overwrite legacy unmasked bookkeeping
         self.effective_masks.append(mask)
+        if self.advantage_target_observer is not None:
+            try:
+                old_probabilities = self._pending_old_policy_probabilities.pop(task_id)
+            except KeyError as exc:
+                raise RuntimeError("Missing decision-time masked policy distribution") from exc
+            self.rollout_old_policy_probabilities.append(old_probabilities)
 
     def clear_rollout(self):
         super().clear_rollout()
         self.effective_masks.clear()
         self.pending_decisions.clear()
         self.current_decision = None
+        self._pending_old_policy_probabilities.clear()
+        self.rollout_old_policy_probabilities.clear()
 
     def train_step(self):
         n = len(self.states)
@@ -199,9 +217,32 @@ class ReliabilityMaskedPairPPOAgent(PPOAgent):
             returns = advantages + values.detach()
             if not torch.isfinite(advantages).all() or not torch.isfinite(returns).all():
                 raise RuntimeError("Masked PPO GAE is non-finite")
+            raw_advantages = advantages.detach().clone()
             mean = advantages.mean()
             std = advantages.std(unbiased=False)
             advantages = (advantages - mean) if std.item() < 1e-8 else (advantages - mean) / (std + 1e-8)
+        if self.advantage_target_observer is not None:
+            if len(self.rollout_old_policy_probabilities) != n:
+                raise RuntimeError("Decision-time masked policy distributions do not match rollout")
+            # Export immutable CPU copies only; PPO tensors and update inputs are untouched.
+            payload = {
+                "episode": int(self._current_episode or 0),
+                "task_ids": np.asarray(self.task_ids, dtype=np.int64).copy(),
+                "states": np.asarray(self.states, dtype=np.float32).copy(),
+                "actions": np.asarray(self.actions, dtype=np.int64).copy(),
+                "effective_masks": np.asarray(self.effective_masks, dtype=np.bool_).copy(),
+                "old_policy_probabilities": np.asarray(
+                    self.rollout_old_policy_probabilities, dtype=np.float32
+                ).copy(),
+                "raw_gae_advantages": raw_advantages.cpu().numpy().astype(np.float32, copy=True),
+                "actor_used_advantages": advantages.detach().cpu().numpy().astype(np.float32, copy=True),
+                "value_predictions": values.detach().cpu().numpy().astype(np.float32, copy=True),
+                "gae_return_targets": returns.detach().cpu().numpy().astype(np.float32, copy=True),
+            }
+            for value in payload.values():
+                if isinstance(value, np.ndarray):
+                    value.setflags(write=False)
+            self.advantage_target_observer(payload)
         batch_size = min(int(self.batch_size), n)
         first_ratio_max_error = None
         min_ratio, max_ratio = math.inf, -math.inf

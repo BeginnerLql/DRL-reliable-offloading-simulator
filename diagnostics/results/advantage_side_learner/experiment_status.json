@@ -1,0 +1,39 @@
+{
+  "formal_reference_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "source_checkout_head": "97d0211b0c5df44db9032697aaa3b930284ca791",
+  "trial_id": 0,
+  "seed_plan": {
+    "Trial_ID": 0,
+    "Torch_Init_Seed": 3943535286,
+    "Train_Action_Seed": 4135956355,
+    "Train_Arrival_Seed": 2771798559,
+    "Train_Spatial_Seed": 1319650318,
+    "PPO_Minibatch_Seed": 1667818003,
+    "Eval_Arrival_Seed": 2423506597,
+    "Eval_Spatial_Seed": 3960158338
+  },
+  "training_episodes": 300,
+  "tasks_per_episode": 200,
+  "training_transitions": 60000,
+  "heldout_state_count": 1000,
+  "heldout_horizons": [
+    5,
+    10,
+    20,
+    50
+  ],
+  "counterfactual_qh_used_for_training": false,
+  "fixed_horizon_as_algorithm_parameter": false,
+  "actor_v_loss_reward_mask_simulator_changed": false,
+  "regression_smoke_passed": true,
+  "full_regression_passed": true,
+  "centering_residual_max": 1.1362135410308839e-07,
+  "classification": "A. ADVANTAGE REPRESENTATION STILL FAILS",
+  "actor_integration_go": false,
+  "legacy_formal_and_q_diagnostics_modified": false,
+  "input_sha256": {
+    "server_info": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+    "task_parameters": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434",
+    "heldout_state_results": "663179af67f389e4c93a7b6f584acdb40bf62a7fc0a989626a392e95619fff57"
+  }
+}

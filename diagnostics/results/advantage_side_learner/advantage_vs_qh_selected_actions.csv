@@ -1,0 +1,2 @@
+status,training_transitions,heldout_states,matched_state_transition_count,reason,counterfactual_qh_used_for_training
+not_alignable_from_existing_artifacts,60000,1000,0,"Q_H labels belong to frozen held-out evaluation replay states; captured GAE targets belong to training rollouts with separate arrival/spatial RNG streams. No shared transition mapping is saved, so a same-state comparison cannot be established.",False

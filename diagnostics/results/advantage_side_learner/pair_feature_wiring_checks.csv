@@ -1,0 +1,3 @@
+checkpoint,pair_feature_std_mean,initial_or_current_output_spread_mean,permutation_max_abs_error,permutation_pass,pair_mapping_matches_combinations,selected_pair_mapping_sample,pair_feature_gradient_norm,pair_feature_gradient_nonzero
+initial_before_side_update,0.13518182933330536,0.15280194580554962,0.0,True,True,"(1, 3)",0.7484944462776184,True
+final_after_300_episodes,0.13518182933330536,0.3022467792034149,0.0,True,True,"(4, 8)",10.462226867675781,True

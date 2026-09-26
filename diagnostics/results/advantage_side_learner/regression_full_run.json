@@ -1,0 +1,20 @@
+{
+  "trial_id": 0,
+  "transition_count": 60000,
+  "action_mismatch": 0,
+  "effective_mask_mismatch": 0,
+  "reward_max_abs_diff": 2.842170943040401e-14,
+  "delay_max_abs_diff": 8.881784197001252e-16,
+  "episode_reward_curve_max_abs_diff": 1.8189894035458565e-12,
+  "episode_delay_curve_max_abs_diff": 5.684341886080802e-14,
+  "actor_state_dict_match": true,
+  "critic_state_dict_match": true,
+  "actor_state_dict_digest": "3cfdaee2e86ec5b42c3b7cba854adf30ddbd43eaea2515265be32d78dc59e116",
+  "critic_state_dict_digest": "126b975c6ca2cde2a774051afc5b052eb5377987e0c701705078244f33f020b3",
+  "baseline_actor_state_dict_digest": "3cfdaee2e86ec5b42c3b7cba854adf30ddbd43eaea2515265be32d78dc59e116",
+  "baseline_critic_state_dict_digest": "126b975c6ca2cde2a774051afc5b052eb5377987e0c701705078244f33f020b3",
+  "captured_ppo_updates": 300,
+  "actor_hash_match": true,
+  "critic_hash_match": true,
+  "passed": true
+}
