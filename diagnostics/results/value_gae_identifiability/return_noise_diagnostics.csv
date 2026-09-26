@@ -1,0 +1,3 @@
+method,n,conditional_variance_ratio,mean_neighbor_distance,normalized_pair_difference_variance,note
+train-neighbor k20 for test states,12000,0.7706076339425206,0.8730216738345832,0.8089235111743253,"Approximate-state grouping, not an irreducible-noise estimate; train/test episodes disjoint"
+test load/demand/R_req coarse bins,12000,0.9174327083993116,,,TRAIN tercile cutpoints; bins are approximate states

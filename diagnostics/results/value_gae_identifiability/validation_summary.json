@@ -1,0 +1,22 @@
+{
+  "command": "python -m pytest -q --ignore-glob='*dqn*' --ignore-glob='*ddpg*'",
+  "passed": 346,
+  "failed": 0,
+  "subtests_passed": 90,
+  "warnings": 1,
+  "warning": "Existing action_conditioned_q_critic.py list-of-ndarrays tensor performance warning",
+  "python": "3.10.19 (main, Oct 21 2025, 16:43:05) [GCC 11.2.0]",
+  "executable": "/home/user/anaconda3/envs/DRL-reliable-offloading-simulator/bin/python",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "numpy": "2.2.6",
+  "pandas": "2.3.3",
+  "torch": "2.10.0+cu130",
+  "scipy": "1.15.3",
+  "pytest": "9.0.3",
+  "dataset_hash_mismatch_count": 0,
+  "dataset_numerical_checks": "passed",
+  "matched_states": 1000,
+  "candidate_branches": 23065,
+  "matched_mismatch_count": 0,
+  "plot_count": 10
+}

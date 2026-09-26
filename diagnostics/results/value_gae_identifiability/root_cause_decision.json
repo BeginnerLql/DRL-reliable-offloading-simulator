@@ -1,0 +1,17 @@
+{
+  "primary": "C",
+  "secondary": "B",
+  "best_validation_arm": "V3",
+  "value_gate": true,
+  "overall_gae_gate": false,
+  "coupled_gae_gate": false,
+  "modify_formal_v": false,
+  "integrate_centered_advantage": false,
+  "standardization_scale_effect": true,
+  "current_state_low_predictability": true,
+  "one_seed_only": true,
+  "primary_reference": "production task-credit reward + gamma**delta_t",
+  "historical_reference": "interval completion reward + gamma**step, sensitivity only",
+  "original_huber_hypothesis_rejected": "Formal value loss is MSE; delta1 saturation is hypothetical",
+  "v1_inference_limit": "Fresh offline replay and critic-only gradient clipping also differ; improvement alone does not isolate policy nonstationarity causally"
+}
