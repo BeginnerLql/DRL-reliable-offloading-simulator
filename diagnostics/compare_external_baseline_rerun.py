@@ -179,10 +179,15 @@ def run(old_dir: Path = OLD_DEFAULT, new_dir: Path = NEW_DEFAULT) -> dict:
     old_dir, new_dir = old_dir.resolve(), new_dir.resolve()
     metadata_path = new_dir / "rerun_metadata.json"
     metadata = json.loads(metadata_path.read_text())
-    if metadata["git_commit"] != subprocess.check_output(
+    current_head = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-    ).strip():
-        raise RuntimeError("Working HEAD changed since rerun metadata was recorded")
+    ).strip()
+    base_is_ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", metadata["git_commit"], current_head],
+        cwd=ROOT, check=False,
+    ).returncode == 0
+    if not base_is_ancestor:
+        raise RuntimeError("Rerun base commit is not an ancestor of the current checkout")
     old_hash_before = metadata["old_external_baselines_sha256_before"]
     old_hash_now = _tree_hashes(old_dir)
     old_unchanged = old_hash_before == old_hash_now

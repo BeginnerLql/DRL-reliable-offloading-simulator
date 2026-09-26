@@ -511,8 +511,8 @@
     },
     "verdict": "A. EXACT / NUMERICALLY IDENTICAL REPRODUCTION"
   },
-  "reproduction_report_script_sha256": "13edcf8b3f3c13ecf6d5c9fb3a8d98a51e19107c812fe45633e754c881c5451a",
-  "run_completed_utc": "2026-09-26T08:36:17.502504+00:00",
+  "reproduction_report_script_sha256": "c71f9613dc1e9db7c095f8bc8193f09383d27683778e9b801336400af07c8966",
+  "run_completed_utc": "2026-09-26T08:38:37.858762+00:00",
   "run_started_utc": "2026-09-26T08:21:29.815739+00:00",
   "script_versions": {
     "agents/masked_pair_ppo_agent.py": "424274a31e3f514c358656b8c9b5e534610a15008889b3c0cdd689f367c7473e",
