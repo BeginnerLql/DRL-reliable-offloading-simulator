@@ -1,0 +1,3 @@
+policy,tasks,action_mismatch_count,selected_pair_mismatch_count,max_abs_diff_Task_Reward,max_abs_diff_Task_Delay,max_abs_diff_Execution_Reliability,max_abs_diff_selected_pair_reliability,max_abs_diff_estimated_latency,max_abs_diff_R_req,max_abs_diff_safe_set_size,max_abs_diff_safe_set_empty,safe_set_size_mismatch_count,safe_set_empty_mismatch_count,reliability_satisfied_mismatch_count,reliability_requirement_mismatch_count
+Safe Min-Latency,40000,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0
+Masked PPO stochastic,40000,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,0,0,0

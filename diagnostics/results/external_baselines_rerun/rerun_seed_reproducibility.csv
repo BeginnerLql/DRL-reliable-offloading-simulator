@@ -1,0 +1,481 @@
+trial_id,policy,metric,old_value,rerun_value,absolute_diff,match
+0,Safe Min-Latency,mean_reward,64.67208297229865,64.67208297229865,0.0,True
+1,Safe Min-Latency,mean_reward,65.80624468290765,65.80624468290765,0.0,True
+2,Safe Min-Latency,mean_reward,64.78873655817024,64.78873655817024,0.0,True
+3,Safe Min-Latency,mean_reward,65.26720987866372,65.26720987866372,0.0,True
+4,Safe Min-Latency,mean_reward,66.14770884605954,66.14770884605954,0.0,True
+5,Safe Min-Latency,mean_reward,65.66543115660157,65.66543115660157,0.0,True
+6,Safe Min-Latency,mean_reward,65.91380235176057,65.91380235176057,0.0,True
+7,Safe Min-Latency,mean_reward,66.3722341126399,66.3722341126399,0.0,True
+8,Safe Min-Latency,mean_reward,65.09336829256384,65.09336829256384,0.0,True
+9,Safe Min-Latency,mean_reward,66.68277288285104,66.68277288285104,0.0,True
+0,Safe Min-Latency,mean_latency,1.85199155616718,1.85199155616718,0.0,True
+1,Safe Min-Latency,mean_latency,1.843264976811387,1.843264976811387,0.0,True
+2,Safe Min-Latency,mean_latency,1.8468500138066184,1.8468500138066184,0.0,True
+3,Safe Min-Latency,mean_latency,1.8492765122675612,1.8492765122675612,0.0,True
+4,Safe Min-Latency,mean_latency,1.847830030218144,1.847830030218144,0.0,True
+5,Safe Min-Latency,mean_latency,1.8388378225697013,1.8388378225697013,0.0,True
+6,Safe Min-Latency,mean_latency,1.83529402563474,1.83529402563474,0.0,True
+7,Safe Min-Latency,mean_latency,1.8511387113236324,1.8511387113236324,0.0,True
+8,Safe Min-Latency,mean_latency,1.8479938677510928,1.8479938677510928,0.0,True
+9,Safe Min-Latency,mean_latency,1.8388027157924456,1.8388027157924456,0.0,True
+0,Safe Min-Latency,p50_latency,1.836423968533936,1.836423968533936,0.0,True
+1,Safe Min-Latency,p50_latency,1.7947845699724212,1.7947845699724212,0.0,True
+2,Safe Min-Latency,p50_latency,1.807657702832301,1.807657702832301,0.0,True
+3,Safe Min-Latency,p50_latency,1.807657702832301,1.807657702832301,0.0,True
+4,Safe Min-Latency,p50_latency,1.807657702832301,1.807657702832301,0.0,True
+5,Safe Min-Latency,p50_latency,1.806895344916203,1.806895344916203,0.0,True
+6,Safe Min-Latency,p50_latency,1.8104846337677003,1.8104846337677003,0.0,True
+7,Safe Min-Latency,p50_latency,1.8359357774366172,1.8359357774366172,0.0,True
+8,Safe Min-Latency,p50_latency,1.8312567047462949,1.8312567047462949,0.0,True
+9,Safe Min-Latency,p50_latency,1.807657702832301,1.807657702832301,0.0,True
+0,Safe Min-Latency,p90_latency,2.8350189186446078,2.8350189186446078,0.0,True
+1,Safe Min-Latency,p90_latency,2.8350189186446078,2.8350189186446078,0.0,True
+2,Safe Min-Latency,p90_latency,2.8265712935369165,2.8265712935369165,0.0,True
+3,Safe Min-Latency,p90_latency,2.8350520981221266,2.8350520981221266,0.0,True
+4,Safe Min-Latency,p90_latency,2.8235896603175843,2.8235896603175843,0.0,True
+5,Safe Min-Latency,p90_latency,2.8243114876464714,2.8243114876464714,0.0,True
+6,Safe Min-Latency,p90_latency,2.8243114876464688,2.8243114876464688,0.0,True
+7,Safe Min-Latency,p90_latency,2.8350189186446078,2.8350189186446078,0.0,True
+8,Safe Min-Latency,p90_latency,2.8350189186446078,2.8350189186446078,0.0,True
+9,Safe Min-Latency,p90_latency,2.8350189186446078,2.8350189186446078,0.0,True
+0,Safe Min-Latency,p95_latency,3.165309902168332,3.165309902168332,0.0,True
+1,Safe Min-Latency,p95_latency,3.143342361201661,3.143342361201661,0.0,True
+2,Safe Min-Latency,p95_latency,3.125597087487993,3.125597087487993,0.0,True
+3,Safe Min-Latency,p95_latency,3.143342361201661,3.143342361201661,0.0,True
+4,Safe Min-Latency,p95_latency,3.158664461681491,3.158664461681491,0.0,True
+5,Safe Min-Latency,p95_latency,3.1160517252147613,3.1160517252147613,0.0,True
+6,Safe Min-Latency,p95_latency,3.088660221014635,3.088660221014635,0.0,True
+7,Safe Min-Latency,p95_latency,3.165309902168333,3.165309902168333,0.0,True
+8,Safe Min-Latency,p95_latency,3.143342361201661,3.143342361201661,0.0,True
+9,Safe Min-Latency,p95_latency,3.117388160801207,3.117388160801207,0.0,True
+0,Safe Min-Latency,overall_rsr,0.95675,0.95675,0.0,True
+1,Safe Min-Latency,overall_rsr,0.97425,0.97425,0.0,True
+2,Safe Min-Latency,overall_rsr,0.9575,0.9575,0.0,True
+3,Safe Min-Latency,overall_rsr,0.9655,0.9655,0.0,True
+4,Safe Min-Latency,overall_rsr,0.983,0.983,0.0,True
+5,Safe Min-Latency,overall_rsr,0.9715,0.9715,0.0,True
+6,Safe Min-Latency,overall_rsr,0.97525,0.97525,0.0,True
+7,Safe Min-Latency,overall_rsr,0.9875,0.9875,0.0,True
+8,Safe Min-Latency,overall_rsr,0.96625,0.96625,0.0,True
+9,Safe Min-Latency,overall_rsr,0.98975,0.98975,0.0,True
+0,Safe Min-Latency,highest_rsr,0.827,0.827,0.0,True
+1,Safe Min-Latency,highest_rsr,0.897,0.897,0.0,True
+2,Safe Min-Latency,highest_rsr,0.83,0.83,0.0,True
+3,Safe Min-Latency,highest_rsr,0.862,0.862,0.0,True
+4,Safe Min-Latency,highest_rsr,0.932,0.932,0.0,True
+5,Safe Min-Latency,highest_rsr,0.886,0.886,0.0,True
+6,Safe Min-Latency,highest_rsr,0.901,0.901,0.0,True
+7,Safe Min-Latency,highest_rsr,0.95,0.95,0.0,True
+8,Safe Min-Latency,highest_rsr,0.872,0.872,0.0,True
+9,Safe Min-Latency,highest_rsr,0.959,0.959,0.0,True
+0,Safe Min-Latency,feasibility_rate,0.95675,0.95675,0.0,True
+1,Safe Min-Latency,feasibility_rate,0.97425,0.97425,0.0,True
+2,Safe Min-Latency,feasibility_rate,0.9575,0.9575,0.0,True
+3,Safe Min-Latency,feasibility_rate,0.9655,0.9655,0.0,True
+4,Safe Min-Latency,feasibility_rate,0.983,0.983,0.0,True
+5,Safe Min-Latency,feasibility_rate,0.9715,0.9715,0.0,True
+6,Safe Min-Latency,feasibility_rate,0.97525,0.97525,0.0,True
+7,Safe Min-Latency,feasibility_rate,0.9875,0.9875,0.0,True
+8,Safe Min-Latency,feasibility_rate,0.96625,0.96625,0.0,True
+9,Safe Min-Latency,feasibility_rate,0.98975,0.98975,0.0,True
+0,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+1,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+2,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+3,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+4,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+5,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+6,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+7,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+8,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+9,Safe Min-Latency,conditional_rsr,1.0,1.0,0.0,True
+0,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+1,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+2,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+3,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+4,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+5,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+6,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+7,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+8,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+9,Safe Min-Latency,avoidable_violation_count,0.0,0.0,0.0,True
+0,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+1,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+2,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+3,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+4,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+5,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+6,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+7,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+8,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+9,Safe Min-Latency,avoidable_violation_rate,0.0,0.0,0.0,True
+0,Safe Min-Latency,unavoidable_violation_count,173.0,173.0,0.0,True
+1,Safe Min-Latency,unavoidable_violation_count,103.0,103.0,0.0,True
+2,Safe Min-Latency,unavoidable_violation_count,170.0,170.0,0.0,True
+3,Safe Min-Latency,unavoidable_violation_count,138.0,138.0,0.0,True
+4,Safe Min-Latency,unavoidable_violation_count,68.0,68.0,0.0,True
+5,Safe Min-Latency,unavoidable_violation_count,114.0,114.0,0.0,True
+6,Safe Min-Latency,unavoidable_violation_count,99.0,99.0,0.0,True
+7,Safe Min-Latency,unavoidable_violation_count,50.0,50.0,0.0,True
+8,Safe Min-Latency,unavoidable_violation_count,135.0,135.0,0.0,True
+9,Safe Min-Latency,unavoidable_violation_count,41.0,41.0,0.0,True
+0,Safe Min-Latency,unavoidable_violation_rate,0.04325,0.04325,0.0,True
+1,Safe Min-Latency,unavoidable_violation_rate,0.02575,0.02575,0.0,True
+2,Safe Min-Latency,unavoidable_violation_rate,0.0425,0.0425,0.0,True
+3,Safe Min-Latency,unavoidable_violation_rate,0.0345,0.0345,0.0,True
+4,Safe Min-Latency,unavoidable_violation_rate,0.017,0.017,0.0,True
+5,Safe Min-Latency,unavoidable_violation_rate,0.0285,0.0285,0.0,True
+6,Safe Min-Latency,unavoidable_violation_rate,0.02475,0.02475,0.0,True
+7,Safe Min-Latency,unavoidable_violation_rate,0.0125,0.0125,0.0,True
+8,Safe Min-Latency,unavoidable_violation_rate,0.03375,0.03375,0.0,True
+9,Safe Min-Latency,unavoidable_violation_rate,0.01025,0.01025,0.0,True
+0,Safe Min-Latency,mean_safe_set_size,20.9215,20.9215,0.0,True
+1,Safe Min-Latency,mean_safe_set_size,21.58975,21.58975,0.0,True
+2,Safe Min-Latency,mean_safe_set_size,20.92725,20.92725,0.0,True
+3,Safe Min-Latency,mean_safe_set_size,21.56875,21.56875,0.0,True
+4,Safe Min-Latency,mean_safe_set_size,22.13625,22.13625,0.0,True
+5,Safe Min-Latency,mean_safe_set_size,21.52125,21.52125,0.0,True
+6,Safe Min-Latency,mean_safe_set_size,21.96725,21.96725,0.0,True
+7,Safe Min-Latency,mean_safe_set_size,22.172,22.172,0.0,True
+8,Safe Min-Latency,mean_safe_set_size,21.60325,21.60325,0.0,True
+9,Safe Min-Latency,mean_safe_set_size,22.111,22.111,0.0,True
+0,Safe Min-Latency,pair_selection_hhi,0.081664875,0.081664875,0.0,True
+1,Safe Min-Latency,pair_selection_hhi,0.079294375,0.079294375,0.0,True
+2,Safe Min-Latency,pair_selection_hhi,0.081038625,0.081038625,0.0,True
+3,Safe Min-Latency,pair_selection_hhi,0.079184375,0.079184375,0.0,True
+4,Safe Min-Latency,pair_selection_hhi,0.077373625,0.077373625,0.0,True
+5,Safe Min-Latency,pair_selection_hhi,0.0836555,0.0836555,0.0,True
+6,Safe Min-Latency,pair_selection_hhi,0.080683375,0.080683375,0.0,True
+7,Safe Min-Latency,pair_selection_hhi,0.0768985,0.0768985,0.0,True
+8,Safe Min-Latency,pair_selection_hhi,0.080299,0.080299,0.0,True
+9,Safe Min-Latency,pair_selection_hhi,0.078456875,0.078456875,0.0,True
+0,Safe Min-Latency,pair_selection_entropy,2.711369778210285,2.711369778210285,0.0,True
+1,Safe Min-Latency,pair_selection_entropy,2.721474662941847,2.721474662941847,0.0,True
+2,Safe Min-Latency,pair_selection_entropy,2.7438960070657386,2.7438960070657386,0.0,True
+3,Safe Min-Latency,pair_selection_entropy,2.7256097360057936,2.7256097360057936,0.0,True
+4,Safe Min-Latency,pair_selection_entropy,2.749915754813114,2.749915754813114,0.0,True
+5,Safe Min-Latency,pair_selection_entropy,2.705820331374136,2.705820331374136,0.0,True
+6,Safe Min-Latency,pair_selection_entropy,2.727893571820084,2.727893571820084,0.0,True
+7,Safe Min-Latency,pair_selection_entropy,2.7449016869118275,2.7449016869118275,0.0,True
+8,Safe Min-Latency,pair_selection_entropy,2.719119760540863,2.719119760540863,0.0,True
+9,Safe Min-Latency,pair_selection_entropy,2.728151797872141,2.728151797872141,0.0,True
+0,Safe Min-Latency,top1_pair_frequency,0.1755,0.1755,0.0,True
+1,Safe Min-Latency,top1_pair_frequency,0.163,0.163,0.0,True
+2,Safe Min-Latency,top1_pair_frequency,0.17825,0.17825,0.0,True
+3,Safe Min-Latency,top1_pair_frequency,0.15925,0.15925,0.0,True
+4,Safe Min-Latency,top1_pair_frequency,0.1605,0.1605,0.0,True
+5,Safe Min-Latency,top1_pair_frequency,0.18225,0.18225,0.0,True
+6,Safe Min-Latency,top1_pair_frequency,0.1745,0.1745,0.0,True
+7,Safe Min-Latency,top1_pair_frequency,0.15875,0.15875,0.0,True
+8,Safe Min-Latency,top1_pair_frequency,0.1685,0.1685,0.0,True
+9,Safe Min-Latency,top1_pair_frequency,0.1565,0.1565,0.0,True
+0,Safe Min-Latency,unique_selected_pairs,27.0,27.0,0.0,True
+1,Safe Min-Latency,unique_selected_pairs,25.0,25.0,0.0,True
+2,Safe Min-Latency,unique_selected_pairs,27.0,27.0,0.0,True
+3,Safe Min-Latency,unique_selected_pairs,27.0,27.0,0.0,True
+4,Safe Min-Latency,unique_selected_pairs,27.0,27.0,0.0,True
+5,Safe Min-Latency,unique_selected_pairs,26.0,26.0,0.0,True
+6,Safe Min-Latency,unique_selected_pairs,26.0,26.0,0.0,True
+7,Safe Min-Latency,unique_selected_pairs,25.0,25.0,0.0,True
+8,Safe Min-Latency,unique_selected_pairs,26.0,26.0,0.0,True
+9,Safe Min-Latency,unique_selected_pairs,27.0,27.0,0.0,True
+0,Safe Min-Latency,pair_78_frequency,0.1755,0.1755,0.0,True
+1,Safe Min-Latency,pair_78_frequency,0.163,0.163,0.0,True
+2,Safe Min-Latency,pair_78_frequency,0.17825,0.17825,0.0,True
+3,Safe Min-Latency,pair_78_frequency,0.15925,0.15925,0.0,True
+4,Safe Min-Latency,pair_78_frequency,0.1605,0.1605,0.0,True
+5,Safe Min-Latency,pair_78_frequency,0.18225,0.18225,0.0,True
+6,Safe Min-Latency,pair_78_frequency,0.1745,0.1745,0.0,True
+7,Safe Min-Latency,pair_78_frequency,0.15875,0.15875,0.0,True
+8,Safe Min-Latency,pair_78_frequency,0.1685,0.1685,0.0,True
+9,Safe Min-Latency,pair_78_frequency,0.1565,0.1565,0.0,True
+0,Safe Min-Latency,maximum_server_selection_share,0.298125,0.298125,0.0,True
+1,Safe Min-Latency,maximum_server_selection_share,0.294125,0.294125,0.0,True
+2,Safe Min-Latency,maximum_server_selection_share,0.29125,0.29125,0.0,True
+3,Safe Min-Latency,maximum_server_selection_share,0.29675,0.29675,0.0,True
+4,Safe Min-Latency,maximum_server_selection_share,0.296375,0.296375,0.0,True
+5,Safe Min-Latency,maximum_server_selection_share,0.29275,0.29275,0.0,True
+6,Safe Min-Latency,maximum_server_selection_share,0.299125,0.299125,0.0,True
+7,Safe Min-Latency,maximum_server_selection_share,0.29675,0.29675,0.0,True
+8,Safe Min-Latency,maximum_server_selection_share,0.29775,0.29775,0.0,True
+9,Safe Min-Latency,maximum_server_selection_share,0.292625,0.292625,0.0,True
+0,Safe Min-Latency,maximum_server_utilization,0.3856139139336006,0.3856139139336006,0.0,True
+1,Safe Min-Latency,maximum_server_utilization,0.3962511036142336,0.3962511036142336,0.0,True
+2,Safe Min-Latency,maximum_server_utilization,0.3932698915959617,0.3932698915959617,0.0,True
+3,Safe Min-Latency,maximum_server_utilization,0.382714404782797,0.382714404782797,0.0,True
+4,Safe Min-Latency,maximum_server_utilization,0.3828274488298799,0.3828274488298799,0.0,True
+5,Safe Min-Latency,maximum_server_utilization,0.3954730675922501,0.3954730675922501,0.0,True
+6,Safe Min-Latency,maximum_server_utilization,0.3833350356885028,0.3833350356885028,0.0,True
+7,Safe Min-Latency,maximum_server_utilization,0.3789784161977597,0.3789784161977597,0.0,True
+8,Safe Min-Latency,maximum_server_utilization,0.3869199116939666,0.3869199116939666,0.0,True
+9,Safe Min-Latency,maximum_server_utilization,0.3862756566850967,0.3862756566850967,0.0,True
+0,Safe Min-Latency,maximum_mean_queue_length,0.091311879765735,0.091311879765735,0.0,True
+1,Safe Min-Latency,maximum_mean_queue_length,0.0826671062152911,0.0826671062152911,0.0,True
+2,Safe Min-Latency,maximum_mean_queue_length,0.0814288306392054,0.0814288306392054,0.0,True
+3,Safe Min-Latency,maximum_mean_queue_length,0.0828063398942639,0.0828063398942639,0.0,True
+4,Safe Min-Latency,maximum_mean_queue_length,0.0762851957451155,0.0762851957451155,0.0,True
+5,Safe Min-Latency,maximum_mean_queue_length,0.0886403523441422,0.0886403523441422,0.0,True
+6,Safe Min-Latency,maximum_mean_queue_length,0.0732389490035144,0.0732389490035144,0.0,True
+7,Safe Min-Latency,maximum_mean_queue_length,0.0793513332198254,0.0793513332198254,0.0,True
+8,Safe Min-Latency,maximum_mean_queue_length,0.0807257426252435,0.0807257426252435,0.0,True
+9,Safe Min-Latency,maximum_mean_queue_length,0.0763937981495129,0.0763937981495129,0.0,True
+0,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+1,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+2,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+3,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+4,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+5,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+6,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+7,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+8,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+9,Safe Min-Latency,maximum_p95_queue_length,1.0,1.0,0.0,True
+0,Safe Min-Latency,mean_server_waiting_time,0.2265356421495607,0.2265356421495607,0.0,True
+1,Safe Min-Latency,mean_server_waiting_time,0.2194575303477568,0.2194575303477568,0.0,True
+2,Safe Min-Latency,mean_server_waiting_time,0.2312852281189183,0.2312852281189183,0.0,True
+3,Safe Min-Latency,mean_server_waiting_time,0.2524771946087332,0.2524771946087332,0.0,True
+4,Safe Min-Latency,mean_server_waiting_time,0.2598725429791358,0.2598725429791358,0.0,True
+5,Safe Min-Latency,mean_server_waiting_time,0.2201400326847887,0.2201400326847887,0.0,True
+6,Safe Min-Latency,mean_server_waiting_time,0.2270469116014584,0.2270469116014584,0.0,True
+7,Safe Min-Latency,mean_server_waiting_time,0.2404927255140329,0.2404927255140329,0.0,True
+8,Safe Min-Latency,mean_server_waiting_time,0.2606818504406566,0.2606818504406566,0.0,True
+9,Safe Min-Latency,mean_server_waiting_time,0.2006487424275553,0.2006487424275553,0.0,True
+0,Masked PPO stochastic,mean_reward,60.55369681812354,60.55369681812354,0.0,True
+1,Masked PPO stochastic,mean_reward,61.77776491377688,61.77776491377688,0.0,True
+2,Masked PPO stochastic,mean_reward,60.59948446595163,60.59948446595163,0.0,True
+3,Masked PPO stochastic,mean_reward,60.82596312725253,60.82596312725253,0.0,True
+4,Masked PPO stochastic,mean_reward,61.89701687390434,61.89701687390434,0.0,True
+5,Masked PPO stochastic,mean_reward,61.41212309869239,61.41212309869239,0.0,True
+6,Masked PPO stochastic,mean_reward,61.27887790795619,61.27887790795619,0.0,True
+7,Masked PPO stochastic,mean_reward,62.54022229614039,62.54022229614039,0.0,True
+8,Masked PPO stochastic,mean_reward,61.10400267624844,61.10400267624844,0.0,True
+9,Masked PPO stochastic,mean_reward,62.30216503836733,62.30216503836733,0.0,True
+0,Masked PPO stochastic,mean_latency,2.0214231522299118,2.0214231522299118,0.0,True
+1,Masked PPO stochastic,mean_latency,1.9947217306645169,1.9947217306645169,0.0,True
+2,Masked PPO stochastic,mean_latency,2.004543715790942,2.004543715790942,0.0,True
+3,Masked PPO stochastic,mean_latency,2.024229400940285,2.024229400940285,0.0,True
+4,Masked PPO stochastic,mean_latency,2.0186603089588715,2.0186603089588715,0.0,True
+5,Masked PPO stochastic,mean_latency,2.000493183586977,2.000493183586977,0.0,True
+6,Masked PPO stochastic,mean_latency,2.0185708145064973,2.0185708145064973,0.0,True
+7,Masked PPO stochastic,mean_latency,2.00216210579365,2.00216210579365,0.0,True
+8,Masked PPO stochastic,mean_latency,2.006335342784879,2.006335342784879,0.0,True
+9,Masked PPO stochastic,mean_latency,2.0159210399026364,2.0159210399026364,0.0,True
+0,Masked PPO stochastic,p50_latency,1.9650437059567167,1.9650437059567167,0.0,True
+1,Masked PPO stochastic,p50_latency,1.9488527919060343,1.9488527919060343,0.0,True
+2,Masked PPO stochastic,p50_latency,1.964890229284464,1.964890229284464,0.0,True
+3,Masked PPO stochastic,p50_latency,1.970155737637356,1.970155737637356,0.0,True
+4,Masked PPO stochastic,p50_latency,1.9575082193838045,1.9575082193838045,0.0,True
+5,Masked PPO stochastic,p50_latency,1.973657550068438,1.973657550068438,0.0,True
+6,Masked PPO stochastic,p50_latency,1.9667104167755485,1.9667104167755485,0.0,True
+7,Masked PPO stochastic,p50_latency,1.9564873090121324,1.9564873090121324,0.0,True
+8,Masked PPO stochastic,p50_latency,1.95444667843708,1.95444667843708,0.0,True
+9,Masked PPO stochastic,p50_latency,1.9556495884978489,1.9556495884978489,0.0,True
+0,Masked PPO stochastic,p90_latency,3.171451280879728,3.171451280879728,0.0,True
+1,Masked PPO stochastic,p90_latency,3.120254550879394,3.120254550879394,0.0,True
+2,Masked PPO stochastic,p90_latency,3.1175841014778825,3.1175841014778825,0.0,True
+3,Masked PPO stochastic,p90_latency,3.1769637190787705,3.1769637190787705,0.0,True
+4,Masked PPO stochastic,p90_latency,3.138991470250357,3.138991470250357,0.0,True
+5,Masked PPO stochastic,p90_latency,3.109329766840247,3.109329766840247,0.0,True
+6,Masked PPO stochastic,p90_latency,3.143342361201661,3.143342361201661,0.0,True
+7,Masked PPO stochastic,p90_latency,3.141662871190151,3.141662871190151,0.0,True
+8,Masked PPO stochastic,p90_latency,3.117569862220233,3.117569862220233,0.0,True
+9,Masked PPO stochastic,p90_latency,3.165309902168332,3.165309902168332,0.0,True
+0,Masked PPO stochastic,p95_latency,3.684334382344083,3.684334382344083,0.0,True
+1,Masked PPO stochastic,p95_latency,3.5824872743383978,3.5824872743383978,0.0,True
+2,Masked PPO stochastic,p95_latency,3.511721600659995,3.511721600659995,0.0,True
+3,Masked PPO stochastic,p95_latency,3.622861964037744,3.622861964037744,0.0,True
+4,Masked PPO stochastic,p95_latency,3.595003047634219,3.595003047634219,0.0,True
+5,Masked PPO stochastic,p95_latency,3.573257693271728,3.573257693271728,0.0,True
+6,Masked PPO stochastic,p95_latency,3.591429896579541,3.591429896579541,0.0,True
+7,Masked PPO stochastic,p95_latency,3.5943579689825014,3.5943579689825014,0.0,True
+8,Masked PPO stochastic,p95_latency,3.657479395725673,3.657479395725673,0.0,True
+9,Masked PPO stochastic,p95_latency,3.593144656350185,3.593144656350185,0.0,True
+0,Masked PPO stochastic,overall_rsr,0.95675,0.95675,0.0,True
+1,Masked PPO stochastic,overall_rsr,0.97425,0.97425,0.0,True
+2,Masked PPO stochastic,overall_rsr,0.9575,0.9575,0.0,True
+3,Masked PPO stochastic,overall_rsr,0.9655,0.9655,0.0,True
+4,Masked PPO stochastic,overall_rsr,0.983,0.983,0.0,True
+5,Masked PPO stochastic,overall_rsr,0.9715,0.9715,0.0,True
+6,Masked PPO stochastic,overall_rsr,0.97525,0.97525,0.0,True
+7,Masked PPO stochastic,overall_rsr,0.9875,0.9875,0.0,True
+8,Masked PPO stochastic,overall_rsr,0.96625,0.96625,0.0,True
+9,Masked PPO stochastic,overall_rsr,0.98975,0.98975,0.0,True
+0,Masked PPO stochastic,highest_rsr,0.827,0.827,0.0,True
+1,Masked PPO stochastic,highest_rsr,0.897,0.897,0.0,True
+2,Masked PPO stochastic,highest_rsr,0.83,0.83,0.0,True
+3,Masked PPO stochastic,highest_rsr,0.862,0.862,0.0,True
+4,Masked PPO stochastic,highest_rsr,0.932,0.932,0.0,True
+5,Masked PPO stochastic,highest_rsr,0.886,0.886,0.0,True
+6,Masked PPO stochastic,highest_rsr,0.901,0.901,0.0,True
+7,Masked PPO stochastic,highest_rsr,0.95,0.95,0.0,True
+8,Masked PPO stochastic,highest_rsr,0.872,0.872,0.0,True
+9,Masked PPO stochastic,highest_rsr,0.959,0.959,0.0,True
+0,Masked PPO stochastic,feasibility_rate,0.95675,0.95675,0.0,True
+1,Masked PPO stochastic,feasibility_rate,0.97425,0.97425,0.0,True
+2,Masked PPO stochastic,feasibility_rate,0.9575,0.9575,0.0,True
+3,Masked PPO stochastic,feasibility_rate,0.9655,0.9655,0.0,True
+4,Masked PPO stochastic,feasibility_rate,0.983,0.983,0.0,True
+5,Masked PPO stochastic,feasibility_rate,0.9715,0.9715,0.0,True
+6,Masked PPO stochastic,feasibility_rate,0.97525,0.97525,0.0,True
+7,Masked PPO stochastic,feasibility_rate,0.9875,0.9875,0.0,True
+8,Masked PPO stochastic,feasibility_rate,0.96625,0.96625,0.0,True
+9,Masked PPO stochastic,feasibility_rate,0.98975,0.98975,0.0,True
+0,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+1,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+2,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+3,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+4,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+5,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+6,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+7,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+8,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+9,Masked PPO stochastic,conditional_rsr,1.0,1.0,0.0,True
+0,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+1,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+2,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+3,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+4,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+5,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+6,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+7,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+8,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+9,Masked PPO stochastic,avoidable_violation_count,0.0,0.0,0.0,True
+0,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+1,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+2,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+3,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+4,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+5,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+6,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+7,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+8,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+9,Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,0.0,True
+0,Masked PPO stochastic,unavoidable_violation_count,173.0,173.0,0.0,True
+1,Masked PPO stochastic,unavoidable_violation_count,103.0,103.0,0.0,True
+2,Masked PPO stochastic,unavoidable_violation_count,170.0,170.0,0.0,True
+3,Masked PPO stochastic,unavoidable_violation_count,138.0,138.0,0.0,True
+4,Masked PPO stochastic,unavoidable_violation_count,68.0,68.0,0.0,True
+5,Masked PPO stochastic,unavoidable_violation_count,114.0,114.0,0.0,True
+6,Masked PPO stochastic,unavoidable_violation_count,99.0,99.0,0.0,True
+7,Masked PPO stochastic,unavoidable_violation_count,50.0,50.0,0.0,True
+8,Masked PPO stochastic,unavoidable_violation_count,135.0,135.0,0.0,True
+9,Masked PPO stochastic,unavoidable_violation_count,41.0,41.0,0.0,True
+0,Masked PPO stochastic,unavoidable_violation_rate,0.04325,0.04325,0.0,True
+1,Masked PPO stochastic,unavoidable_violation_rate,0.02575,0.02575,0.0,True
+2,Masked PPO stochastic,unavoidable_violation_rate,0.0425,0.0425,0.0,True
+3,Masked PPO stochastic,unavoidable_violation_rate,0.0345,0.0345,0.0,True
+4,Masked PPO stochastic,unavoidable_violation_rate,0.017,0.017,0.0,True
+5,Masked PPO stochastic,unavoidable_violation_rate,0.0285,0.0285,0.0,True
+6,Masked PPO stochastic,unavoidable_violation_rate,0.02475,0.02475,0.0,True
+7,Masked PPO stochastic,unavoidable_violation_rate,0.0125,0.0125,0.0,True
+8,Masked PPO stochastic,unavoidable_violation_rate,0.03375,0.03375,0.0,True
+9,Masked PPO stochastic,unavoidable_violation_rate,0.01025,0.01025,0.0,True
+0,Masked PPO stochastic,mean_safe_set_size,20.9215,20.9215,0.0,True
+1,Masked PPO stochastic,mean_safe_set_size,21.58975,21.58975,0.0,True
+2,Masked PPO stochastic,mean_safe_set_size,20.92725,20.92725,0.0,True
+3,Masked PPO stochastic,mean_safe_set_size,21.56875,21.56875,0.0,True
+4,Masked PPO stochastic,mean_safe_set_size,22.13625,22.13625,0.0,True
+5,Masked PPO stochastic,mean_safe_set_size,21.52125,21.52125,0.0,True
+6,Masked PPO stochastic,mean_safe_set_size,21.96725,21.96725,0.0,True
+7,Masked PPO stochastic,mean_safe_set_size,22.172,22.172,0.0,True
+8,Masked PPO stochastic,mean_safe_set_size,21.60325,21.60325,0.0,True
+9,Masked PPO stochastic,mean_safe_set_size,22.111,22.111,0.0,True
+0,Masked PPO stochastic,pair_selection_hhi,0.067177625,0.067177625,0.0,True
+1,Masked PPO stochastic,pair_selection_hhi,0.0554265,0.0554265,0.0,True
+2,Masked PPO stochastic,pair_selection_hhi,0.05409525,0.05409525,0.0,True
+3,Masked PPO stochastic,pair_selection_hhi,0.050383375,0.050383375,0.0,True
+4,Masked PPO stochastic,pair_selection_hhi,0.061419375,0.061419375,0.0,True
+5,Masked PPO stochastic,pair_selection_hhi,0.052747875,0.052747875,0.0,True
+6,Masked PPO stochastic,pair_selection_hhi,0.04917075,0.04917075,0.0,True
+7,Masked PPO stochastic,pair_selection_hhi,0.0571855,0.0571855,0.0,True
+8,Masked PPO stochastic,pair_selection_hhi,0.05719575,0.05719575,0.0,True
+9,Masked PPO stochastic,pair_selection_hhi,0.050288125,0.050288125,0.0,True
+0,Masked PPO stochastic,pair_selection_entropy,2.9541763740238665,2.9541763740238665,0.0,True
+1,Masked PPO stochastic,pair_selection_entropy,3.073732633109536,3.073732633109536,0.0,True
+2,Masked PPO stochastic,pair_selection_entropy,3.090167051506724,3.090167051506724,0.0,True
+3,Masked PPO stochastic,pair_selection_entropy,3.133141259629636,3.133141259629636,0.0,True
+4,Masked PPO stochastic,pair_selection_entropy,3.022242160953362,3.022242160953362,0.0,True
+5,Masked PPO stochastic,pair_selection_entropy,3.108842130663404,3.108842130663404,0.0,True
+6,Masked PPO stochastic,pair_selection_entropy,3.161269694059401,3.161269694059401,0.0,True
+7,Masked PPO stochastic,pair_selection_entropy,3.067167580610917,3.067167580610917,0.0,True
+8,Masked PPO stochastic,pair_selection_entropy,3.0645583275422505,3.0645583275422505,0.0,True
+9,Masked PPO stochastic,pair_selection_entropy,3.1376274260916936,3.1376274260916936,0.0,True
+0,Masked PPO stochastic,top1_pair_frequency,0.13575,0.13575,0.0,True
+1,Masked PPO stochastic,top1_pair_frequency,0.11525,0.11525,0.0,True
+2,Masked PPO stochastic,top1_pair_frequency,0.115,0.115,0.0,True
+3,Masked PPO stochastic,top1_pair_frequency,0.085,0.085,0.0,True
+4,Masked PPO stochastic,top1_pair_frequency,0.1355,0.1355,0.0,True
+5,Masked PPO stochastic,top1_pair_frequency,0.10075,0.10075,0.0,True
+6,Masked PPO stochastic,top1_pair_frequency,0.10475,0.10475,0.0,True
+7,Masked PPO stochastic,top1_pair_frequency,0.12425,0.12425,0.0,True
+8,Masked PPO stochastic,top1_pair_frequency,0.12325,0.12325,0.0,True
+9,Masked PPO stochastic,top1_pair_frequency,0.094,0.094,0.0,True
+0,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+1,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+2,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+3,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+4,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+5,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+6,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+7,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+8,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+9,Masked PPO stochastic,unique_selected_pairs,28.0,28.0,0.0,True
+0,Masked PPO stochastic,pair_78_frequency,0.13575,0.13575,0.0,True
+1,Masked PPO stochastic,pair_78_frequency,0.11525,0.11525,0.0,True
+2,Masked PPO stochastic,pair_78_frequency,0.115,0.115,0.0,True
+3,Masked PPO stochastic,pair_78_frequency,0.08225,0.08225,0.0,True
+4,Masked PPO stochastic,pair_78_frequency,0.1355,0.1355,0.0,True
+5,Masked PPO stochastic,pair_78_frequency,0.10075,0.10075,0.0,True
+6,Masked PPO stochastic,pair_78_frequency,0.10475,0.10475,0.0,True
+7,Masked PPO stochastic,pair_78_frequency,0.12425,0.12425,0.0,True
+8,Masked PPO stochastic,pair_78_frequency,0.12325,0.12325,0.0,True
+9,Masked PPO stochastic,pair_78_frequency,0.094,0.094,0.0,True
+0,Masked PPO stochastic,maximum_server_selection_share,0.22575,0.22575,0.0,True
+1,Masked PPO stochastic,maximum_server_selection_share,0.22325,0.22325,0.0,True
+2,Masked PPO stochastic,maximum_server_selection_share,0.226375,0.226375,0.0,True
+3,Masked PPO stochastic,maximum_server_selection_share,0.20075,0.20075,0.0,True
+4,Masked PPO stochastic,maximum_server_selection_share,0.219875,0.219875,0.0,True
+5,Masked PPO stochastic,maximum_server_selection_share,0.21675,0.21675,0.0,True
+6,Masked PPO stochastic,maximum_server_selection_share,0.19575,0.19575,0.0,True
+7,Masked PPO stochastic,maximum_server_selection_share,0.218625,0.218625,0.0,True
+8,Masked PPO stochastic,maximum_server_selection_share,0.220375,0.220375,0.0,True
+9,Masked PPO stochastic,maximum_server_selection_share,0.199375,0.199375,0.0,True
+0,Masked PPO stochastic,maximum_server_utilization,0.3314381275895553,0.3314381275895553,0.0,True
+1,Masked PPO stochastic,maximum_server_utilization,0.3383188257219316,0.3383188257219316,0.0,True
+2,Masked PPO stochastic,maximum_server_utilization,0.3116339550914631,0.3116339550914631,0.0,True
+3,Masked PPO stochastic,maximum_server_utilization,0.2836479329945096,0.2836479329945096,0.0,True
+4,Masked PPO stochastic,maximum_server_utilization,0.3246312640685282,0.3246312640685282,0.0,True
+5,Masked PPO stochastic,maximum_server_utilization,0.2904431972793377,0.2904431972793377,0.0,True
+6,Masked PPO stochastic,maximum_server_utilization,0.2865600609254978,0.2865600609254978,0.0,True
+7,Masked PPO stochastic,maximum_server_utilization,0.2971250268162468,0.2971250268162468,0.0,True
+8,Masked PPO stochastic,maximum_server_utilization,0.2991391818993017,0.2991391818993017,0.0,True
+9,Masked PPO stochastic,maximum_server_utilization,0.2942581747524039,0.2942581747524039,0.0,True
+0,Masked PPO stochastic,maximum_mean_queue_length,0.0992695746722853,0.0992695746722853,0.0,True
+1,Masked PPO stochastic,maximum_mean_queue_length,0.1097602417139122,0.1097602417139122,0.0,True
+2,Masked PPO stochastic,maximum_mean_queue_length,0.08555490981709,0.08555490981709,0.0,True
+3,Masked PPO stochastic,maximum_mean_queue_length,0.0804486735567736,0.0804486735567736,0.0,True
+4,Masked PPO stochastic,maximum_mean_queue_length,0.0953023800845271,0.0953023800845271,0.0,True
+5,Masked PPO stochastic,maximum_mean_queue_length,0.0679435635549536,0.0679435635549536,0.0,True
+6,Masked PPO stochastic,maximum_mean_queue_length,0.0683998278677293,0.0683998278677293,0.0,True
+7,Masked PPO stochastic,maximum_mean_queue_length,0.0798664143553824,0.0798664143553824,0.0,True
+8,Masked PPO stochastic,maximum_mean_queue_length,0.0836819503009754,0.0836819503009754,0.0,True
+9,Masked PPO stochastic,maximum_mean_queue_length,0.0736590680280506,0.0736590680280506,0.0,True
+0,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+1,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+2,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+3,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+4,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+5,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+6,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+7,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+8,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+9,Masked PPO stochastic,maximum_p95_queue_length,1.0,1.0,0.0,True
+0,Masked PPO stochastic,mean_server_waiting_time,0.2997010155472162,0.2997010155472162,0.0,True
+1,Masked PPO stochastic,mean_server_waiting_time,0.2880461308569502,0.2880461308569502,0.0,True
+2,Masked PPO stochastic,mean_server_waiting_time,0.31108304678669,0.31108304678669,0.0,True
+3,Masked PPO stochastic,mean_server_waiting_time,0.3275935265251522,0.3275935265251522,0.0,True
+4,Masked PPO stochastic,mean_server_waiting_time,0.2889632587341331,0.2889632587341331,0.0,True
+5,Masked PPO stochastic,mean_server_waiting_time,0.308087617102074,0.308087617102074,0.0,True
+6,Masked PPO stochastic,mean_server_waiting_time,0.3084289296175045,0.3084289296175045,0.0,True
+7,Masked PPO stochastic,mean_server_waiting_time,0.2955990978227967,0.2955990978227967,0.0,True
+8,Masked PPO stochastic,mean_server_waiting_time,0.2896917282043728,0.2896917282043728,0.0,True
+9,Masked PPO stochastic,mean_server_waiting_time,0.2882769084035403,0.2882769084035403,0.0,True

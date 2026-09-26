@@ -1,0 +1,7 @@
+{
+  "trial_id": 6,
+  "actor_sha256": "1f9b9c5f6f3baaad2d7f7f7a37f7a9cb16beb6fceeb94aa75cef580d16524fe1",
+  "critic_sha256": "38c38968fa3944066e07942413014ee6312678948e0c1326a1a26206c7b53888",
+  "checkpoint_unchanged": true,
+  "replay_match": true
+}

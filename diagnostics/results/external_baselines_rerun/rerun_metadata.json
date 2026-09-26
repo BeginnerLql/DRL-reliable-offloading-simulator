@@ -1,0 +1,598 @@
+{
+  "checkpoint_hashes": [
+    {
+      "actor_sha256": "f8e729db614052e3acd20aab6c12f7e1ef6698668f750eb0d77e9eceae9404d0",
+      "critic_sha256": "7a674efd2dffd689af1d920fc89fa23b81d1a88e9f4269c5db832e3db8228019",
+      "eval_action_seed": 230484919,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 0
+    },
+    {
+      "actor_sha256": "4de404c0e51479a1519b3475fbd0a61c7906779b9f71386aaeac99d2372b10b2",
+      "critic_sha256": "cdd99e972a8f427149db430c61616307790892e1599009f9e46443718e67b5e5",
+      "eval_action_seed": 2497284264,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 1
+    },
+    {
+      "actor_sha256": "7b5a112d576fb8b8482f841a52d832ca15a79b4a2ca3a526a6491f890211fcab",
+      "critic_sha256": "2f8f6f2f0e3fe3d8977bb70857a63d22ca4e92ac2abdbc7d28f30a2511632e8e",
+      "eval_action_seed": 2293171022,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 2
+    },
+    {
+      "actor_sha256": "8900a7135cdb4b1d8948ed2465aa3d550b08350bef5805abd0ba69430aa3a091",
+      "critic_sha256": "7b065dbb70ced618d937534d41a8f94234dea02a09cd42c64b368e31b644612e",
+      "eval_action_seed": 3098273200,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 3
+    },
+    {
+      "actor_sha256": "b3841d2cb9a5440d0da89f8db6610cc93c3d3708d527ddff41b0bb018d68b44e",
+      "critic_sha256": "3419a56dd3b2dc48a0048d195517a48551138548ecce50c7a9fd4b0540660650",
+      "eval_action_seed": 919963319,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 4
+    },
+    {
+      "actor_sha256": "d709e6df82cc36370be09f55918bf4b8b6556ef2a503139679e7fa46f7ba592c",
+      "critic_sha256": "45277f84268d878769e962204c823d04cabf4b4d89f1f08ae4e2b2cc0672660d",
+      "eval_action_seed": 286573639,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 5
+    },
+    {
+      "actor_sha256": "1f9b9c5f6f3baaad2d7f7f7a37f7a9cb16beb6fceeb94aa75cef580d16524fe1",
+      "critic_sha256": "38c38968fa3944066e07942413014ee6312678948e0c1326a1a26206c7b53888",
+      "eval_action_seed": 2351310479,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 6
+    },
+    {
+      "actor_sha256": "4480caac197c3b904c2d1f13a3162d10431c796b8a37a0b6b27a0f878eff5fd5",
+      "critic_sha256": "49dd72d9c7877890666c30823043de19ab3664a0495d30c639389a543b69569c",
+      "eval_action_seed": 3745849670,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 7
+    },
+    {
+      "actor_sha256": "34e03d27397249ddc8b39faf3862b39e5aad36891a822b964a62a409f54d9604",
+      "critic_sha256": "5b57936a5eafed9593b4862cc474dd3cedce5cc402c95202bc942d0d1b60ce67",
+      "eval_action_seed": 3738762366,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 8
+    },
+    {
+      "actor_sha256": "7c47cebb7003296e60ae7e760175bf8f21b9e4d815be45d60dc9b8dcedfe867f",
+      "critic_sha256": "8aeb3c7844de624f4ca9a4e6846008317cb2ba23dfeac542484c023ebca4f73e",
+      "eval_action_seed": 3984531998,
+      "training_episodes": 300,
+      "training_tasks": 60000,
+      "trial_id": 9
+    }
+  ],
+  "evaluation_config": {
+    "bootstrap_samples": 20000,
+    "bootstrap_seed": 2043,
+    "deployment_mode_masked_ppo": "stochastic",
+    "eval_episodes": 20,
+    "num_trials": 10,
+    "policy_methods": [
+      "Max-Reliability",
+      "Safe Min-Latency",
+      "Safe Random",
+      "Masked PPO stochastic",
+      "Pair PPO greedy",
+      "Pair PPO stochastic",
+      "Masked PPO greedy"
+    ],
+    "seed_level_statistical_unit": true,
+    "tasks_per_episode": 200,
+    "tasks_per_policy": 40000,
+    "train_episodes_reference": 300,
+    "workers": 4
+  },
+  "formal_hyperparameters_and_reliability": {
+    "beta": 0.8,
+    "ell": 0.5,
+    "lambda_ref": 0.003,
+    "num_actions": 28,
+    "num_states": 35,
+    "omega": 0.9,
+    "ppo_actor_lr": 0.0001,
+    "ppo_batch_size": 64,
+    "ppo_clip_eps": 0.2,
+    "ppo_critic_lr": 0.0005,
+    "ppo_entropy_coef": 0.01,
+    "ppo_epochs": 2,
+    "ppo_gae_lambda": 0.95,
+    "ppo_gamma": 0.9,
+    "task_arrival_rate": 0.5
+  },
+  "formal_reference_commit": "7ddef1af40aef6e42c91f692946fda847a465024",
+  "formal_reference_input_sha256": {
+    "server_info.xlsx": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+    "task_parameters.xlsx": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434"
+  },
+  "formal_reference_timestamp": "2026-09-22T06:42:30.044877+00:00",
+  "formal_seed_plan": [
+    {
+      "Eval_Arrival_Seed": 2423506597,
+      "Eval_Spatial_Seed": 3960158338,
+      "PPO_Minibatch_Seed": 1667818003,
+      "Torch_Init_Seed": 3943535286,
+      "Train_Action_Seed": 4135956355,
+      "Train_Arrival_Seed": 2771798559,
+      "Train_Spatial_Seed": 1319650318,
+      "Trial_ID": 0
+    },
+    {
+      "Eval_Arrival_Seed": 4043962209,
+      "Eval_Spatial_Seed": 2612271498,
+      "PPO_Minibatch_Seed": 1086487992,
+      "Torch_Init_Seed": 2218427184,
+      "Train_Action_Seed": 391746049,
+      "Train_Arrival_Seed": 2111723216,
+      "Train_Spatial_Seed": 4100872708,
+      "Trial_ID": 1
+    },
+    {
+      "Eval_Arrival_Seed": 2017672492,
+      "Eval_Spatial_Seed": 2957188839,
+      "PPO_Minibatch_Seed": 670832229,
+      "Torch_Init_Seed": 3305516831,
+      "Train_Action_Seed": 1280262144,
+      "Train_Arrival_Seed": 1371824368,
+      "Train_Spatial_Seed": 2839701880,
+      "Trial_ID": 2
+    },
+    {
+      "Eval_Arrival_Seed": 2546089818,
+      "Eval_Spatial_Seed": 3735038650,
+      "PPO_Minibatch_Seed": 3676356497,
+      "Torch_Init_Seed": 1192739334,
+      "Train_Action_Seed": 4235503580,
+      "Train_Arrival_Seed": 3968220588,
+      "Train_Spatial_Seed": 4232791932,
+      "Trial_ID": 3
+    },
+    {
+      "Eval_Arrival_Seed": 1497692198,
+      "Eval_Spatial_Seed": 1055097318,
+      "PPO_Minibatch_Seed": 2351170419,
+      "Torch_Init_Seed": 505114092,
+      "Train_Action_Seed": 95520675,
+      "Train_Arrival_Seed": 8150809,
+      "Train_Spatial_Seed": 883848863,
+      "Trial_ID": 4
+    },
+    {
+      "Eval_Arrival_Seed": 2751659313,
+      "Eval_Spatial_Seed": 3468984453,
+      "PPO_Minibatch_Seed": 1312113740,
+      "Torch_Init_Seed": 1707589374,
+      "Train_Action_Seed": 152708713,
+      "Train_Arrival_Seed": 1504335179,
+      "Train_Spatial_Seed": 3281253211,
+      "Trial_ID": 5
+    },
+    {
+      "Eval_Arrival_Seed": 1043718295,
+      "Eval_Spatial_Seed": 1794308211,
+      "PPO_Minibatch_Seed": 2610243770,
+      "Torch_Init_Seed": 3174027296,
+      "Train_Action_Seed": 238249313,
+      "Train_Arrival_Seed": 2897305872,
+      "Train_Spatial_Seed": 2542459732,
+      "Trial_ID": 6
+    },
+    {
+      "Eval_Arrival_Seed": 3140262569,
+      "Eval_Spatial_Seed": 2503817415,
+      "PPO_Minibatch_Seed": 3972047515,
+      "Torch_Init_Seed": 2533770461,
+      "Train_Action_Seed": 827260491,
+      "Train_Arrival_Seed": 2748321498,
+      "Train_Spatial_Seed": 2244402405,
+      "Trial_ID": 7
+    },
+    {
+      "Eval_Arrival_Seed": 2002949442,
+      "Eval_Spatial_Seed": 3766312230,
+      "PPO_Minibatch_Seed": 4092474524,
+      "Torch_Init_Seed": 1327927588,
+      "Train_Action_Seed": 3590579795,
+      "Train_Arrival_Seed": 2296599192,
+      "Train_Spatial_Seed": 720261216,
+      "Trial_ID": 8
+    },
+    {
+      "Eval_Arrival_Seed": 2514310370,
+      "Eval_Spatial_Seed": 439308977,
+      "PPO_Minibatch_Seed": 1720455781,
+      "Torch_Init_Seed": 1638014571,
+      "Train_Action_Seed": 3031775690,
+      "Train_Arrival_Seed": 2458745699,
+      "Train_Spatial_Seed": 2887005890,
+      "Trial_ID": 9
+    }
+  ],
+  "git_commit": "3e93404214a2fd027e7073eceee30d34e2d9e3fa",
+  "input_sha256": {
+    "server_info.xlsx": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+    "task_parameters.xlsx": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434"
+  },
+  "num_actions": 28,
+  "num_states": 35,
+  "old_external_baselines_sha256_after": {
+    "EXTERNAL_BASELINE_REPORT.md": "6914ee728cc612e67649544a943ff3b6a916935716b3b914857789f50d6d3d9c",
+    "baseline_bootstrap_ci.csv": "da8c87b396ba95d6f045c4ea1bb29ec795bb6d85118834f531a082dab5dee0cf",
+    "baseline_decision_telemetry.csv.gz": "7ba69dc3af3418ddeb6cc4468ca9bb05cba33d2a043978270b50348c80e8c909",
+    "baseline_highest_rsr.png": "7c5d4da358ffd3c716d212fbcf919e410cc0ae102f2cac518ba22ac6055f15da",
+    "baseline_information_audit.md": "eab7c475b652a86a59e5294fb151d3cf7883063fa766853532b2cd04d99c4579",
+    "baseline_latency_by_task_quartile.csv": "adf3b8ba76fc94a145fb7be28ef57589988ad2e04458b33508e886f11a0b622b",
+    "baseline_latency_mechanism.csv": "85e23d3b41759039fa36484ce782f7b5c35e4227c18177464ff45732a34955e2",
+    "baseline_max_queue.png": "e09e9e605ce2c9d5eda0f50d0f9a5dd9ecda5b8cf31e3c90ab71fab3af27a09b",
+    "baseline_max_reliability_tie_summary.csv": "be375848c25f64855349d7987123911858a065467ac33edba079f42189e20b6e",
+    "baseline_max_reliability_ties.csv": "21bda6f0e77befb147107f9618e1ab3f298265116f1b203218df6803f9d94f4d",
+    "baseline_mean_latency.png": "f5fc93d3bffb3b94fb49d99ed0048f51f85dc4b639ec50bd09b1c6a39d2d2dac",
+    "baseline_overall_rsr.png": "06dfff868133c03cd154028b135876c0276a0f887bc113caceae4d3538db5679",
+    "baseline_p95_latency.png": "9c9ae1c3f9a83857fa003ebb52e83e143fb51b3ba3c5ed442e5b1e7aab69d8ac",
+    "baseline_pair_distribution.csv": "c85fdbed5f5291fdc2966a7fe9724f0ce172aecdde89dbfd67c12a473487cc68",
+    "baseline_pair_hhi.png": "c62e14a75213118090657ab4ce8dbc0fef87020386eacd8b793ef00c2cfd32ba",
+    "baseline_paired_comparisons.csv": "87fa526ac62fbfa987b82969602bf5fc0322dcc479de197d0ba632744f06922f",
+    "baseline_requirement_results.csv": "c7fa7fe7e1971adc323df5781f5278cefc4812769ca8b16de83a7f002478b103",
+    "baseline_reward.png": "09f5560b9555b7b79c2a8d19c5fc9adbe14277af9cdf006c6da176149bf58029",
+    "baseline_seed_results.csv": "25db34b3913784bd9642dacd08655f67d7d59911602be05aaf00fd358e3d21f8",
+    "baseline_server_load.csv": "a8f9d18c314efdf978e112548e8f133f826aa756394a7ac5a4c2450dffedf2fe",
+    "myopic_latency_estimate_vs_realized.png": "4c538c60cde45d464edb7fc3fb6ac6a6eede4ee7c1cdd423d5d5d0b383f437d7",
+    "ppo_vs_safe_min_latency.png": "558c24cc9114ddee42ef972f6e9148c25307398fa0de8de4aa875d6d1f05f097",
+    "ppo_vs_safe_min_latency_latency.png": "fbd2f674e007ee47a584de3c45f265fdd4121958e80ab62aad4c817153cab9f0",
+    "ppo_vs_safe_min_latency_queue.png": "04358063bac86c9c817c5a7c8d3fed28941b3712e62b280256402ebd757af478",
+    "ppo_vs_safe_min_latency_reward.png": "ad8ec68af84017691ea648442dd9bc2e1ea3345df768602b0e5067aa9760537e",
+    "ppo_vs_safe_random.png": "2a0f74a2f296796f3bca13d5774539d7e8cd894dec8b94c024b8e5bd08945b92",
+    "queue_backlog_by_task_quartile.png": "a75db443e6def483871e7740bd2c0653e914b2751c6d1c58da30729fc7028508",
+    "runs/trial_000/masked_stochastic_replay/checkpoint_replay.json": "65458c9656f85505e31051b417375c7380a6f4d693e5d5c14cac8f4a831247be",
+    "runs/trial_000/masked_stochastic_replay/replay_manifest.json": "837f2484ae997174ef9e8c2463a2f973eaa048754ad3f6b6d0267ee1d9742cf1",
+    "runs/trial_001/masked_stochastic_replay/checkpoint_replay.json": "b0bba441daaf221f8340f95dc7bce79cf02111c6bc421d31c4c3d6ede05aab4f",
+    "runs/trial_001/masked_stochastic_replay/replay_manifest.json": "478abd4625a3d6618d3bee8c63276cc9b8608abe8e95066c9f799be99507a0c4",
+    "runs/trial_002/masked_stochastic_replay/checkpoint_replay.json": "23d9697e7ac94316f568d9cb1c0666e6d7053b71c284f947e1a3304c4ff1abd7",
+    "runs/trial_002/masked_stochastic_replay/replay_manifest.json": "a91c3d068652d6deb34374df106c1d30170d35ec523b1926dd4f84234689d982",
+    "runs/trial_003/masked_stochastic_replay/checkpoint_replay.json": "3bb22a53bcab15867730fd28535371ab9d802d05b691062af852246544138f39",
+    "runs/trial_003/masked_stochastic_replay/replay_manifest.json": "f873d026b9501eb536825b4d154854f4c8a77ae3d7488b4f1c9c6a6a741d4f15",
+    "runs/trial_004/masked_stochastic_replay/checkpoint_replay.json": "60407ebb4777f6497fcfbdb421c66a159f6d9c0dcdb3be1a23946817265e3b8b",
+    "runs/trial_004/masked_stochastic_replay/replay_manifest.json": "44416a4bb6f8ac8f257487c582f13c78a7d7243ca67c716fbd432e6490cad9f2",
+    "runs/trial_005/masked_stochastic_replay/checkpoint_replay.json": "d189d3f59b155d2b2b02af19cacacff716fac0fdf470f02418b1c8b36b7da779",
+    "runs/trial_005/masked_stochastic_replay/replay_manifest.json": "2c0d6f9c341768f017359c69b0f492f61795d0f58931ce903f2b9df41a4142d0",
+    "runs/trial_006/masked_stochastic_replay/checkpoint_replay.json": "df93764030aea74a07ca687e5d4040bc785627c0b4d0d8cf4b5150bacb1463ca",
+    "runs/trial_006/masked_stochastic_replay/replay_manifest.json": "0d0b45cb471f50d591134914a65b3128697ac080e8ea4affb232b81a54799221",
+    "runs/trial_007/masked_stochastic_replay/checkpoint_replay.json": "caf9ed905b5bede1a86e6140f9bcadef6e63ca8a41665cea227cca3c9757b01e",
+    "runs/trial_007/masked_stochastic_replay/replay_manifest.json": "03255e39356e318449d7eb453c5075d881da6548a423991f9f3de29f917d881f",
+    "runs/trial_008/masked_stochastic_replay/checkpoint_replay.json": "45cf948326c5276ea29737d04bf194bc2f513b9604d901ec287d4f8394e1ed00",
+    "runs/trial_008/masked_stochastic_replay/replay_manifest.json": "77d462094097c301807258d22bf19c701ac57b57be5abf539110aee731e36c6e",
+    "runs/trial_009/masked_stochastic_replay/checkpoint_replay.json": "55ce7d3b4122422f7dfa8205b350d264315ac458c5ba2e7150b74f543f8466e1",
+    "runs/trial_009/masked_stochastic_replay/replay_manifest.json": "b6bfcb63337a642ac5eb4dc73f9ed0c664c4f479e419f5e23e0de60feafced52"
+  },
+  "old_external_baselines_sha256_before": {
+    "EXTERNAL_BASELINE_REPORT.md": "6914ee728cc612e67649544a943ff3b6a916935716b3b914857789f50d6d3d9c",
+    "baseline_bootstrap_ci.csv": "da8c87b396ba95d6f045c4ea1bb29ec795bb6d85118834f531a082dab5dee0cf",
+    "baseline_decision_telemetry.csv.gz": "7ba69dc3af3418ddeb6cc4468ca9bb05cba33d2a043978270b50348c80e8c909",
+    "baseline_highest_rsr.png": "7c5d4da358ffd3c716d212fbcf919e410cc0ae102f2cac518ba22ac6055f15da",
+    "baseline_information_audit.md": "eab7c475b652a86a59e5294fb151d3cf7883063fa766853532b2cd04d99c4579",
+    "baseline_latency_by_task_quartile.csv": "adf3b8ba76fc94a145fb7be28ef57589988ad2e04458b33508e886f11a0b622b",
+    "baseline_latency_mechanism.csv": "85e23d3b41759039fa36484ce782f7b5c35e4227c18177464ff45732a34955e2",
+    "baseline_max_queue.png": "e09e9e605ce2c9d5eda0f50d0f9a5dd9ecda5b8cf31e3c90ab71fab3af27a09b",
+    "baseline_max_reliability_tie_summary.csv": "be375848c25f64855349d7987123911858a065467ac33edba079f42189e20b6e",
+    "baseline_max_reliability_ties.csv": "21bda6f0e77befb147107f9618e1ab3f298265116f1b203218df6803f9d94f4d",
+    "baseline_mean_latency.png": "f5fc93d3bffb3b94fb49d99ed0048f51f85dc4b639ec50bd09b1c6a39d2d2dac",
+    "baseline_overall_rsr.png": "06dfff868133c03cd154028b135876c0276a0f887bc113caceae4d3538db5679",
+    "baseline_p95_latency.png": "9c9ae1c3f9a83857fa003ebb52e83e143fb51b3ba3c5ed442e5b1e7aab69d8ac",
+    "baseline_pair_distribution.csv": "c85fdbed5f5291fdc2966a7fe9724f0ce172aecdde89dbfd67c12a473487cc68",
+    "baseline_pair_hhi.png": "c62e14a75213118090657ab4ce8dbc0fef87020386eacd8b793ef00c2cfd32ba",
+    "baseline_paired_comparisons.csv": "87fa526ac62fbfa987b82969602bf5fc0322dcc479de197d0ba632744f06922f",
+    "baseline_requirement_results.csv": "c7fa7fe7e1971adc323df5781f5278cefc4812769ca8b16de83a7f002478b103",
+    "baseline_reward.png": "09f5560b9555b7b79c2a8d19c5fc9adbe14277af9cdf006c6da176149bf58029",
+    "baseline_seed_results.csv": "25db34b3913784bd9642dacd08655f67d7d59911602be05aaf00fd358e3d21f8",
+    "baseline_server_load.csv": "a8f9d18c314efdf978e112548e8f133f826aa756394a7ac5a4c2450dffedf2fe",
+    "myopic_latency_estimate_vs_realized.png": "4c538c60cde45d464edb7fc3fb6ac6a6eede4ee7c1cdd423d5d5d0b383f437d7",
+    "ppo_vs_safe_min_latency.png": "558c24cc9114ddee42ef972f6e9148c25307398fa0de8de4aa875d6d1f05f097",
+    "ppo_vs_safe_min_latency_latency.png": "fbd2f674e007ee47a584de3c45f265fdd4121958e80ab62aad4c817153cab9f0",
+    "ppo_vs_safe_min_latency_queue.png": "04358063bac86c9c817c5a7c8d3fed28941b3712e62b280256402ebd757af478",
+    "ppo_vs_safe_min_latency_reward.png": "ad8ec68af84017691ea648442dd9bc2e1ea3345df768602b0e5067aa9760537e",
+    "ppo_vs_safe_random.png": "2a0f74a2f296796f3bca13d5774539d7e8cd894dec8b94c024b8e5bd08945b92",
+    "queue_backlog_by_task_quartile.png": "a75db443e6def483871e7740bd2c0653e914b2751c6d1c58da30729fc7028508",
+    "runs/trial_000/masked_stochastic_replay/checkpoint_replay.json": "65458c9656f85505e31051b417375c7380a6f4d693e5d5c14cac8f4a831247be",
+    "runs/trial_000/masked_stochastic_replay/replay_manifest.json": "837f2484ae997174ef9e8c2463a2f973eaa048754ad3f6b6d0267ee1d9742cf1",
+    "runs/trial_001/masked_stochastic_replay/checkpoint_replay.json": "b0bba441daaf221f8340f95dc7bce79cf02111c6bc421d31c4c3d6ede05aab4f",
+    "runs/trial_001/masked_stochastic_replay/replay_manifest.json": "478abd4625a3d6618d3bee8c63276cc9b8608abe8e95066c9f799be99507a0c4",
+    "runs/trial_002/masked_stochastic_replay/checkpoint_replay.json": "23d9697e7ac94316f568d9cb1c0666e6d7053b71c284f947e1a3304c4ff1abd7",
+    "runs/trial_002/masked_stochastic_replay/replay_manifest.json": "a91c3d068652d6deb34374df106c1d30170d35ec523b1926dd4f84234689d982",
+    "runs/trial_003/masked_stochastic_replay/checkpoint_replay.json": "3bb22a53bcab15867730fd28535371ab9d802d05b691062af852246544138f39",
+    "runs/trial_003/masked_stochastic_replay/replay_manifest.json": "f873d026b9501eb536825b4d154854f4c8a77ae3d7488b4f1c9c6a6a741d4f15",
+    "runs/trial_004/masked_stochastic_replay/checkpoint_replay.json": "60407ebb4777f6497fcfbdb421c66a159f6d9c0dcdb3be1a23946817265e3b8b",
+    "runs/trial_004/masked_stochastic_replay/replay_manifest.json": "44416a4bb6f8ac8f257487c582f13c78a7d7243ca67c716fbd432e6490cad9f2",
+    "runs/trial_005/masked_stochastic_replay/checkpoint_replay.json": "d189d3f59b155d2b2b02af19cacacff716fac0fdf470f02418b1c8b36b7da779",
+    "runs/trial_005/masked_stochastic_replay/replay_manifest.json": "2c0d6f9c341768f017359c69b0f492f61795d0f58931ce903f2b9df41a4142d0",
+    "runs/trial_006/masked_stochastic_replay/checkpoint_replay.json": "df93764030aea74a07ca687e5d4040bc785627c0b4d0d8cf4b5150bacb1463ca",
+    "runs/trial_006/masked_stochastic_replay/replay_manifest.json": "0d0b45cb471f50d591134914a65b3128697ac080e8ea4affb232b81a54799221",
+    "runs/trial_007/masked_stochastic_replay/checkpoint_replay.json": "caf9ed905b5bede1a86e6140f9bcadef6e63ca8a41665cea227cca3c9757b01e",
+    "runs/trial_007/masked_stochastic_replay/replay_manifest.json": "03255e39356e318449d7eb453c5075d881da6548a423991f9f3de29f917d881f",
+    "runs/trial_008/masked_stochastic_replay/checkpoint_replay.json": "45cf948326c5276ea29737d04bf194bc2f513b9604d901ec287d4f8394e1ed00",
+    "runs/trial_008/masked_stochastic_replay/replay_manifest.json": "77d462094097c301807258d22bf19c701ac57b57be5abf539110aee731e36c6e",
+    "runs/trial_009/masked_stochastic_replay/checkpoint_replay.json": "55ce7d3b4122422f7dfa8205b350d264315ac458c5ba2e7150b74f543f8466e1",
+    "runs/trial_009/masked_stochastic_replay/replay_manifest.json": "b6bfcb63337a642ac5eb4dc73f9ed0c664c4f479e419f5e23e0de60feafced52"
+  },
+  "old_external_baselines_unchanged": true,
+  "origin_main_commit": "3e93404214a2fd027e7073eceee30d34e2d9e3fa",
+  "pair_action_order": [
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      6
+    ],
+    [
+      1,
+      7
+    ],
+    [
+      1,
+      8
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      2,
+      7
+    ],
+    [
+      2,
+      8
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      3,
+      8
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      4,
+      7
+    ],
+    [
+      4,
+      8
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      5,
+      8
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      6,
+      8
+    ],
+    [
+      7,
+      8
+    ]
+  ],
+  "post_run_audit": {
+    "checkpoint_replay": {
+      "checkpoint_mutation_count": 0,
+      "masked_action_mismatch_count": 0,
+      "masked_safe_mask_mismatch_count": 0,
+      "masked_task_outcome_failure_count": 0,
+      "matched_tasks_per_trial": 4000,
+      "trials": 10
+    },
+    "formal_evaluation_tasks_per_policy": 40000,
+    "maximum_seed_metric_absolute_difference": 0.0,
+    "new_seed_metric_rows": 480,
+    "no_ppo_training": true,
+    "old_external_baselines_unchanged": true,
+    "old_external_file_count": 47,
+    "paired_exogenous_trace_checks": {
+      "arrival_trace_mismatch_count": 0,
+      "assertions_passed": true,
+      "spatial_risk_trace_mismatch_count": 0,
+      "within_trial_policy_stream_comparisons": 30
+    },
+    "per_seed_reliability_equal": true,
+    "seed_metric_mismatch_count_at_1e-12": 0,
+    "task_reproduction": {
+      "Masked PPO stochastic": {
+        "action_mismatch_count": 0,
+        "max_abs_diff_Execution_Reliability": 0.0,
+        "max_abs_diff_R_req": 0.0,
+        "max_abs_diff_Task_Delay": 0.0,
+        "max_abs_diff_Task_Reward": 0.0,
+        "max_abs_diff_estimated_latency": 0.0,
+        "max_abs_diff_safe_set_empty": 0.0,
+        "max_abs_diff_safe_set_size": 0.0,
+        "max_abs_diff_selected_pair_reliability": 0.0,
+        "policy": "Masked PPO stochastic",
+        "reliability_requirement_mismatch_count": 0,
+        "reliability_satisfied_mismatch_count": 0,
+        "safe_set_empty_mismatch_count": 0,
+        "safe_set_size_mismatch_count": 0,
+        "selected_pair_mismatch_count": 0,
+        "tasks": 40000
+      },
+      "Safe Min-Latency": {
+        "action_mismatch_count": 0,
+        "max_abs_diff_Execution_Reliability": 0.0,
+        "max_abs_diff_R_req": 0.0,
+        "max_abs_diff_Task_Delay": 0.0,
+        "max_abs_diff_Task_Reward": 0.0,
+        "max_abs_diff_estimated_latency": 0.0,
+        "max_abs_diff_safe_set_empty": 0.0,
+        "max_abs_diff_safe_set_size": 0.0,
+        "max_abs_diff_selected_pair_reliability": 0.0,
+        "policy": "Safe Min-Latency",
+        "reliability_requirement_mismatch_count": 0,
+        "reliability_satisfied_mismatch_count": 0,
+        "safe_set_empty_mismatch_count": 0,
+        "safe_set_size_mismatch_count": 0,
+        "selected_pair_mismatch_count": 0,
+        "tasks": 40000
+      }
+    },
+    "verdict": "A. EXACT / NUMERICALLY IDENTICAL REPRODUCTION"
+  },
+  "reproduction_report_script_sha256": "13edcf8b3f3c13ecf6d5c9fb3a8d98a51e19107c812fe45633e754c881c5451a",
+  "run_completed_utc": "2026-09-26T08:36:17.502504+00:00",
+  "run_started_utc": "2026-09-26T08:21:29.815739+00:00",
+  "script_versions": {
+    "agents/masked_pair_ppo_agent.py": "424274a31e3f514c358656b8c9b5e534610a15008889b3c0cdd689f367c7473e",
+    "config/params.py": "1dc2346f3835594d3d083d80e45247f40ac598b7f33978272bc1332ee1b17fe2",
+    "core/main_loop.py": "6abc3d2ac92540c6c82852a8cf66df3fa71f14a2bb65a2385fea27ca6d5e895c",
+    "core/task.py": "1860a8c92673a008a0d99d741f6b904bee389c15ef994a2939f0944aee0322f7",
+    "diagnostics/external_reliability_baselines.py": "0428de3f4f2900f0f030d23ddf38c444a04cd95a1e76920323805aee2d56b9ab",
+    "diagnostics/run_external_reliability_baselines.py": "044894d5c83ee37d118bfe038f10e5b4e22c29692d69507c3a828b300653718c",
+    "diagnostics/run_masked_pair_ppo_10seed.py": "6d2f90f9fa07426228f3062faeb8841a105f01a90287ca0ce1f0ea2b63d389dc"
+  },
+  "training_performed": false,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.19",
+    "simpy": "4.1.1"
+  },
+  "workspace_status_at_start": [
+    " M .gitignore",
+    " M results/fixed_rate_results/ppo_results.xlsx",
+    "?? diagnostics/pair_policy_behavior/",
+    "?? diagnostics/paired_ppo_experiment/",
+    "?? diagnostics/ppo_convergence/",
+    "?? diagnostics/results/action_value_critic/runs/",
+    "?? diagnostics/results/q_credit_audit/bellman_recompute_sample_source.npz",
+    "?? diagnostics/results/q_credit_audit/bootstrap_action_spread_summary.csv",
+    "?? diagnostics/results/q_credit_audit/counterfactual_by_trial/",
+    "?? diagnostics/results/q_credit_audit/counterfactual_state_spreads.csv",
+    "?? diagnostics/results/q_credit_audit/replica_completion_log.csv.gz",
+    "?? diagnostics/results/q_credit_audit/reward_assignment_audit.json",
+    "?? diagnostics/results/q_credit_audit/reward_lag_summary.csv",
+    "?? diagnostics/results/q_credit_audit/reward_transition_attribution.csv.gz",
+    "?? diagnostics/results/q_credit_audit/target_snapshot_manifest.json",
+    "?? diagnostics/results/q_credit_audit/target_snapshots/",
+    "?? diagnostics/results/q_credit_audit/training_decisions.csv.gz",
+    "?? diagnostics/results/q_credit_audit/training_episode_curve.csv",
+    "?? diagnostics/results/q_credit_audit/training_run/",
+    "?? diagnostics/results/q_credit_audit/training_task_assignments.csv.gz",
+    "?? diagnostics/spatial_reliability_calibration.py",
+    "?? diagnostics/spatial_reliability_lambda_ref_sweep.py",
+    "?? eua-dataset-master/",
+    "?? results/diagnostics/credit_fix_matched_trace_evaluation.xlsx",
+    "?? results/diagnostics/fixed7_vs_ppo_objective_alignment_analysis.xlsx",
+    "?? results/diagnostics/fixed_7_7_0_alpha0_ep100_seed2026.xlsx",
+    "?? results/diagnostics/fixed_7_7_0_alpha10_ep100_seed2026.xlsx",
+    "?? results/diagnostics/matched_trace_fixed7_alpha10_ep100_commit17bf1b43.xlsx",
+    "?? results/diagnostics/matched_trace_fixed7_alpha10_ep100_commit1ec307f.xlsx",
+    "?? results/diagnostics/matched_trace_fixed7_vs_ppo_alpha10_analysis.xlsx",
+    "?? results/diagnostics/matched_trace_ppo_alpha10_ep100_commit17bf1b43.xlsx",
+    "?? results/diagnostics/matched_trace_ppo_alpha10_ep100_commit1ec307f.xlsx",
+    "?? results/diagnostics/nominal_vs_full_oracle_vs_ppo_analysis.xlsx",
+    "?? results/diagnostics/ppo_credit_assignment_diagnostic.xlsx",
+    "?? results/diagnostics/ppo_flat_action_representation_bottleneck.xlsx",
+    "?? results/diagnostics/ppo_requirement_action_reliability_alignment.xlsx",
+    "?? results/diagnostics/ppo_requirement_counterfactual_sensitivity.xlsx",
+    "?? results/diagnostics/spatial_reliability_calibration_summary.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_correlation_extremes.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_correlation_matrix.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_correlation_summary.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_distance_matrix.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_hazard_multiplier_stats.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_node_best_frequency.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_node_parameters.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_nominal_by_demand.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_pair_stats.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_scenario_comparison.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_summary.csv",
+    "?? results/diagnostics/spatial_reliability_calibration_v2_vs_v1_comparison.csv",
+    "?? results/diagnostics/spatial_reliability_correlation_extremes.csv",
+    "?? results/diagnostics/spatial_reliability_correlation_matrix.csv",
+    "?? results/diagnostics/spatial_reliability_correlation_summary.csv",
+    "?? results/diagnostics/spatial_reliability_distance_matrix.csv",
+    "?? results/diagnostics/spatial_reliability_lambda_ref_monotonicity.csv",
+    "?? results/diagnostics/spatial_reliability_lambda_ref_node_parameters.csv",
+    "?? results/diagnostics/spatial_reliability_lambda_ref_sweep.csv",
+    "?? results/diagnostics/spatial_reliability_lambda_ref_sweep_compact.csv",
+    "?? results/diagnostics/spatial_reliability_lambda_ref_switching.csv",
+    "?? results/diagnostics/spatial_reliability_node_best_frequency.csv",
+    "?? results/diagnostics/spatial_reliability_node_parameters.csv",
+    "?? results/diagnostics/spatial_reliability_nominal_by_demand.csv",
+    "?? results/diagnostics/spatial_reliability_pair_stats.csv",
+    "?? results/diagnostics/spatial_reliability_scenario_comparison.csv"
+  ]
+}

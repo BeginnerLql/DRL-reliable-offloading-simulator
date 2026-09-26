@@ -1,0 +1,8 @@
+comparison,metric,direction,n_seeds,bootstrap_samples,mean_delta_ppo_minus_baseline,ci95_low,ci95_high,ppo_wins,baseline_wins,ties,bootstrap_seed
+Masked PPO stochastic vs Safe Min-Latency,mean_reward,higher,10,20000,-4.211827451810306,-4.350530779309839,-4.07183046926082,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,mean_latency,lower,10,20000,0.1655780562816664,0.1591863465734209,0.172184164593116,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,p95_latency,lower,10,20000,0.4639069335782331,0.4384723728477357,0.487832784203729,0,10,0,2043
+Masked PPO stochastic vs Safe Min-Latency,overall_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Min-Latency,highest_rsr,higher,10,20000,0.0,0.0,0.0,0,0,10,2043
+Masked PPO stochastic vs Safe Min-Latency,pair_selection_hhi,lower,10,20000,-0.0243458999999999,-0.0277229696874999,-0.0207164253125,10,0,0,2043
+Masked PPO stochastic vs Safe Min-Latency,maximum_mean_queue_length,lower,10,20000,0.003103707634983,-0.0044449072096686,0.011020833619837,4,6,0,2043

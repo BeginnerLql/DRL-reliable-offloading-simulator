@@ -1,0 +1,49 @@
+policy,metric,mean_absolute_diff,max_absolute_diff,exact_seed_matches,seed_count
+Masked PPO stochastic,avoidable_violation_count,0.0,0.0,10,10
+Masked PPO stochastic,avoidable_violation_rate,0.0,0.0,10,10
+Masked PPO stochastic,conditional_rsr,0.0,0.0,10,10
+Masked PPO stochastic,feasibility_rate,0.0,0.0,10,10
+Masked PPO stochastic,highest_rsr,0.0,0.0,10,10
+Masked PPO stochastic,maximum_mean_queue_length,0.0,0.0,10,10
+Masked PPO stochastic,maximum_p95_queue_length,0.0,0.0,10,10
+Masked PPO stochastic,maximum_server_selection_share,0.0,0.0,10,10
+Masked PPO stochastic,maximum_server_utilization,0.0,0.0,10,10
+Masked PPO stochastic,mean_latency,0.0,0.0,10,10
+Masked PPO stochastic,mean_reward,0.0,0.0,10,10
+Masked PPO stochastic,mean_safe_set_size,0.0,0.0,10,10
+Masked PPO stochastic,mean_server_waiting_time,0.0,0.0,10,10
+Masked PPO stochastic,overall_rsr,0.0,0.0,10,10
+Masked PPO stochastic,p50_latency,0.0,0.0,10,10
+Masked PPO stochastic,p90_latency,0.0,0.0,10,10
+Masked PPO stochastic,p95_latency,0.0,0.0,10,10
+Masked PPO stochastic,pair_78_frequency,0.0,0.0,10,10
+Masked PPO stochastic,pair_selection_entropy,0.0,0.0,10,10
+Masked PPO stochastic,pair_selection_hhi,0.0,0.0,10,10
+Masked PPO stochastic,top1_pair_frequency,0.0,0.0,10,10
+Masked PPO stochastic,unavoidable_violation_count,0.0,0.0,10,10
+Masked PPO stochastic,unavoidable_violation_rate,0.0,0.0,10,10
+Masked PPO stochastic,unique_selected_pairs,0.0,0.0,10,10
+Safe Min-Latency,avoidable_violation_count,0.0,0.0,10,10
+Safe Min-Latency,avoidable_violation_rate,0.0,0.0,10,10
+Safe Min-Latency,conditional_rsr,0.0,0.0,10,10
+Safe Min-Latency,feasibility_rate,0.0,0.0,10,10
+Safe Min-Latency,highest_rsr,0.0,0.0,10,10
+Safe Min-Latency,maximum_mean_queue_length,0.0,0.0,10,10
+Safe Min-Latency,maximum_p95_queue_length,0.0,0.0,10,10
+Safe Min-Latency,maximum_server_selection_share,0.0,0.0,10,10
+Safe Min-Latency,maximum_server_utilization,0.0,0.0,10,10
+Safe Min-Latency,mean_latency,0.0,0.0,10,10
+Safe Min-Latency,mean_reward,0.0,0.0,10,10
+Safe Min-Latency,mean_safe_set_size,0.0,0.0,10,10
+Safe Min-Latency,mean_server_waiting_time,0.0,0.0,10,10
+Safe Min-Latency,overall_rsr,0.0,0.0,10,10
+Safe Min-Latency,p50_latency,0.0,0.0,10,10
+Safe Min-Latency,p90_latency,0.0,0.0,10,10
+Safe Min-Latency,p95_latency,0.0,0.0,10,10
+Safe Min-Latency,pair_78_frequency,0.0,0.0,10,10
+Safe Min-Latency,pair_selection_entropy,0.0,0.0,10,10
+Safe Min-Latency,pair_selection_hhi,0.0,0.0,10,10
+Safe Min-Latency,top1_pair_frequency,0.0,0.0,10,10
+Safe Min-Latency,unavoidable_violation_count,0.0,0.0,10,10
+Safe Min-Latency,unavoidable_violation_rate,0.0,0.0,10,10
+Safe Min-Latency,unique_selected_pairs,0.0,0.0,10,10
