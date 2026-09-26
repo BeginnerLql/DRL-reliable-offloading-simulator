@@ -1,0 +1,18 @@
+{
+  "evidence": {
+    "conflict_rate": 0.112,
+    "decision_event_optimal_set_jaccard_mean": 0.998,
+    "decision_event_total_spearman_median": 0.9999999999999999,
+    "mean_future_event_spread": 10.535697306951468,
+    "own_total_disjoint_rate": 0.112,
+    "raw_gae_future_spearman": 0.07577926384078436,
+    "raw_gae_own_spearman": 0.11422770078741168,
+    "safemin_conflict_regret": 10.604610519937191
+  },
+  "frozen_old_q_status": "scored using the existing target-network checkpoint",
+  "future_externality_worth_learning": true,
+  "primary": "B",
+  "recommend_change_current_gae_temporal_semantics": false,
+  "recommend_externality_aware_counterfactual_advantage": true,
+  "secondary": "None"
+}
