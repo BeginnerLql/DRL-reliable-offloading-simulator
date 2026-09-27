@@ -18,3 +18,18 @@ def test_pending_reward_variation_is_not_forced_to_zero():
                         'task_reward':[10.,5.,20.]})
     p=pending_components(frame,.9)
     assert p.pending_event.tolist()==pytest.approx([9.,4.05])
+
+
+@pytest.mark.parametrize('modern', [False, True])
+def test_ranking_conversion_preserves_intersection_and_is_idempotent(modern):
+    from diagnostics.review_credit_diagnostics import corrected_ranking
+    frame = pd.DataFrame({'top1_hit': [not modern, True],
+                          'reference_regret': [2., 0.]})
+    if modern:
+        frame['best_set_intersects_reference'] = [True, True]
+    original = frame.copy()
+    result = corrected_ranking(frame)
+    assert result.top1_hit.tolist() == [False, True]
+    assert result.best_set_intersects_reference.tolist() == [True, True]
+    pd.testing.assert_frame_equal(corrected_ranking(result), result)
+    pd.testing.assert_frame_equal(frame, original)

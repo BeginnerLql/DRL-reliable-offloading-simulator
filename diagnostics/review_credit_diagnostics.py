@@ -24,6 +24,16 @@ def pending_components(frame, gamma):
     return p
 
 
+def corrected_ranking(ranking):
+    """Support both historical and explicit selected-action ranking schemas."""
+    ranking = ranking.copy()
+    if 'best_set_intersects_reference' not in ranking.columns:
+        ranking['best_set_intersects_reference'] = ranking['top1_hit']
+    ranking['top1_hit'] = ranking.reference_regret <= TIE_ATOL
+    ranking['selection_rule'] = 'lowest action index among best method scores'
+    return ranking
+
+
 def run(source, output):
     source, output = Path(source), Path(output)
     if output.exists() and any(output.iterdir()):
@@ -81,9 +91,7 @@ def run(source, output):
     pd.concat(details).to_csv(output/'all_outcomes_action_values.csv.gz',index=False,compression='gzip')
     gap_summary.to_csv(output/'performance_gap_decomposition.csv')
     ranking = pd.read_csv(source/'action_ranking_component_comparison.csv')
-    ranking['best_set_intersects_reference'] = ranking['top1_hit']
-    ranking['top1_hit'] = ranking.reference_regret <= TIE_ATOL
-    ranking['selection_rule'] = 'lowest action index among best method scores'
+    ranking = corrected_ranking(ranking)
     ranking.to_csv(output/'corrected_action_ranking.csv.gz', index=False, compression='gzip')
     ranking.groupby(['reference','method']).agg(
         top1_hit=('top1_hit','mean'), best_set_intersection=('best_set_intersects_reference','mean'),

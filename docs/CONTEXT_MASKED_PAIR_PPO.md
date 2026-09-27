@@ -97,3 +97,21 @@ are still required before an algorithmic root-cause or effectiveness claim.
 The smoke results establish functioning training/deployment and credit
 bookkeeping only. They must not be compared with historical 10-seed results as
 an effectiveness claim; the training lengths and evaluation samples differ.
+
+## Checkpoint environment verification
+
+New checkpoints record a configuration snapshot and SHA256 hashes of both input
+workbooks. Evaluation checks them before loading weights or running the simulator.
+It also checks Actor pair ordering and correlation buffers against the current
+model before loading; `load_state_dict` must not overwrite them with stale values.
+Configuration or data mismatches fail explicitly. This conservative check also
+rejects configuration changes that may not affect a particular evaluation.
+
+Older checkpoints without this snapshot (including the original committed smoke)
+are preserved, but the new entry refuses to certify their environment. Use their
+original code/environment for historical reproduction, or create a new checkpoint;
+do not infer and attach a training snapshot from today's configuration.
+
+The ranking supplement supports both historical and new ranking CSV schemas.
+An existing `best_set_intersects_reference` column is preserved; only historical
+files lacking it derive that value from the old `top1_hit` column.
