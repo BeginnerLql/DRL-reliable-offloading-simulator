@@ -28,6 +28,8 @@ from agents.masked_pair_ppo_agent import ReliabilityMaskedPairPPOAgent
 from config.params import params
 from Project_main import build_pair_correlations
 from diagnostics.run_masked_pair_ppo import train_one, evaluate_one, summary, trace, check_external_trace
+from diagnostics.evaluate_reliability_masked_policy import ArrivalTraceLoop
+from tools.paired_ppo_experiment import scoped_environment_seeds
 from diagnostics.run_masked_pair_ppo_10seed import formal_spec, action_seed, OUT as HISTORY
 from tools.paired_ppo_experiment import _agent_kwargs, sha256_file
 from tools.run_context_masked_pair_ppo import checkpoint_environment, validate_checkpoint_environment, load_verified_actor
@@ -409,6 +411,9 @@ def aggregate(output):
     folders=[output/f'trial_{i:03d}' for i in range(10)]
     if not all((f/'completed.json').exists() for f in folders):
         raise RuntimeError('All ten paired trials must complete before aggregation')
+    direct_trace=json.loads((output/'gate/decision_trace/state_trace_verification.json').read_text())
+    if not direct_trace['exact'] or direct_trace['decisions_checked']!=TRAIN_EPISODES*TASKS:
+        raise RuntimeError('Full-seed direct state/interval regression gate failed')
     plan=pd.read_csv(HISTORY/'formal_seed_plan.csv')
     plan['Eval_Action_Seed']=[action_seed(row) for _,row in plan.iterrows()]
     plan.to_csv(output/'formal_seed_plan.csv',index=False)
@@ -424,6 +429,7 @@ def aggregate(output):
         'action_pair_order':list(__import__('itertools').combinations(range(1,9),2)),
         'pair_correlations':np.asarray(rho).tolist(),
         'gate_report':json.loads((output/'gate/gate_report.json').read_text()),
+        'direct_state_trace_gate':direct_trace,
         'smoke_report':json.loads((output/'smoke/smoke_report.json').read_text())}
     (output/'run_metadata.json').write_text(json.dumps(metadata,indent=2)+'\n')
     seed=pd.concat([pd.read_csv(f/'seed_level_summary.csv') for f in folders],ignore_index=True)
@@ -597,6 +603,9 @@ def write_report_and_figures(output,seed,bootstrap,gap):
         'Each seed uses 300 × 200 training and 20 × 200 evaluation tasks. Evaluation metrics are task-level.', '',
         '## Historical regression and reproducibility','',
         'The complete trial-0 300-episode gate is in `gate/gate_report.json`. '
+        'A separate direct 60,000-decision trace gate compares state, decision time, delta_t, '
+        'action, mask, old log probability and final tensors exactly; see '
+        '`gate/decision_trace/state_trace_verification.json`. '
         'Every Origin trial additionally reproduces its archived Actor/Critic checkpoint, training curve and evaluation actions/rewards. '
         'Initial tensors, arrival/spatial streams and input workbooks match between arms.', '',
         '## Paired performance (Event − Origin)','',
@@ -646,16 +655,78 @@ def write_report_and_figures(output,seed,bootstrap,gap):
     return classification
 
 
+def run_trace_gate(output):
+    """Direct 60,000-decision state and elapsed-time comparison for trial zero."""
+    torch.set_num_threads(1)
+    _,plan=formal_spec();trial={k:int(v) for k,v in plan.iloc[0].items()}
+    _,rho=build_pair_correlations()
+    target=output/'gate/decision_trace'
+    if target.exists():raise RuntimeError('Decision trace gate already exists')
+    if not json.loads((output/'gate/gate_report.json').read_text())['exact']:
+        raise RuntimeError('Existing historical gate failed')
+    target.mkdir(parents=True)
+    arrays=[];loops=[];models=[]
+    for label,agent in [('historical',legacy_agent(trial,rho)),
+                        ('origin',new_agent(trial,rho,'origin_task',audited=False))]:
+        observed=[];transitions=[]
+        prepare=agent.prepare_action
+        store=agent.store_transition
+        def tapped_prepare(task,env_state,episode,state,*,_prepare=prepare):
+            observed.append((int(episode),int(task.id),float(task.env.now),np.asarray(state).copy()))
+            return _prepare(task,env_state,episode,state)
+        def tapped_store(*args,_store=store,**kwargs):
+            result=_store(*args,**kwargs)
+            transitions.append((int(kwargs['task_id']),int(args[1]),float(kwargs['delta_t']),
+                float(agent.old_log_probs[-1]),np.asarray(agent.effective_masks[-1]).copy()))
+            return result
+        agent.prepare_action=tapped_prepare
+        agent.store_transition=tapped_store
+        torch.manual_seed(int(trial['Train_Action_Seed']))
+        with scoped_environment_seeds(int(trial['Train_Arrival_Seed']),int(trial['Train_Spatial_Seed'])):
+            with (target/f'{label}.log').open('w') as log,redirect_stdout(log):
+                loop=ArrivalTraceLoop(agent,TRAIN_EPISODES,TASKS,params.num_states,params.num_actions)
+                loop.EP()
+        if len(observed)!=TRAIN_EPISODES*TASKS or len(transitions)!=TRAIN_EPISODES*TASKS:
+            raise RuntimeError(f'{label}: incomplete direct decision trace')
+        data={'episode':np.asarray([x[0] for x in observed],dtype=np.int16),
+              'task_id':np.asarray([x[1] for x in observed],dtype=np.int16),
+              'decision_time':np.asarray([x[2] for x in observed],dtype=np.float64),
+              'states':np.stack([x[3] for x in observed]),
+              'transition_task_id':np.asarray([x[0] for x in transitions],dtype=np.int16),
+              'actions':np.asarray([x[1] for x in transitions],dtype=np.int8),
+              'delta_t':np.asarray([x[2] for x in transitions],dtype=np.float64),
+              'old_log_probability':np.asarray([x[3] for x in transitions],dtype=np.float64),
+              'effective_mask':np.stack([x[4] for x in transitions]).astype(np.bool_)}
+        np.savez_compressed(target/f'{label}.npz',**data)
+        arrays.append(data);loops.append(loop);models.append(agent)
+    check_external_trace(trace(loops[0]),trace(loops[1]))
+    result={'decisions_checked':TRAIN_EPISODES*TASKS,'arrival_mismatch':0,'spatial_mismatch':0}
+    for field in arrays[0]:
+        a,b=arrays[0][field],arrays[1][field]
+        result[field+'_mismatches']=int(np.count_nonzero(a!=b))
+        if result[field+'_mismatches']:raise RuntimeError(f'Direct gate mismatch: {field}')
+    for name in ('policy_net','policy_old','value_net'):
+        result[name+'_tensor_mismatches']=assert_equal_states(getattr(models[0],name).state_dict(),
+                                                              getattr(models[1],name).state_dict())
+        if result[name+'_tensor_mismatches']:raise RuntimeError(f'Direct gate mismatch: {name}')
+    result['exact']=True
+    (target/'state_trace_verification.json').write_text(json.dumps(result,indent=2)+'\n')
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir',type=Path,default=OUT)
     parser.add_argument('--gate',action='store_true')
+    parser.add_argument('--trace-gate',action='store_true')
     parser.add_argument('--aggregate',action='store_true')
     parser.add_argument('--smoke',action='store_true')
     parser.add_argument('--trial-id',type=int,choices=range(10))
     args=parser.parse_args()
     output=args.output_dir
-    if args.aggregate:
+    if args.trace_gate:
+        result=run_trace_gate(output)
+    elif args.aggregate:
         seed,bootstrap,gap=aggregate(output)
         result={'seed_rows':len(seed),'classification':write_report_and_figures(output,seed,bootstrap,gap)}
     elif args.gate:

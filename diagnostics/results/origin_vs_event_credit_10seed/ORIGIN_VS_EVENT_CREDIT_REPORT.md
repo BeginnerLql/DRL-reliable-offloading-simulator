@@ -4,7 +4,7 @@ Both arms use the historical `pair_scoring` Actor, joint clipping, the same PPO 
 
 ## Historical regression and reproducibility
 
-The complete trial-0 300-episode gate is in `gate/gate_report.json`. Every Origin trial additionally reproduces its archived Actor/Critic checkpoint, training curve and evaluation actions/rewards. Initial tensors, arrival/spatial streams and input workbooks match between arms.
+The complete trial-0 300-episode gate is in `gate/gate_report.json`. A separate direct 60,000-decision trace gate compares state, decision time, delta_t, action, mask, old log probability and final tensors exactly; see `gate/decision_trace/state_trace_verification.json`. Every Origin trial additionally reproduces its archived Actor/Critic checkpoint, training curve and evaluation actions/rewards. Initial tensors, arrival/spatial streams and input workbooks match between arms.
 
 ## Paired performance (Event − Origin)
 

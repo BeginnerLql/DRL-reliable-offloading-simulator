@@ -1,5 +1,5 @@
 {
-  "base_commit": "391db514b650788479563c3e31acdfec66bb0a25",
+  "base_commit": "bc444c5eb6703bcf67432945e970a77d35d83397",
   "historical_formal_seed_plan": "/home/user/workplaces/DRL-reliable-offloading-simulator/diagnostics/results/masked_pair_ppo_10seed/formal_seed_plan.csv",
   "seed_plan_sha256": "2d30e20b3caa6e354feae42caf90998cded44cb6c38f3d1d3727a979bb4de47b",
   "training_episodes": 300,
@@ -298,6 +298,24 @@
     "safe_set_size_mismatch": 0,
     "selected_pair_reliability_mismatch": 0,
     "task_sequence_mismatch": 0
+  },
+  "direct_state_trace_gate": {
+    "decisions_checked": 60000,
+    "arrival_mismatch": 0,
+    "spatial_mismatch": 0,
+    "episode_mismatches": 0,
+    "task_id_mismatches": 0,
+    "decision_time_mismatches": 0,
+    "states_mismatches": 0,
+    "transition_task_id_mismatches": 0,
+    "actions_mismatches": 0,
+    "delta_t_mismatches": 0,
+    "old_log_probability_mismatches": 0,
+    "effective_mask_mismatches": 0,
+    "policy_net_tensor_mismatches": 0,
+    "policy_old_tensor_mismatches": 0,
+    "value_net_tensor_mismatches": 0,
+    "exact": true
   },
   "smoke_report": {
     "episodes": 5,

@@ -85,3 +85,19 @@ def test_temporal_shift_reconstruction_uses_actual_first_finish(monkeypatch):
     result=runner.reconstruct_temporal_shifts(tasks,123,0,'origin')
     assert result.index_shift.tolist()==[1,0]
     assert result.resolution_delay.tolist()==pytest.approx([t2+.5-t1,1.])
+
+
+def test_direct_decision_trace_gate_checks_state_and_delta_t(tmp_path, monkeypatch):
+    import json
+    import tools.run_origin_vs_event_credit_10seed as runner
+    monkeypatch.setattr(runner, 'TRAIN_EPISODES', 1)
+    monkeypatch.setattr(runner, 'TASKS', 20)
+    gate=tmp_path/'gate'
+    gate.mkdir()
+    (gate/'gate_report.json').write_text(json.dumps({'exact':True}))
+    result=runner.run_trace_gate(tmp_path)
+    assert result['decisions_checked']==20
+    assert result['exact']
+    assert result['states_mismatches']==0
+    assert result['delta_t_mismatches']==0
+    assert result['old_log_probability_mismatches']==0

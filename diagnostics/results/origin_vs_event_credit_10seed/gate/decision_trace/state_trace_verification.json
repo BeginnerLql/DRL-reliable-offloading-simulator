@@ -1,0 +1,18 @@
+{
+  "decisions_checked": 60000,
+  "arrival_mismatch": 0,
+  "spatial_mismatch": 0,
+  "episode_mismatches": 0,
+  "task_id_mismatches": 0,
+  "decision_time_mismatches": 0,
+  "states_mismatches": 0,
+  "transition_task_id_mismatches": 0,
+  "actions_mismatches": 0,
+  "delta_t_mismatches": 0,
+  "old_log_probability_mismatches": 0,
+  "effective_mask_mismatches": 0,
+  "policy_net_tensor_mismatches": 0,
+  "policy_old_tensor_mismatches": 0,
+  "value_net_tensor_mismatches": 0,
+  "exact": true
+}
