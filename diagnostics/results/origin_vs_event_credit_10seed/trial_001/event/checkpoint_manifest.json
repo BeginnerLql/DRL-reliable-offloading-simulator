@@ -1,0 +1,330 @@
+{
+  "agent_name": "context_masked_pair_ppo_v2",
+  "environment": {
+    "schema_version": 1,
+    "configuration": {
+      "BACKLOG_TIME_SCALE_SEC": 4.0,
+      "CLOUD_FAILURE_RATE_RANGE": [
+        0.02382984704172845,
+        0.003
+      ],
+      "CLOUD_PROCESSING_FREQ_RANGE": [
+        10,
+        20
+      ],
+      "COMPUTATION_DEMAND_RANGE_MI": [
+        5,
+        50
+      ],
+      "COMPUTATION_DEMAND_SEED": 2030,
+      "EDGE_FAILURE_RATE_RANGE": [
+        0.02382984704172845,
+        0.003
+      ],
+      "EDGE_PROCESSING_FREQ_RANGE": [
+        10,
+        20
+      ],
+      "FAILURE_RATE_FMAX": 20.0,
+      "FAILURE_RATE_FMIN": 10.0,
+      "FAILURE_RATE_OMEGA": 0.9,
+      "FIXED_EDGE_PROCESSING_FREQUENCIES": [
+        10,
+        11,
+        12,
+        14,
+        15,
+        17,
+        18,
+        20
+      ],
+      "High_demand": 50,
+      "INPUT_DATA_SIZE_RANGE_MB": [
+        0.5,
+        2.0
+      ],
+      "INPUT_DATA_SIZE_SEED": 2029,
+      "LAMBDA_REF": 0.003,
+      "Low_demand": 5,
+      "NUM_CLOUD_SERVERS": 0,
+      "NUM_EDGE_SERVERS": 8,
+      "PPO_ACTOR_MODE": "pair_scoring",
+      "PPO_MINIBATCH_SEED": 2028,
+      "RELIABILITY_VIOLATION_WEIGHT": 10.0,
+      "SPATIAL_CORRELATION_LENGTH_KM": 0.5,
+      "SPATIAL_RISK_BETA_P": 0.8,
+      "SPATIAL_RISK_ENABLED": true,
+      "SPATIAL_RISK_SEED": 2026,
+      "TASK_ARRIVAL_RATE": 0.5,
+      "TASK_ARRIVAL_SEED": 2027,
+      "TASK_SIZE_RANGE": [
+        0.5,
+        2.0
+      ],
+      "UPLINK_RATE_RANGE_MBPS": [
+        16.0,
+        40.0
+      ],
+      "activation_function_ddpg": "softmax",
+      "actor_lr_ddpg": 0.0003,
+      "actor_lr_ppo": 0.0001,
+      "af_dqn": "relu",
+      "af_ppo": "tanh",
+      "batch_size_ddpg": 256,
+      "batch_size_dqn": 256,
+      "batch_size_ppo": 64,
+      "buffer_capacity_ddpg": 100000,
+      "buffer_capacity_dqn": 200000,
+      "clip_eps_ppo": 0.2,
+      "critic_lr_ddpg": 0.001,
+      "critic_lr_ppo": 0.0005,
+      "entropy_coef_ppo": 0.01,
+      "epsilon_decay_dqn": 300,
+      "epsilon_end_dqn": 0.01,
+      "epsilon_start_dqn": 1.0,
+      "gae_lambda_ppo": 0.95,
+      "gamma_ddpg": 0.85,
+      "gamma_dqn": 0.9,
+      "gamma_ppo": 0.9,
+      "hidden_layers_dqn": [
+        128,
+        64
+      ],
+      "hidden_layers_ppo": [
+        64,
+        32
+      ],
+      "k_epochs_ppo": 2,
+      "lr_dqn": 0.0005,
+      "max_grad_norm_ppo": 0.5,
+      "model_summary": "ppo",
+      "reward_scale_ppo": 1,
+      "rsu_to_cloud_bandwidth": 8,
+      "serverNo": 8,
+      "std_dev_ddpg": 0.25,
+      "taskno": 200,
+      "tau_ddpg": 0.005,
+      "tau_dqn": 0.005,
+      "total_episodes": 5,
+      "value_loss_coef_ppo": 0.5
+    },
+    "data_sha256": {
+      "server_info.xlsx": "bf33fc1ce088a3a01f6201c8e0469ed1a63b883c69a599f00e75f0299ba38849",
+      "task_parameters.xlsx": "f79752048c546137865aafe61cb96d86c2f567df97239dae241a2831ae986434"
+    }
+  },
+  "credit_mode": "event_interval",
+  "actor_mode": "pair_scoring",
+  "gradient_clipping": "joint",
+  "trial": {
+    "Trial_ID": 1,
+    "Torch_Init_Seed": 2218427184,
+    "Train_Action_Seed": 391746049,
+    "Train_Arrival_Seed": 2111723216,
+    "Train_Spatial_Seed": 4100872708,
+    "PPO_Minibatch_Seed": 1086487992,
+    "Eval_Arrival_Seed": 4043962209,
+    "Eval_Spatial_Seed": 2612271498,
+    "Eval_Action_Seed": 2497284264
+  },
+  "pair_indices": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      0,
+      4
+    ],
+    [
+      0,
+      5
+    ],
+    [
+      0,
+      6
+    ],
+    [
+      0,
+      7
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      1,
+      6
+    ],
+    [
+      1,
+      7
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      2,
+      7
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      4,
+      7
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      6,
+      7
+    ]
+  ],
+  "pair_correlations": [
+    0.02100936882197857,
+    0.18306787312030792,
+    0.05616030469536781,
+    0.35189399123191833,
+    0.06799478828907013,
+    0.1381715089082718,
+    0.025396350771188736,
+    0.05198802426457405,
+    0.29867100715637207,
+    0.05141578987240791,
+    0.19052302837371826,
+    0.15181352198123932,
+    0.17127735912799835,
+    0.17249059677124023,
+    0.1799694299697876,
+    0.07696016132831573,
+    0.21986769139766693,
+    0.028028985485434532,
+    0.11444176733493805,
+    0.20339179039001465,
+    0.34472766518592834,
+    0.09898217767477036,
+    0.1915213167667389,
+    0.32451897859573364,
+    0.07217004150152206,
+    0.34993940591812134,
+    0.3540107011795044,
+    0.12671318650245667
+  ],
+  "actor_architecture": [
+    [
+      "pair_indices",
+      [
+        28,
+        2
+      ]
+    ],
+    [
+      "pair_correlations",
+      [
+        28
+      ]
+    ],
+    [
+      "scorer.0.weight",
+      [
+        64,
+        12
+      ]
+    ],
+    [
+      "scorer.0.bias",
+      [
+        64
+      ]
+    ],
+    [
+      "scorer.2.weight",
+      [
+        32,
+        64
+      ]
+    ],
+    [
+      "scorer.2.bias",
+      [
+        32
+      ]
+    ],
+    [
+      "scorer.4.weight",
+      [
+        1,
+        32
+      ]
+    ],
+    [
+      "scorer.4.bias",
+      [
+        1
+      ]
+    ]
+  ],
+  "actor_sha256": "6feb5f41bde0f41a3dea705fa264feeda5438826dbabe3c652a7c8991b7a106c",
+  "critic_sha256": "a89b90acbc12315343f69e69f12c1c2fe4b176cdf619c7386e370d11da1eac41"
+}

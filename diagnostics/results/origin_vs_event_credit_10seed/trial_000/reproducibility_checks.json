@@ -1,0 +1,8 @@
+{
+  "initial_network_equal": true,
+  "arrival_mismatch": 0,
+  "spatial_mismatch": 0,
+  "task_sequence_mismatch": 0,
+  "checkpoint_verified": true,
+  "historical_origin_exact": true
+}

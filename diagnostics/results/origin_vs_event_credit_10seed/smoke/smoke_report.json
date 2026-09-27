@@ -1,0 +1,8 @@
+{
+  "episodes": 5,
+  "tasks": 1000,
+  "max_return_residual": 4.547473508864641e-13,
+  "max_first_ratio_error": 0.0,
+  "nan_count": 0,
+  "pending_outcomes": 0
+}

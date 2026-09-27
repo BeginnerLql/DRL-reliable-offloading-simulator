@@ -1,0 +1,8 @@
+{
+  "trial_id": 2,
+  "arm": "event",
+  "tasks_train": 60000,
+  "tasks_eval": 4000,
+  "checkpoint_verified": true,
+  "historical_exact": false
+}

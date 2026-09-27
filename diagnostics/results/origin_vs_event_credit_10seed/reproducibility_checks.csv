@@ -1,0 +1,11 @@
+trial_id,initial_network_equal,arrival_mismatch,spatial_mismatch,task_sequence_mismatch,checkpoint_verified,historical_origin_exact,train_episode_mismatch,train_task_id_mismatch,train_R_req_mismatch,train_safe_mask_mismatch,train_effective_mask_mismatch,train_best_achievable_reliability_mismatch,eval_episode_mismatch,eval_task_id_mismatch,eval_R_req_mismatch,eval_safe_mask_mismatch,eval_effective_mask_mismatch,eval_best_achievable_reliability_mismatch
+0,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+1,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+2,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+3,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+4,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+5,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+6,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+7,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+8,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
+9,True,0,0,0,True,True,0,0,0,0,0,0,0,0,0,0,0,0
