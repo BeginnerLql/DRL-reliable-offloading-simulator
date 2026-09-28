@@ -1,4 +1,3 @@
-# pre_process.py
 """
 Pre-process launcher (run from project root).
 Generates input Excel files into data/:

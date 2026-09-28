@@ -1,18 +1,10 @@
 
-"""core.task
-
-Task object used by the SimPy environment.
-
-Change in the modular refactor:
-- Excel files live in data/... (config.paths.DATA_DIR)
-- So, default params_file is resolved via DATA_DIR.
-"""
+"""Task input, analytical pair reliability and parallel replica lifecycle."""
 
 import os
 import pandas as pd
 import math
 
-from config.params import params
 from config.paths import DATA_DIR
 
 
@@ -40,7 +32,6 @@ class Task:
         self.env_state = state
         self.id = id
         
-        # Other attributes
         # Compatibility names: primaryNode/backupNode represent symmetric
         # replica A/replica B in the formal pair-action model.
         self.primaryNode = None
@@ -202,22 +193,18 @@ class Task:
             all_done_event.succeed(self.all_replicas_finish_time)
         self.try_finalize_lifecycle()
 
-    
     def primary(self):
-        
-        inpDelay , outDelay = self.calc_input_output_delay(self.primaryNode)
-              
-        yield self.env.timeout(inpDelay)
+        input_delay, output_delay = self.calc_input_output_delay(self.primaryNode)
+        yield self.env.timeout(input_delay)
 
-        
-        Q_time= self.env.now
+        queue_time = self.env.now
         self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
         self.env_state.register_waiting_replica(
             self.primaryNode.server_id, self, "primary", self.primary_service_time
         )
         with self.primaryNode.queue.request(priority=1) as req:
-            yield req  # Queueing time in server
-            Q_time= self.env.now - Q_time
+            yield req
+            queue_time = self.env.now - queue_time
             self.env_state.start_replica_execution(
                 self.primaryNode.server_id, self, "primary",
                 self.primary_service_time, self.env.now
@@ -230,26 +217,26 @@ class Task:
             
         # Replica completion is nominal; task-level threshold is stored in
         # reliability_satisfied and applied by MainLoop reward bookkeeping.
-        yield self.env.timeout(outDelay)
+        yield self.env.timeout(output_delay)
         self.primaryStat = "success"
 
         self.primaryFinished = self.env.now
         
-        #print(f"Task {self.id} {'succeeded' if self.primaryStat == 'success' else 'failed'} on primary server {self.primaryNode.server_id}")
         self.env_state.record_replica_completion(
             self.primaryNode.server_id, self, "primary", self.primaryFinished,
             service_time=float(self.primary_service_time),
         )
         
-        self.teta= 1.5 * (self.primary_service_time + inpDelay + outDelay + Q_time)
+        self.teta = 1.5 * (
+            self.primary_service_time + input_delay + output_delay + queue_time
+        )
         self._signal_resolution_if_ready(self.primaryNode.server_id)
 
     def backup(self):
-
-        inpDelay, outDelay = self.calc_input_output_delay(self.backupNode)
+        input_delay, output_delay = self.calc_input_output_delay(self.backupNode)
         # Replica B is symmetric with replica A: upload first, then request
         # its own CPU queue with the same priority.
-        yield self.env.timeout(inpDelay)
+        yield self.env.timeout(input_delay)
         backup_service_time = self.computation_demand / self.backupNode.processing_frequency
         self.env_state.register_waiting_replica(
             self.backupNode.server_id, self, "backup", backup_service_time
@@ -267,12 +254,11 @@ class Task:
 
         # Replica completion is nominal; task-level threshold is stored in
         # reliability_satisfied and applied by MainLoop reward bookkeeping.
-        yield self.env.timeout(outDelay)
+        yield self.env.timeout(output_delay)
         self.backupStat = "success"
          
         self.backupFinished = self.env.now
         
-        #print(f"Task {self.id} {'succeeded' if self.backupStat == 'success' else 'failed'} on backup server {self.backupNode.server_id}")
         self.env_state.record_replica_completion(
             self.backupNode.server_id, self, "backup", self.backupFinished,
             service_time=float(backup_service_time),

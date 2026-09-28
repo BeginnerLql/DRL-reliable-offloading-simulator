@@ -8,7 +8,6 @@ from config.params import params
 from core.env_state import EnvironmentState
 from tools.generate_server_and_task_parameters import (
     generate_computation_demands,
-    generate_reliability_requirements,
     generate_task_params,
 )
 

@@ -1,283 +1,186 @@
 # DRL-Based Reliable Offloading Simulator
 
-This repository provides a **generic and modular simulator** for reliability-aware
-task offloading in **distributed Edge/Cloud computing systems**.
-The simulator supports pluggable Deep Reinforcement Learning (DRL) agents
-(e.g., **DQN**, **PPO**, **DDPG**) and is not tied to any specific application domain
-(e.g., vehicular or RSU-based systems).
+A SimPy simulator for reliability-aware task offloading with DQN, PPO and DDPG.
+The current configuration uses eight Edge servers with different CPU frequencies,
+uplink rates and baseline fault rates. Each action selects an unordered pair of
+distinct servers; both replicas run in parallel.
 
-All input Excel files are generated automatically, and all experiment outputs are
-written to a dedicated results directory.
+See [the code map and cleanup review](docs/CODE_REVIEW.md) for module relationships
+and [Context Masked Pair PPO v2](docs/CONTEXT_MASKED_PAIR_PPO.md) for the versioned
+actor and reward-credit experiments.
 
----
+## Layout
 
-## Project structure
+| Path | Responsibility |
+| --- | --- |
+| `Project_main.py` | Build a configured agent, run episodes and export results |
+| `pre_process.py` / `post_process.py` | Input generation / Excel aggregation launchers |
+| `agents/` | DQN, DDPG, PPO and separate masked/context/auxiliary-critic variants |
+| `config/` | Experiment defaults, runtime parameter snapshot and shared paths |
+| `core/` | SimPy scheduling, server queues, task lifecycle and spatial hazards |
+| `diagnostics/` | Experiment runners, frozen-policy audits, aggregation and reports |
+| `io_utils/` | Shared log schema, Excel persistence and post-processing |
+| `tests/` | Simulator, agent, diagnostic and data-tool regression tests |
+| `tools/` | Data preparation, offline analyses and experiment entry points |
+| `data/` | Input workbooks and prepared server topology |
+| `results/` / `diagnostics/results/` | Simulation outputs / diagnostic artifacts |
 
-- `Project_main.py`  
-  Main entry point for running the simulator.
+## Setup and execution
 
-- `pre_process.py`  
-  Standalone launcher for generating input Excel files.
-
-- `post_process.py`  
-  Standalone launcher for post-processing and aggregating results.
-
-- `config/`  
-  Experiment configuration and centralized paths:
-  - `configuration.py` – fixed failure-rate ranges, agent selection, hyperparameters
-  - `params.py` – unified parameter object  
-  - `paths.py` – single source of truth for project paths (project root, `data`, `results`)
-
-- `core/`  
-  Simulation core (environment, state representation, episode loop, tasks, servers).
-
-- `agents/`  
-  DRL agents (DQN / PPO / DDPG), implemented as interchangeable modules.
-
-- `tools/`  
-  Utility scripts (e.g., generation of input Excel parameter files).
-
-- `io_utils/`  
-  Result logging and post-processing utilities.
-
-- `data/`  
-  Input Excel files generated during the pre-processing step.
-
-- `results/`  
-  Output Excel files generated per model.
-
----
-
-## Requirements and environment setup
-
-### Python version
-- Python **3.9** or **3.10** is recommended.
-
-### Required libraries
-All required Python dependencies are listed in `requirements.txt`.
-
-Install dependencies using:
+Use Python 3.10 or newer and install the runtime dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-It is recommended to use a virtual environment before installing dependencies.
-
----
-
-## Execution workflow
-
-### 1) Pre-process (generate input Excel files)
-
-Run this step **only if** input Excel files do not exist or need to be regenerated:
+Run commands from the repository root. If the input workbooks need regeneration:
 
 ```bash
 python pre_process.py
 ```
 
-This script generates all required Excel files into the `data/` directory.
-
----
-
-### 2) Run the simulation
+This writes `data/server_info.xlsx` and `data/task_parameters.xlsx`. Server
+coordinates come from `data/eua_melbourne_cbd_site_order.csv`; the generator
+expects that prepared topology to exist. Input generation replaces the workbooks,
+so retain the original inputs when reproducing a saved experiment.
 
 ```bash
 python Project_main.py
-```
-
-Simulation results are automatically written to:
-
-```
-results/fixed_rate_results/<model>_results.xlsx
-```
-
----
-
-### 3) Post-process results (optional)
-
-```bash
 python post_process.py
 ```
 
-This step augments result workbooks with additional analysis sheets and may generate
-a global aggregated file (e.g., `Final_Result_All.xlsx`) inside the `results/` directory.
+The simulation writes `results/fixed_rate_results/<model>_results.xlsx`.
+Post-processing adds distribution sheets and creates
+`results/Final_Result_All.xlsx`.
 
----
+For the existing tests, install the test runner separately:
 
-## Switching DRL agents and experiment setup
-
-The learning algorithm and base failure-rate ranges are controlled via
-`config/configuration.py`, which serves as the main experiment configuration file.
-
-Key parameters include:
-
-- `model_summary = "dqn" | "ppo" | "ddpg"`  
-  Selects the DRL algorithm used for decision making. The corresponding agent
-  implementation is instantiated from the `agents/` directory.
-
-- `EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)` (1/s).
-- `CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)` (1/s).
-
-Pre-processing generates `data/server_info.xlsx` with one `Servers` sheet and
-`data/task_parameters.xlsx`. Each server's base failure rate is sampled uniformly
-from its type's range, then remains fixed throughout execution. Episodes load the
-same server parameters. Regenerate inputs after changing the ranges.
-
-Primary and backup use their respective server's rate with execution time
-`computation_demand / processing_frequency`: failure probability is
-`1 - exp(-failure_rate * service_time)`, followed by uniform random sampling.
-Queue length does not adjust this rate. The default algorithm remains PPO.
-The result workbook's `Servers` sheet records the rates used in the simulation.
-
-## PPO/MDP state representation
-
-Each server contributes three normalized state features:
-
-1. its observable estimated base transient fault arrival rate `lambda_n`;
-2. its processing frequency;
-3. its current backlog service time.
-
-The backlog time of server `n` is the remaining service time of its currently
-executing replica plus the service times of all replicas waiting in its CPU queue:
-
-```text
-B_n(t) = R_n(t) + sum(C_q / f_n)
+```bash
+python -m pip install pytest pytest-subtests
+python -m pytest -q
 ```
 
-It is normalized with the fixed scale `BACKLOG_TIME_SCALE_SEC = 4.0`:
+## Configuration and agents
 
-```text
-normalized_backlog_time = B_n(t) / (B_n(t) + 4.0)
+Edit `config/configuration.py`. `config/params.py` copies those defaults at import
+time and derives state/action dimensions; experiment runners can temporarily
+patch the runtime snapshot without changing the default configuration.
+
+`model_summary` selects `dqn`, `ppo` or `ddpg`. For the ordinary PPO entry point,
+`PPO_ACTOR_MODE` selects `flat` or `pair_scoring` (the current default). The pair
+actor applies one shared scorer to symmetric pair features; its input includes
+static pair spatial correlation. `agents/networks.py` shares hidden-layer
+construction while retaining checkpoint layer names and initialization order.
+
+Masked PPO and Context Masked Pair PPO v2 have separate runners. They are not
+selected by setting a new value of `model_summary`. For example:
+
+```bash
+python tools/run_context_masked_pair_ppo.py \
+  --train-episodes 3 --eval-episodes 3 \
+  --output-dir diagnostics/results/my_context_v2_smoke
 ```
 
-The current task contributes normalized task size and computation demand. The
-state is ordered as `[failure_rates, frequencies, backlog_times, task_size, demand]`,
-so its dimension remains `3N + 2`. With the current eight servers, PPO receives
-26 state features. Backlog time represents CPU service backlog only; network
-input/output delay is not included.
+Use a new output directory. This is a functional smoke run, not a multi-seed
+performance benchmark. See the v2 document for checkpoint environment checks,
+deployment and ablation options.
 
-## Task arrival process
+## Observations and actions
 
-Tasks arrive according to a Poisson process with rate `lambda_a =
-TASK_ARRIVAL_RATE`, measured in tasks/s. Therefore, each inter-arrival time is
-exponentially distributed:
+The observation has four server blocks in sorted `Server_ID` order, followed by
+three task features:
 
 ```text
-Delta_T_k ~ Exp(lambda_a)
-E[Delta_T_k] = 1 / lambda_a
+[base_failure_rates, processing_frequencies, CPU_backlogs, uplink_rates,
+ input_data_size, computation_demand, reliability_requirement]
 ```
 
-The simulator samples each interval with
-`np.random.exponential(scale=1.0 / TASK_ARRIVAL_RATE)` and keeps the resulting
-floating-point value. With the current `TASK_ARRIVAL_RATE = 0.5` tasks/s, the
-mean inter-arrival time is 2.0 seconds.
+The dimension is `4N + 3`, or **35** for eight servers. The action count is
+`N(N - 1) / 2`, or **28**, ordered by `combinations(range(1, N + 1), 2)`.
 
-## Event-driven PPO/SMDP semantics
+CPU backlog is remaining running service plus all waiting service times. It is
+normalized as `B / (B + BACKLOG_TIME_SCALE_SEC)`, with a default scale of 4 seconds.
+Replicas still uploading are not part of this physical CPU backlog. Reliability
+requirements are encoded through `-log10(1 - R_req)`, then scaled and clipped.
+The observation exposes base hazards, not the episode's realized spatial field;
+the masked policy separately uses production reliability to construct its support.
 
-PPO makes one decision when each task arrives. If task `k` arrives at time
-`t_k`, the next decision interval is `delta_t_k = t_(k+1) - t_k`. PPO stores
-transitions in task-arrival order:
+## Reliability and task lifecycle
+
+The generated baseline fault rate depends on processing frequency:
 
 ```text
-(s_k, a_k, r_k_interval, s_(k+1), delta_t_k, done_k)
+lambda_base = LAMBDA_REF * 10 ** (
+    FAILURE_RATE_OMEGA * (1 - f / FAILURE_RATE_FMAX)
+    / (1 - FAILURE_RATE_FMIN / FAILURE_RATE_FMAX)
+)
 ```
 
-`r_k_interval` is the sum of final task outcome rewards that become resolved
-during `[t_k, t_(k+1))`. Individual task rewards still use the unchanged
-`calcReward` formula; completion order does not reorder the PPO rollout. The
-last arrival closes an explicit terminal interval after all pending replicas
-are drained. The drain waits on task-level resolution events instead of using a
-computation-demand value as a simulation-time polling timeout. For this final
-interval, elapsed time is measured to the actual timestamp of the last resolved
-task outcome, rather than to a later polling wake-up time.
+When spatial risk is enabled, each episode samples `Z ~ N(0, R)`, where
+`R[j,k] = exp(-distance[j,k] / correlation_length)`, and uses
+`lambda_eff[j] = lambda_base[j] * exp(beta_p * Z[j])`. At `Z = 0`, the base rate
+is recovered; no lognormal mean correction is applied. Spatial-off runs use the
+base rates directly.
 
-For PPO, `gamma_ppo = 0.90` is a per-second discount base. Each transition uses
-`gamma_k = gamma_ppo ** delta_t_k`, so a zero-length interval has discount 1.
-Advantages use ordered variable-discount GAE:
+For a replica with demand `C` on CPU frequency `f`, the analytical failure
+probability is `-expm1(-lambda_eff * C / f)`. Conditional on the episode hazards,
+the selected pair uses the product of its two failure probabilities:
 
 ```text
-delta_k = r_k_interval + gamma_k * V(s_(k+1)) * (1 - done_k) - V(s_k)
-A_k = delta_k + gamma_k * gae_lambda * (1 - done_k) * A_(k+1)
+joint_failure = primary_failure * backup_failure
+execution_reliability = 1 - joint_failure
+reliability_satisfied = execution_reliability >= task_requirement
 ```
 
-GAE is computed before PPO minibatch shuffling. DQN and DDPG retain their
-existing transition and discount behavior.
+Runtime execution does not draw Bernoulli replica failures. Replica completion
+status is nominal; task success/failure in reward and summary tables is the
+analytical reliability-threshold outcome. The offline Monte Carlo correlation
+analyses in `tools/` are separate diagnostics.
 
-## Transient server-fault model
+Each replica uploads its payload (`8 * MB / Mbps` seconds), requests its server's
+CPU at the same priority, and executes. The first completed replica resolves the
+task reward. The second continues to completion and releases its CPU. A task is
+removed only after reward bookkeeping and both replica completions. Therefore,
+task-resolution logs may lack the slower replica's finish timestamp; the separate
+`ReplicaCompletions` sheet records actual completions of both replicas.
 
-Each Edge or Cloud server has a fixed transient fault arrival rate, `lambda_n`,
-measured in `1/s`. The ranges are configured by
-`EDGE_FAILURE_RATE_RANGE` and `CLOUD_FAILURE_RATE_RANGE` and are sampled once
-when `data/server_info.xlsx` is generated.
+## Arrivals, rewards and PPO credit
 
-For a task replica with computation demand `C_i` running on a server with
-processing frequency `f_n`, the execution interval is:
+Tasks follow a Poisson arrival process with rate `TASK_ARRIVAL_RATE` (default
+0.5 tasks/s). `MainLoop` uses a private NumPy generator for arrivals and another
+for spatial risk. PPO minibatch shuffling also has its own generator.
+
+Reward combines the delay-based success/failure term in `MainLoop.calcReward`
+with a logarithmic failure-budget violation penalty. The task requirement,
+realized pair reliability, reward components and action metadata are logged.
+
+Ordinary PPO and legacy masked PPO collect arrival-ordered transitions:
 
 ```text
-t_i,n = C_i / f_n
+(s_k, a_k, reward_of_origin_task_k, s_(k+1), delta_t_k, done_k)
 ```
 
-The probability that at least one transient server fault occurs during that
-interval is:
+A reward can resolve before or after its transition shell is stored; task IDs
+ensure it is assigned once to the originating task. `delta_t` is time to the next
+arrival, or from the final arrival to the latest resolved task outcome. PPO
+updates once per episode using `gamma_k = gamma_ppo ** delta_t_k` and ordered GAE
+before minibatch shuffling. The simulator still drains the slower replicas.
 
-```text
-P(replica failure) = 1 - exp(-lambda_n * t_i,n)
-```
+Context Masked Pair PPO v2 defaults to **event-interval** credit: outcomes are
+assigned to the interval in which they actually occurred, including outcomes of
+earlier tasks, with within-interval discounting. It also defaults to a context
+actor and independent actor/critic gradient clipping. These are intentional
+versioned differences; legacy credit and clipping remain available as ablations.
+DQN and DDPG retain their own transition and training semantics.
 
-The simulator samples this probability independently for the primary and backup
-replicas. A `failure` status means that the current replica execution failed due
-to a transient fault. The server does not enter a permanent DOWN state, and the
-fault recovery interval is treated as negligible. Therefore later tasks and a
-retry on the same server remain allowed. A task-level failure means that all
-required replicas failed. Correlated or common-cause faults are not modeled.
+## Agent integration
 
----
+`MainLoop` calls `select_action(state, epsilon)` for DQN/PPO, or `policy(state)`
+and `addNoise(...)` for DDPG scores. The latter are decoded by argmax.
 
-## Agent interface contract
-
-The simulation core depends only on a **minimal agent interface**, which ensures
-that learning algorithms can be replaced without modifying the environment logic.
-
-- **Discrete-action agents (DQN / PPO):**
-  ```text
-  select_action(state) -> int
-  ```
-
-- **Continuous scoring agents (DDPG):**
-  ```text
-  policy(state) -> score_vector
-  ```
-
-The final action selection (e.g., `argmax` over scores) is handled inside the
-simulation core.
-
----
-
-## Adding a new DRL agent
-
-New DRL algorithms can be integrated in an incremental and low-risk manner:
-
-1. Create a new agent implementation inside the `agents/` directory
-   (e.g., `agents/a2c_agent.py`).
-
-2. Implement the required action-selection interface expected by the simulation core
-   (`select_action` or `policy`, depending on the action space).
-
-3. Register the new agent in the model construction logic
-   (e.g., within `build_model()` in `Project_main.py`).
-
-4. Set the corresponding value of `model_summary` in `config/configuration.py`.
-
-This design allows new learning methods to be added without altering the
-simulation environment or episode loop.
-
----
-
-## Notes
-
-- All scripts should be executed from the **project root**.
-- Input data (`data/`) and experiment outputs (`results/`) are generated automatically
-  and are not expected to be present in the repository.
-- Root-level launcher scripts are provided to avoid Python import issues when running
-  utility modules.
+Training interfaces also differ: DQN accepts transition tuples and learns online;
+DDPG uses its internal replay buffer and target updates; PPO accepts task-bound
+transitions, later reward assignment and episode-end `train_step()`. Specialized
+policies can implement `prepare_action(...)` and `record_task_outcome(...)` hooks.
+Register new agents in the model builder or provide a dedicated runner that
+respects these contracts.

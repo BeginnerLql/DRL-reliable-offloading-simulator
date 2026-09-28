@@ -11,8 +11,6 @@ from core.env_state import EnvironmentState
 from core.main_loop import MainLoop
 from core.server import Server
 from core.spatial_risk import (
-    build_distance_matrix,
-    build_spatial_correlation_matrix,
     map_spatial_risk_to_effective_failure_rates,
 )
 from tools.generate_server_and_task_parameters import base_failure_rate_from_frequency

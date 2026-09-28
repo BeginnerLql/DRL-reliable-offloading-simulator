@@ -1,7 +1,4 @@
-# DDPG_template.py  (PyTorch DDPG with INTERNAL replay buffer)
-# - Same overall structure/behavior as your TF template (actor/critic/target + OU noise + replay buffer learning)
-# - Buffer is created INSIDE ddpgModel (__init__) and accessible as dm.buffer
-# - No need to create Buffer externally in Project_main.py
+"""DDPG with actor/critic targets, OU exploration and an internal replay buffer."""
 
 import numpy as np
 
@@ -29,7 +26,7 @@ def _to_torch_tensor(x, dtype=torch.float32, device="cpu"):
 class _BaseNet(nn.Module):
     @property
     def variables(self):
-        # Mimic TF "variables" usage in your code
+        # Compatibility interface used by MainLoop's target updates.
         return list(self.parameters())
 
     def get_weights(self):
@@ -72,9 +69,6 @@ class _ActorNet(_BaseNet):
             x = F.softmax(x, dim=-1)
         elif self.activation_fn == "sigmoid":
             x = torch.sigmoid(x)
-        else:
-            # Unknown activation: leave linear
-            pass
 
         return x
 
@@ -225,13 +219,12 @@ class ddpgModel:
         self.critic_optimizer = torch.optim.Adam(self.critic_model.parameters(), lr=self.critic_lr)
         self.actor_optimizer = torch.optim.Adam(self.actor_model.parameters(), lr=self.actor_lr)
 
-        # ✅ Internal replay buffer (no external Buffer needed)
         self.buffer = Buffer(self, buffer_capacity=buffer_capacity, batch_size=batch_size)
 
     # Soft-update targets
     def update_target(self, target_weights, weights):
         with torch.no_grad():
-            for (a, b) in zip(target_weights, weights):
+            for a, b in zip(target_weights, weights):
                 a.copy_(b * self.tau + a * (1.0 - self.tau))
 
     def get_actor(self):

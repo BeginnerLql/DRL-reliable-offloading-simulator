@@ -12,7 +12,17 @@ import numpy as np
 import pandas as pd
 import torch
 from torch import nn
-from diagnostics.value_gae_identifiability import *
+import hashlib
+from agents.masked_pair_ppo_agent import masked_logits
+from config.params import params
+from diagnostics.value_gae_identifiability import (
+    CHECKPOINT, HORIZONS, OUT, episode_seed_plan, inverse_target, make_agent,
+    matched_indices, model_hash, normalize_target, production_gae, replay_checks,
+    run_episode, saturation, split_episodes, train_normalization,
+    truncated_smdp_returns, value_metrics,
+)
+from tools.pair_policy_diagnostics import TASK_ASSIGNMENT_COLUMNS
+from tools.paired_ppo_experiment import sha256_file
 from diagnostics.run_long_horizon_coupling import _interval_returns
 from agents.ppo_agent import PPOValueNetwork
 

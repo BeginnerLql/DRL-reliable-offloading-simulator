@@ -1,4 +1,4 @@
-# server.py
+"""Single-CPU Edge server with validated location and baseline fault rate."""
 import math
 
 import simpy
@@ -19,10 +19,9 @@ class Server:
         self.env = env
         self.server_type = server_type
         self.server_id = server_id
-        #self.queue = simpy.Resource(env, capacity=1)
         self.queue = simpy.PriorityResource(env, capacity=1)
 
-        self.processing_frequency = processing_frequency  # fn(t)
+        self.processing_frequency = processing_frequency
         # Normal-environment transient fault arrival rate λ_j^0, unit: 1/s.
         # ``failure_rate`` remains a compatibility alias for older analysis
         # code; formal runtime code uses ``base_failure_rate``.

@@ -5,7 +5,6 @@ from __future__ import annotations
 import copy
 import math
 from itertools import combinations
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -13,50 +12,12 @@ import torch
 
 from agents.ppo_agent import PPOAgent
 from core.env_state import EnvironmentState
+from io_utils.schemas import TASK_ASSIGNMENT_COLUMNS as TASK_ASSIGNMENT_COLUMNS
 
 
 RELIABILITY_REQUIREMENT_TIERS = (0.9, 0.99, 0.999, 0.9999)
 PAIR_DIAGNOSTIC_SEED = 2041
 PAIR_DIAGNOSTIC_TORCH_SEED = 2042
-
-# This mirrors the named order used by save_params_and_logs when it converts
-# MainLoop.task_Assignments_info. The saver currently defines this schema
-# locally rather than exporting a reusable canonical-column constant.
-TASK_ASSIGNMENT_COLUMNS = [
-    "episode",
-    "task_id",
-    "Primary",
-    "Primary_Start",
-    "Primary_End",
-    "Primary_Status",
-    "Backup",
-    "Backup_Start",
-    "Backup_End",
-    "Backup_Status",
-    "Z",
-    "Reliability_Requirement",
-    "Primary_Effective_Failure_Rate",
-    "Backup_Effective_Failure_Rate",
-    "Primary_Reliability_Service_Time",
-    "Backup_Reliability_Service_Time",
-    "Primary_Failure_Probability",
-    "Backup_Failure_Probability",
-    "Joint_Failure_Probability",
-    "Execution_Reliability",
-    "Reliability_Satisfied",
-    "Task_Reward",
-    "Task_Delay",
-    "Reliability_Margin",
-    "Reliability_Shortfall",
-    "Reliability_Excess",
-    "Base_Reward",
-    "Reliability_Violation_Log10",
-    "Reliability_Penalty",
-    "action_index",
-    "server_j",
-    "server_k",
-]
-
 
 class DiagnosticPPOAgent(PPOAgent):
     """PPOAgent subclass that only archives copies of observed states."""

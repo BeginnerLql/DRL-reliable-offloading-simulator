@@ -1,14 +1,9 @@
-import json
-import os
-import tempfile
 import unittest
-from types import SimpleNamespace
-from unittest.mock import patch
 
 import numpy as np
 import torch
 
-from agents.ppo_agent import PPOAgent, PPOPairScoringPolicyNetwork
+from agents.ppo_agent import PPOAgent
 from tools.pair_policy_diagnostics import (
     DiagnosticPPOAgent,
     RELIABILITY_REQUIREMENT_TIERS,

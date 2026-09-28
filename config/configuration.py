@@ -1,16 +1,16 @@
-#configuration.py
+"""Experiment defaults; runtime copies and derived dimensions live in params."""
 
 class parameters:
     # ======================================================================
     # experiment setting
     # ======================================================================
     model_summary = "ppo" # Options: "dqn", "ppo","ddpg"  
-    total_episodes = 5  # 100
+    total_episodes = 5
 
     # ======================================================================
     # Infrastructure: servers
     # ======================================================================
-    # The formal simulator now models eight homogeneous Edge servers.
+    # Eight Edge servers with distinct processing frequencies and base hazards.
     NUM_EDGE_SERVERS = 8
     NUM_CLOUD_SERVERS = 0
     serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  # 8
@@ -41,7 +41,7 @@ class parameters:
     UPLINK_RATE_RANGE_MBPS = (16.0, 40.0)
 
     # ======================================================================
-    # Reliability model parameters for the homogeneous Edge infrastructure.
+    # Reliability model parameters for the Edge infrastructure.
     # ======================================================================
     FIXED_EDGE_PROCESSING_FREQUENCIES = (10, 11, 12, 14, 15, 17, 18, 20)  # MIPS
     LAMBDA_REF = 0.003  # 1/s, normal-environment reference rate
@@ -60,7 +60,6 @@ class parameters:
     # Approximately one representative Edge task service time.
     BACKLOG_TIME_SCALE_SEC = 4.0
 
-    # Episode-level quasi-static physical spatial risk field.
     # Episode-level quasi-static spatial risk field used by runtime reliability.
     SPATIAL_RISK_ENABLED = True
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
@@ -77,12 +76,12 @@ class parameters:
     # ======================================================================
     # ----------- DDPG ----------------
     std_dev_ddpg = 0.25
-    critic_lr_ddpg = 0.001   #0.002  
-    actor_lr_ddpg = 0.0003 #  0.0005  # 0.0005
-    gamma_ddpg = 0.85 # 0.9
-    tau_ddpg = 0.005 #0.01
-    buffer_capacity_ddpg = 100000 #50000
-    batch_size_ddpg = 256 #64
+    critic_lr_ddpg = 0.001
+    actor_lr_ddpg = 0.0003
+    gamma_ddpg = 0.85
+    tau_ddpg = 0.005
+    buffer_capacity_ddpg = 100000
+    batch_size_ddpg = 256
     activation_function_ddpg ="softmax" 
     # ------------- DQN --------------
     hidden_layers_dqn = [128, 64]

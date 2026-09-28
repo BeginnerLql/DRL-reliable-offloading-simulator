@@ -1,11 +1,7 @@
-"""config.params
+"""Runtime parameter snapshot and derived observation/action dimensions.
 
-Lightweight 'params' holder used across the simulator.
-It mirrors values from config.configuration.parameters.
-
-Important:
-- Keep this file mostly as-is to avoid breaking logic.
-- Any path-related values are handled in config.paths (DATA_DIR/RESULTS_DIR).
+Values are copied at import time so experiments can override them independently
+of configuration.parameters. Paths are defined in config.paths.
 """
 
 from config.configuration import parameters
@@ -99,8 +95,4 @@ class params:
     gae_lambda_ppo = parameters.gae_lambda_ppo
     value_loss_coef_ppo = parameters.value_loss_coef_ppo
     max_grad_norm_ppo = parameters.max_grad_norm_ppo
-
-
-    
-    
     

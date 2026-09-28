@@ -1,10 +1,4 @@
-# save_parameters_and_logs.py
-# - Fixed base failure rates, fixed local paths only
-# - No Permutation_Number
-# - Reads Excel input files ONLY from data/
-# - Writes results per model
-# - Creates Excel-native charts (no PNG files)
-# - Adds Summary.AVG_Failure (rolling mean over last 40 episodes) + ONLY line chart in Summary
+"""Export configuration, task/replica logs and reliability summaries to Excel."""
 
 import os
 import pandas as pd
@@ -14,6 +8,7 @@ from openpyxl.chart import LineChart, Reference
 
 
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
+from io_utils.schemas import TASK_ASSIGNMENT_COLUMNS
 
 
 RELIABILITY_DIAGNOSTIC_COLUMNS = [
@@ -314,40 +309,7 @@ def save_params_and_logs(
     # ---------------------------
     # TaskAssignments dataframe
     # ---------------------------
-    task_assignment_columns = [
-        "episode",
-        "task_id",
-        "Primary",
-        "Primary_Start",
-        "Primary_End",
-        "Primary_Status",
-        "Backup",
-        "Backup_Start",
-        "Backup_End",
-        "Backup_Status",
-        "Z",
-        "Reliability_Requirement",
-        "Primary_Effective_Failure_Rate",
-        "Backup_Effective_Failure_Rate",
-        "Primary_Reliability_Service_Time",
-        "Backup_Reliability_Service_Time",
-        "Primary_Failure_Probability",
-        "Backup_Failure_Probability",
-        "Joint_Failure_Probability",
-        "Execution_Reliability",
-        "Reliability_Satisfied",
-        "Task_Reward",
-        "Task_Delay",
-        "Reliability_Margin",
-        "Reliability_Shortfall",
-        "Reliability_Excess",
-        "Base_Reward",
-        "Reliability_Violation_Log10",
-        "Reliability_Penalty",
-        "action_index",
-        "server_j",
-        "server_k",
-    ]
+    task_assignment_columns = TASK_ASSIGNMENT_COLUMNS.copy()
     reward_diagnostic_columns = [
         "Base_Reward",
         "Reliability_Violation_Log10",
@@ -457,10 +419,9 @@ def save_params_and_logs(
             line.width = 22
             line.height = 10
 
-            # جایگذاری از بالا (چون بارچارت حذف شده، بهتره همون بالا باشه)
             ws_sum.add_chart(line, "F2")
 
-    # Logs charts (Rewards + optional Delay) - unchanged
+    # Logs charts: rewards and optional delay.
     if "Logs" in wb.sheetnames:
         ws_logs = wb["Logs"]
         header = [cell.value for cell in ws_logs[1]]

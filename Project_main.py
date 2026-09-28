@@ -1,9 +1,4 @@
-# Project_main.py
-# ------------------------------------------------------------
-# Entry point for the simulator.
-# - Original logic preserved.
-# - Updated imports/paths to match the new modular structure.
-# ------------------------------------------------------------
+"""Build a configured agent, run the simulator, and export experiment logs."""
 
 import os
 import sys

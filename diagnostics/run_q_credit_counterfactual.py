@@ -27,7 +27,6 @@ from config.action_value_critic import ActionValueCriticConfig
 from config.params import params
 from tools.paired_ppo_experiment import _agent_kwargs
 from Project_main import build_pair_correlations
-from tools.paired_ppo_experiment import _agent_kwargs
 
 OUT = ROOT / "diagnostics/results/q_credit_audit"
 AUDIT_ROWS = []
@@ -238,11 +237,8 @@ if __name__ == "__main__":
     parser.add_argument("--trial-id", type=int, choices=range(10), help="Run one 100-state trial")
     parser.add_argument("--output-dir", type=Path, default=OUT)
     args = parser.parse_args()
-    from agents.action_value_masked_ppo_agent import ActionValueMaskedPairPPOAgent
-    from Project_main import build_pair_correlations
     from diagnostics.run_action_value_critic import formal_spec
     from agents.action_conditioned_q_critic import ActionValueCritic
-    from config.action_value_critic import ActionValueCriticConfig
 
     meta, plan = formal_spec()
     trial = plan.iloc[0].to_dict()

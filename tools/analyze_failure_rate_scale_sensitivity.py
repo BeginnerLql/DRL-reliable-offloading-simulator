@@ -32,6 +32,7 @@ from tools.analyze_conditional_joint_reliability import (
     _finite_positive,
     _load_servers,
     _load_tasks,
+    _positive_integer,
     calculate_conditional_joint_reliability,
 )
 
@@ -48,17 +49,6 @@ SUMMARY_QUANTILES = {
     "p95": 0.95,
     "p99": 0.99,
 }
-
-
-def _positive_integer(value: object, name: str) -> int:
-    if isinstance(value, (bool, np.bool_)) or not isinstance(
-        value, (int, np.integer)
-    ):
-        raise ValueError(f"{name} must be a positive integer")
-    parsed = int(value)
-    if parsed <= 0:
-        raise ValueError(f"{name} must be a positive integer")
-    return parsed
 
 
 def _normalize_scales(scales: object) -> tuple[float, ...]:

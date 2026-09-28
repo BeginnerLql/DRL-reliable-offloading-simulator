@@ -1,4 +1,3 @@
-# post_process.py
 """
 Post-process launcher (run from project root).
 Runs final aggregation/post-processing on results/.

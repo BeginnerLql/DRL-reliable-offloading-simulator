@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from types import MethodType, SimpleNamespace
+from types import MethodType
 
 import pandas as pd
 import simpy

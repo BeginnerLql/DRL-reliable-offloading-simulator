@@ -1,11 +1,4 @@
-# post_process_results.py
-# - NO average_distribution.xlsx
-# - Enriches each result .xlsx by adding:
-#     * "Task Distribution" sheet + chart
-#     * "Strategy Selection Distribution" sheet + chart
-# - Creates ONE root-level Final_Result_All.xlsx
-#     * one sheet per results folder
-#     * compares Avg Reward and AVG_Failure across models (line charts)
+"""Add task/strategy distributions and build results/Final_Result_All.xlsx."""
 
 import os
 import zipfile
@@ -321,7 +314,6 @@ def build_final_result_all(root_dir: str, folder_payloads: dict):
         write_df_to_sheet(ws, merged, start_row=1, start_col=1)
 
         max_row = 1 + merged.shape[0]  # header + data rows
-        max_col = merged.shape[1]
 
         # Find column indices
         header = list(merged.columns)
@@ -374,7 +366,7 @@ def build_final_result_all(root_dir: str, folder_payloads: dict):
             fail_chart.width = 26
             fail_chart.height = 12
 
-            # Put second chart lower (you suggested row ~30)
+            # Keep the failure chart below the reward chart.
             ws.add_chart(fail_chart, "H30")
 
     wb.save(out_path)
@@ -461,4 +453,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

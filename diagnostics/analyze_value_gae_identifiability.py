@@ -12,7 +12,9 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy.spatial import cKDTree
-from diagnostics.value_gae_identifiability import *
+from Project_main import build_pair_correlations
+from config.params import params
+from diagnostics.value_gae_identifiability import HORIZONS, OUT, correlation, model_hash
 from diagnostics.run_value_gae_identifiability import load_dataset,verify_protected
 from agents.policy_centered_action_advantage import PolicyCenteredActionAdvantage,policy_centered_advantage
 

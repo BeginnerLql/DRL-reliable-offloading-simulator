@@ -1,18 +1,13 @@
-# DQN_template.py
-# Deep Q-Network (DQN) implementation used in this project.
-# Includes:
-#   - A configurable MLP Q-network (DQNNetwork)
-#   - A DQNAgent with:
-#       * epsilon-greedy exploration
-#       * optional softmax action sampling (Boltzmann exploration)
-#       * replay buffer
-#       * target network with soft update (Polyak averaging)
+"""DQN with replay, epsilon-greedy or Boltzmann exploration, and soft targets."""
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import random
 import numpy as np
+
+from agents.networks import build_hidden_layers
+
 
 class DQNNetwork(nn.Module):
     """
@@ -24,26 +19,8 @@ class DQNNetwork(nn.Module):
       - activation: activation function name
     """
     def __init__(self, input_dim, output_dim, hidden_layers, activation='relu'):
-        super(DQNNetwork, self).__init__()
-        layers = []
-        prev_dim = input_dim
-
-        # Build MLP hidden layers
-        for h in hidden_layers:
-            layers.append(nn.Linear(prev_dim, h))
-
-            # Activation selection (must match allowed strings)
-            if activation == 'relu':
-                layers.append(nn.ReLU())
-            elif activation == 'leaky_relu':
-                layers.append(nn.LeakyReLU())
-            elif activation == 'tanh':
-                layers.append(nn.Tanh())
-            else:
-                raise ValueError(f"Unsupported activation function: {activation}")
-
-            prev_dim = h
-
+        super().__init__()
+        layers, prev_dim = build_hidden_layers(input_dim, hidden_layers, activation)
         self.hidden_layers = nn.Sequential(*layers)
 
         # Final linear layer outputs Q-values for all actions

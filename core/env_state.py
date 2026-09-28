@@ -1,7 +1,5 @@
 
-"""core.env_state
-Environment state container.
-"""
+"""Server queues, task/replica lifecycle counters and policy observations."""
 
 import numpy as np
 from config.params import params
@@ -25,8 +23,7 @@ class EnvironmentState:
 
     def add_server_and_init_environment(self, server_object):
         """Add a server object to the environment state."""
-        server_id = server_object.server_id  # Extract the server ID from the server object
-        #print(f"Adding server with ID {server_id}")
+        server_id = server_object.server_id
         self.servers[server_id] = {
             'server_object': server_object,
             'waiting_replicas': [],
@@ -267,7 +264,7 @@ class EnvironmentState:
 
     def add_task(self, task_object):
         """Add a task object to the environment state."""
-        task_id = task_object.id  # Extract the task ID from the task object
+        task_id = task_object.id
         self.tasks[task_id] = task_object
 
     def remove_task(self, task_id):
@@ -287,7 +284,7 @@ class EnvironmentState:
             print("No tasks available.")
             return None
         
-        min_demand = float('inf')  # Initialize min_demand with positive infinity
+        min_demand = float('inf')
         
         for task_id, task_obj in self.tasks.items():
             if task_obj.computation_demand < min_demand:
@@ -402,5 +399,4 @@ class EnvironmentState:
         ], dtype=np.float32)
         assert len(normalized_arr) == params.num_states
         return normalized_arr
-
 

@@ -13,7 +13,17 @@ import pandas as pd
 import torch
 from torch import nn
 from agents.ppo_agent import PPOValueNetwork
-from diagnostics.state_sufficiency_audit import *
+from config.params import params
+from scipy.spatial import cKDTree
+from diagnostics.state_sufficiency_audit import (
+    OUT, ROOT, VALUE_MANIFEST, VALUE_OUT, VARIANT_SEED, StateSufficiencyAgent,
+    collect_replay_episode, make_variants, nearest_indices,
+)
+from diagnostics.value_gae_identifiability import (
+    CHECKPOINT, HORIZONS, inverse_target, make_agent, model_hash,
+    normalize_target, production_gae, value_metrics,
+)
+from tools.paired_ppo_experiment import sha256_file
 
 
 def old_episode(ep):

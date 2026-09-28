@@ -6,7 +6,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from unittest.mock import patch
 
 from core.spatial_risk import build_spatial_correlation_matrix
 from tools.analyze_conditional_joint_reliability import (

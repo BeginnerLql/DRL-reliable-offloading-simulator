@@ -31,16 +31,13 @@ from tools.pair_policy_diagnostics import (
     rho_counterfactual_rows,
     sample_probe_indices,
     summarize_behavior,
-    policy_entropy,
 )
 from tools.paired_ppo_experiment import (
-    BOOTSTRAP_SEED,
     DEFAULT_MASTER_SEED,
     SEED_COLUMNS,
     FrozenEvaluationPPOAgent,
     _agent_kwargs,
     _as_json_value,
-    _parameter_count,
     _state_dict_snapshot,
     assert_state_dict_unchanged,
     generate_seed_plan,

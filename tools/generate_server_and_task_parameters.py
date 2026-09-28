@@ -1,7 +1,4 @@
-# generate_server_and_task_parameters.py
-# Generates:
-# 1) server_info.xlsx -> one sheet: Servers
-# 2) task_parameters.xlsx
+"""Generate server_info.xlsx and task_parameters.xlsx from fixed experiment inputs."""
 
 import math
 import os

@@ -1,8 +1,8 @@
-# mainLoop.py  (multi-model: DDPG / DQN / PPO)
-# - MainLoop signature simplified: no external buffer
-# - DDPG uses model.policy() -> continuous scores -> argmax -> pair, and trains via model.buffer
-# - DQN/PPO use model.select_action(state, epsilon) -> discrete action index -> pair
-# - PPO trains once at end of episode; DQN trains online
+"""SimPy episode orchestration and DDPG/DQN/PPO training integration.
+
+DDPG maps scores to pairs; DQN and PPO select pair indices. PPO updates after
+episode resolution, while DQN and DDPG learn from resolved tasks online.
+"""
 
 from core.server import Server
 from core.task import Task
@@ -441,6 +441,15 @@ class MainLoop:
         self.episodic_reward += reward
         self.episodic_delay += delay
         self.rewardsAll.append(reward)
+        self._record_task_assignment(task, reward, delay)
+        self._mark_task_resolution(task)
+        self.pendingList.remove(task_counter)
+        try_finalize = getattr(task, "try_finalize_lifecycle", None)
+        if callable(try_finalize):
+            try_finalize()
+
+    def _record_task_assignment(self, task, reward, delay):
+        """Append the common task log row without changing lifecycle bookkeeping."""
         reliability_margin, reliability_shortfall, reliability_excess = (
             self._reliability_diagnostic_metrics(task)
         )
@@ -480,11 +489,6 @@ class MainLoop:
                 task.backupNode.server_id,
             )
         )
-        self._mark_task_resolution(task)
-        self.pendingList.remove(task_counter)
-        try_finalize = getattr(task, "try_finalize_lifecycle", None)
-        if callable(try_finalize):
-            try_finalize()
 
     def _get_task_outcome_time(self, task):
         """Return the first actual replica completion timestamp."""
@@ -631,45 +635,7 @@ class MainLoop:
             self.pendingList.remove(t)
             task = self.env_state.get_task_by_id(t)
             task_reward, task_delay = resolved_rewards[t]
-            reliability_margin, reliability_shortfall, reliability_excess = (
-                self._reliability_diagnostic_metrics(task)
-            )
-            self.task_Assignments_info.append(
-                (
-                    self.this_episode,
-                    task.id,
-                    task.primaryNode.server_id,
-                    task.primaryStarted,
-                    task.primaryFinished,
-                    task.primaryStat,
-                    task.backupNode.server_id,
-                    task.backupStarted,
-                    task.backupFinished,
-                    task.backupStat,
-                    None,
-                    getattr(task, "reliability_requirement", None),
-                    getattr(task, "primary_effective_failure_rate", None),
-                    getattr(task, "backup_effective_failure_rate", None),
-                    getattr(task, "primary_service_time_for_reliability", None),
-                    getattr(task, "backup_service_time_for_reliability", None),
-                    getattr(task, "primary_failure_probability", None),
-                    getattr(task, "backup_failure_probability", None),
-                    getattr(task, "joint_failure_probability", None),
-                    getattr(task, "execution_reliability", None),
-                    getattr(task, "reliability_satisfied", None),
-                    task_reward,
-                    task_delay,
-                    reliability_margin,
-                    reliability_shortfall,
-                    reliability_excess,
-                    getattr(task, "base_reward", None),
-                    getattr(task, "reliability_violation", None),
-                    getattr(task, "reliability_penalty", None),
-                    getattr(task, "action_index", None),
-                    task.primaryNode.server_id,
-                    task.backupNode.server_id,
-                )
-            )
+            self._record_task_assignment(task, task_reward, task_delay)
             self._mark_task_resolution(task)
             try_finalize = getattr(task, "try_finalize_lifecycle", None)
             if callable(try_finalize):

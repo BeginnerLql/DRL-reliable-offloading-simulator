@@ -12,7 +12,6 @@ import math
 
 import torch
 from torch import nn
-from torch.distributions import Categorical
 
 from agents.ppo_agent import PPOPairScoringPolicyNetwork
 from config.action_value_critic import ActionValueCriticConfig
@@ -98,10 +97,6 @@ def expected_sarsa_targets(
 
 class ActionConditionedQNetwork(PPOPairScoringPolicyNetwork):
     """Shared pair scorer Q(s,a), returning a value for every legal pair."""
-
-    def forward(self, state):
-        values = super().forward(state)
-        return values
 
 
 class ActionValueCritic:
@@ -251,8 +246,6 @@ class ActionValueCritic:
 
         with torch.no_grad():
             post_values = self.online(tensors["states"])
-        flat_q = post_values.detach().cpu().numpy()
-        flat_target_q = next_q.detach().cpu().numpy()
         td_np = td_errors.detach().cpu().numpy()
         metrics = {
             "episode": episode,

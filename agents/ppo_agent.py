@@ -1,9 +1,4 @@
-# PPO_template.py
-# Project-specific PPO implementation (on-policy), designed to work with the existing simulation codebase.
-# Notes:
-# - Rollout buffer is collected within an episode.
-# - train_step() is intended to run at the end of the episode.
-# - Function signatures keep compatibility with the DQN interface used elsewhere in the project.
+"""Episode-based PPO with elapsed-time GAE and origin-task reward bookkeeping."""
 
 import torch
 import torch.nn as nn
@@ -12,37 +7,20 @@ import numpy as np
 from itertools import combinations
 from torch.distributions import Categorical
 
+from agents.networks import build_hidden_layers
+
 
 class PPOPolicyNetwork(nn.Module):
-    # Actor network: maps state -> action logits
+    """Flat actor mapping observations to categorical action logits."""
     def __init__(self, input_dim, output_dim, hidden_layers, activation="tanh"):
-        super(PPOPolicyNetwork, self).__init__()
-        layers = []
-        prev_dim = input_dim
-
-        # Build MLP body
-        for h in hidden_layers:
-            layers.append(nn.Linear(prev_dim, h))
-
-            # Activation selection
-            if activation == "relu":
-                layers.append(nn.ReLU())
-            elif activation == "leaky_relu":
-                layers.append(nn.LeakyReLU())
-            elif activation == "tanh":
-                layers.append(nn.Tanh())
-            else:
-                raise ValueError(f"Unsupported activation function: {activation}")
-
-            prev_dim = h
-
+        super().__init__()
+        layers, prev_dim = build_hidden_layers(input_dim, hidden_layers, activation)
         self.hidden_layers = nn.Sequential(*layers)
         self.output_layer = nn.Linear(prev_dim, output_dim)
 
     def forward(self, x):
-        # Returns action logits (Categorical distribution will be formed from logits)
         x = self.hidden_layers(x)
-        return self.output_layer(x)  # logits
+        return self.output_layer(x)
 
 
 class PPOPairScoringPolicyNetwork(nn.Module):
@@ -111,19 +89,9 @@ class PPOPairScoringPolicyNetwork(nn.Module):
             torch.tensor(correlations, dtype=torch.float32),
         )
 
-        layers = []
-        prev_dim = self.pair_feature_dim
-        for hidden_dim in hidden_layers:
-            layers.append(nn.Linear(prev_dim, int(hidden_dim)))
-            if activation == 'relu':
-                layers.append(nn.ReLU())
-            elif activation == 'leaky_relu':
-                layers.append(nn.LeakyReLU())
-            elif activation == 'tanh':
-                layers.append(nn.Tanh())
-            else:
-                raise ValueError(f'Unsupported activation function: {activation}')
-            prev_dim = int(hidden_dim)
+        layers, prev_dim = build_hidden_layers(
+            self.pair_feature_dim, map(int, hidden_layers), activation
+        )
         layers.append(nn.Linear(prev_dim, 1))
         self.scorer = nn.Sequential(*layers)
 
@@ -246,35 +214,16 @@ class PPOContextPairScoringPolicyNetwork(PPOPairScoringPolicyNetwork):
 
 
 class PPOValueNetwork(nn.Module):
-    # Critic network: maps state -> scalar value V(s)
+    """State-value critic returning one scalar per observation."""
     def __init__(self, input_dim, hidden_layers, activation="tanh"):
-        super(PPOValueNetwork, self).__init__()
-        layers = []
-        prev_dim = input_dim
-
-        # Build MLP body
-        for h in hidden_layers:
-            layers.append(nn.Linear(prev_dim, h))
-
-            # Activation selection
-            if activation == "relu":
-                layers.append(nn.ReLU())
-            elif activation == "leaky_relu":
-                layers.append(nn.LeakyReLU())
-            elif activation == "tanh":
-                layers.append(nn.Tanh())
-            else:
-                raise ValueError(f"Unsupported activation function: {activation}")
-
-            prev_dim = h
-
+        super().__init__()
+        layers, prev_dim = build_hidden_layers(input_dim, hidden_layers, activation)
         self.hidden_layers = nn.Sequential(*layers)
         self.output_layer = nn.Linear(prev_dim, 1)
 
     def forward(self, x):
-        # Squeeze last dimension to return shape [batch] instead of [batch, 1]
         x = self.hidden_layers(x)
-        return self.output_layer(x).squeeze(-1)  # V(s)
+        return self.output_layer(x).squeeze(-1)
 
 
 class PPOAgent:
