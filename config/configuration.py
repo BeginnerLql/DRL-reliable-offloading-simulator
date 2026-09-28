@@ -1,50 +1,49 @@
-#configuration.py
+"""Central configuration for simulator parameters."""
 
 class parameters:
-    # ======================================================================
-    # experiment setting
-    # ======================================================================
-    model_summary = "ppo" # Options: "dqn", "ppo","ddpg"  
-    total_episodes = 5  # 100
+    # Experiment
+    model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg"
+    total_episodes = 100
 
-    # ======================================================================
-    # Infrastructure: servers
-    # ======================================================================
-    NUM_EDGE_SERVERS = 6  # 7,8
-    NUM_CLOUD_SERVERS = 2  # 3,2
-    serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  # 10
-    # ======================================================================
-    # Workload: tasks
-    # ======================================================================
+    # Infrastructure
+    NUM_SERVERS = 8
+    # Legacy compatibility for the current parameter generator; remove during
+    # the runtime refactor. Cloud-specific behavior is disabled.
+    NUM_EDGE_SERVERS = NUM_SERVERS
+    NUM_CLOUD_SERVERS = 0
+
+    # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
-    TASK_SIZE_RANGE = (10, 100)  # heter
-    Low_demand, High_demand = 1, 100 # MI (Normal(mean=50, std=16) implied)
+    TASK_SIZE_RANGE = (10, 100)
+    Low_demand, High_demand = 1, 100  # MI
     taskno = 200
-    
-    # ======================================================================
-    # Network model
-    # ======================================================================
-    # RSU-to-cloud backhaul bandwidth (Mb/s).
-    rsu_to_cloud_bandwidth = 8  # Mb/s
 
-    # ======================================================================
-    # Reliability model parameters (Edge vs Cloud)
-    # ======================================================================
-    # Transient server-fault arrival-rate range, unit: 1/s.
-    EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)
-    # Transient server-fault arrival-rate range, unit: 1/s.
-    CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)
-    EDGE_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
-    CLOUD_PROCESSING_FREQ_RANGE = (30, 60)  # MIPS
-    # Fixed backlog-time normalization scale, unit: seconds.
-    # Approximately one representative Edge task service time.
+    # TODO: Define task-to-edge transmission-rate configuration.
+
+    # Unified server parameters
+    # TEMPORARY: value to be calibrated later.
+    SERVER_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
+    # TEMPORARY: base transient failure intensity range, unit: s^-1.
+    SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)
+
+    # Legacy compatibility for the current runtime and parameter generator;
+    # both node types map to the same server values. Remove during refactoring.
+    EDGE_PROCESSING_FREQ_RANGE = SERVER_PROCESSING_FREQ_RANGE
+    CLOUD_PROCESSING_FREQ_RANGE = SERVER_PROCESSING_FREQ_RANGE
+    EDGE_FAILURE_RATE_RANGE = SERVER_FAILURE_RATE_RANGE
+    CLOUD_FAILURE_RATE_RANGE = SERVER_FAILURE_RATE_RANGE
+
+    # Retained for backlog normalization; the value remains provisional.
     BACKLOG_TIME_SCALE_SEC = 4.0
 
-    # Episode-level quasi-static physical spatial risk field.
-    # Disabled by default to preserve the independent baseline.
+    # One quasi-static spatial-risk field is sampled per episode when enabled.
     SPATIAL_RISK_ENABLED = False
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
     SPATIAL_RISK_BETA_P = None
+    MASTER_SEED = 2026
+    # TODO: Derive independent streams from MASTER_SEED plus optional per-stream
+    # overrides with numpy.random.SeedSequence.
+    # Existing spatial-risk override, used until the RNG refactor.
     SPATIAL_RISK_SEED = 2026
 
     # ======================================================================

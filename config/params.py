@@ -1,51 +1,43 @@
-"""config.params
-
-Lightweight 'params' holder used across the simulator.
-It mirrors values from config.configuration.parameters.
-
-Important:
-- Keep this file mostly as-is to avoid breaking logic.
-- Any path-related values are handled in config.paths (DATA_DIR/RESULTS_DIR).
-"""
+"""Runtime parameters derived from :mod:`config.configuration`."""
 
 from config.configuration import parameters
 
 class params:
 
-    # experiment setting
+    # Experiment
     model_summary = parameters.model_summary  # Options: "dqn", "ppo", "ddpg"
     total_episodes = parameters.total_episodes
 
-    # Infrastructure: servers
-    NUM_EDGE_SERVERS =parameters.NUM_EDGE_SERVERS
-    NUM_CLOUD_SERVERS = parameters.NUM_CLOUD_SERVERS
-    serverNo = NUM_EDGE_SERVERS + NUM_CLOUD_SERVERS  
+    # Infrastructure
+    NUM_SERVERS = parameters.NUM_SERVERS
+    serverNo = NUM_SERVERS
 
-    # Workload: tasks
+    # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
     Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
     taskno = parameters.taskno
-    # Poisson task-arrival rate, unit: tasks/s
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
-    # Network model
-    rsu_to_cloud_bandwidth = parameters.rsu_to_cloud_bandwidth
 
-    # Server capabilities
+    # Unified server parameters
+    SERVER_PROCESSING_FREQ_RANGE = parameters.SERVER_PROCESSING_FREQ_RANGE
+    SERVER_FAILURE_RATE_RANGE = parameters.SERVER_FAILURE_RATE_RANGE
+
+    # Legacy compatibility; remove during the runtime refactor.
     EDGE_PROCESSING_FREQ_RANGE = parameters.EDGE_PROCESSING_FREQ_RANGE
     CLOUD_PROCESSING_FREQ_RANGE = parameters.CLOUD_PROCESSING_FREQ_RANGE
-    # Fixed base failure rates (1/s)
     EDGE_FAILURE_RATE_RANGE = parameters.EDGE_FAILURE_RATE_RANGE
     CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
+
     BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC
-    # Episode-level quasi-static physical spatial risk field.
     SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
     SPATIAL_CORRELATION_LENGTH_KM = parameters.SPATIAL_CORRELATION_LENGTH_KM
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
     SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
+    MASTER_SEED = parameters.MASTER_SEED
 
-    # RL hyperparameters
-    num_states = 3 * serverNo + 2  # observable failure rate, frequency, backlog time per server + task profile
-    num_actions = (serverNo*serverNo)+(serverNo*(serverNo-1))//2 # 92 actions for 8 servers
+    # New state and action dimensions; runtime state/action construction follows later.
+    num_states = 4 * serverNo + 3
+    num_actions = serverNo * (serverNo - 1) // 2
     
     # ----------- DDPG ----------------
     std_dev_ddpg = parameters.std_dev_ddpg
@@ -82,8 +74,3 @@ class params:
     gae_lambda_ppo = parameters.gae_lambda_ppo
     value_loss_coef_ppo = parameters.value_loss_coef_ppo
     max_grad_norm_ppo = parameters.max_grad_norm_ppo
-
-
-    
-    
-    
