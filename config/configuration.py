@@ -7,10 +7,6 @@ class parameters:
 
     # Infrastructure
     NUM_SERVERS = 8
-    # Legacy compatibility for the current parameter generator; remove during
-    # the runtime refactor. Cloud-specific behavior is disabled.
-    NUM_EDGE_SERVERS = NUM_SERVERS
-    NUM_CLOUD_SERVERS = 0
 
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
@@ -26,13 +22,6 @@ class parameters:
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
     SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)
 
-    # Legacy compatibility for the current runtime and parameter generator;
-    # both node types map to the same server values. Remove during refactoring.
-    EDGE_PROCESSING_FREQ_RANGE = SERVER_PROCESSING_FREQ_RANGE
-    CLOUD_PROCESSING_FREQ_RANGE = SERVER_PROCESSING_FREQ_RANGE
-    EDGE_FAILURE_RATE_RANGE = SERVER_FAILURE_RATE_RANGE
-    CLOUD_FAILURE_RATE_RANGE = SERVER_FAILURE_RATE_RANGE
-
     # Retained for backlog normalization; the value remains provisional.
     BACKLOG_TIME_SCALE_SEC = 4.0
 
@@ -41,10 +30,6 @@ class parameters:
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
     SPATIAL_RISK_BETA_P = None
     MASTER_SEED = 2026
-    # TODO: Derive independent streams from MASTER_SEED plus optional per-stream
-    # overrides with numpy.random.SeedSequence.
-    # Existing spatial-risk override, used until the RNG refactor.
-    SPATIAL_RISK_SEED = 2026
 
     # ======================================================================
     # RL hyperparameters

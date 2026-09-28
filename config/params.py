@@ -10,7 +10,6 @@ class params:
 
     # Infrastructure
     NUM_SERVERS = parameters.NUM_SERVERS
-    serverNo = NUM_SERVERS
 
     # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
@@ -22,22 +21,15 @@ class params:
     SERVER_PROCESSING_FREQ_RANGE = parameters.SERVER_PROCESSING_FREQ_RANGE
     SERVER_FAILURE_RATE_RANGE = parameters.SERVER_FAILURE_RATE_RANGE
 
-    # Legacy compatibility; remove during the runtime refactor.
-    EDGE_PROCESSING_FREQ_RANGE = parameters.EDGE_PROCESSING_FREQ_RANGE
-    CLOUD_PROCESSING_FREQ_RANGE = parameters.CLOUD_PROCESSING_FREQ_RANGE
-    EDGE_FAILURE_RATE_RANGE = parameters.EDGE_FAILURE_RATE_RANGE
-    CLOUD_FAILURE_RATE_RANGE = parameters.CLOUD_FAILURE_RATE_RANGE
-
     BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC
     SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
     SPATIAL_CORRELATION_LENGTH_KM = parameters.SPATIAL_CORRELATION_LENGTH_KM
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
-    SPATIAL_RISK_SEED = parameters.SPATIAL_RISK_SEED
     MASTER_SEED = parameters.MASTER_SEED
 
     # New state and action dimensions; runtime state/action construction follows later.
-    num_states = 4 * serverNo + 3
-    num_actions = serverNo * (serverNo - 1) // 2
+    num_states = 4 * NUM_SERVERS + 3
+    num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
     
     # ----------- DDPG ----------------
     std_dev_ddpg = parameters.std_dev_ddpg
