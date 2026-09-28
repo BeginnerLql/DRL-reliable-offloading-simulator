@@ -20,16 +20,9 @@ from config.configuration import parameters
 
 
 EARTH_RADIUS_KM = 6371.0088
-PRECISION_FILTER = "Within 10 meters"
 EXPECTED_HIGH_PRECISION_COUNT = 99
-REQUIRED_INPUT_COLUMNS = {
-    "SITE_ID",
-    "LATITUDE",
-    "LONGITUDE",
-    "NAME",
-    "SITE_PRECISION",
-}
 TOPOLOGY_COLUMNS = ["Server_ID", "Site_ID", "Latitude", "Longitude"]
+CANDIDATE_COLUMNS = ["Site_ID", "Latitude", "Longitude"]
 
 
 class TopologyValidationError(ValueError):
@@ -106,24 +99,14 @@ def _normalized_candidates(candidates: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
-def _validate_and_filter_sites(raw_df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
-    """Filter high-precision records and validate topology inputs."""
-    frame = raw_df.copy()
-    frame.columns = [str(column).strip() for column in frame.columns]
-    missing = sorted(REQUIRED_INPUT_COLUMNS.difference(frame.columns))
+def _validate_candidate_pool(candidate_df: pd.DataFrame) -> pd.DataFrame:
+    """Validate a cleaned candidate pool before topology selection."""
+    missing = sorted(set(CANDIDATE_COLUMNS).difference(candidate_df.columns))
     if missing:
         raise TopologyValidationError(
-            "Input CSV is missing required columns: " + ", ".join(missing)
+            "Candidate CSV is missing required columns: " + ", ".join(missing)
         )
-
-    original_count = len(frame)
-    precision = frame["SITE_PRECISION"].astype("string").str.strip()
-    candidates = frame.loc[precision == PRECISION_FILTER].copy()
-    candidates = candidates.rename(
-        columns={"SITE_ID": "Site_ID", "LATITUDE": "Latitude", "LONGITUDE": "Longitude"}
-    )
-    candidates = _normalized_candidates(candidates)
-    return candidates, original_count
+    return _normalized_candidates(candidate_df)
 
 
 def _distance_profile(candidates: pd.DataFrame) -> tuple[np.ndarray, float, float]:
@@ -264,26 +247,31 @@ def select_balanced_topology(candidates: pd.DataFrame, num_servers: int) -> pd.D
 
 
 def prepare_topology(
-    input_path: Path | str,
+    input_path: Path | str | None = None,
     output_path: Path | str | None = None,
     num_servers: int = parameters.NUM_SERVERS,
 ) -> pd.DataFrame:
-    """Read EUA records, select a topology, and write its CSV."""
-    input_path = Path(input_path)
+    """Select a topology from the cleaned candidate pool and write its CSV."""
+    input_path = Path(input_path) if input_path is not None else _default_input_path()
     output_path = (
         Path(output_path)
         if output_path is not None
         else _default_output_path(num_servers)
     )
     if input_path.resolve() == output_path.resolve():
-        raise ValueError("Output path must differ from the input CSV path.")
+        raise ValueError("Output path must differ from the candidate CSV path.")
 
-    raw_df = pd.read_csv(input_path, encoding="utf-8-sig", dtype="string")
-    candidates, original_count = _validate_and_filter_sites(raw_df)
-    if len(candidates) != EXPECTED_HIGH_PRECISION_COUNT:
+    candidate_df = pd.read_csv(
+        input_path,
+        encoding="utf-8-sig",
+        dtype={"Site_ID": "string"},
+    )
+    candidates = _validate_candidate_pool(candidate_df)
+    K = len(candidates)
+    if K != EXPECTED_HIGH_PRECISION_COUNT:
         warnings.warn(
-            "Expected about 99 Within-10m sites, "
-            f"but found {len(candidates)}; using the actual candidate count.",
+            "Expected about 99 candidate sites, "
+            f"but found {K}; using the actual candidate count.",
             UserWarning,
             stacklevel=2,
         )
@@ -292,8 +280,7 @@ def prepare_topology(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     topology_df.to_csv(output_path, index=False, lineterminator="\n")
 
-    print(f"Original sites: {original_count}")
-    print(f"High-precision candidate count K: {summary['candidate_count']}")
+    print(f"Candidate site count K: {summary['candidate_count']}")
     print(f"Selected server count N: {summary['selected_count']}")
     print(f"Global Q33: {summary['q33']:.6f} km")
     print(f"Global Q67: {summary['q67']:.6f} km")
@@ -303,8 +290,17 @@ def prepare_topology(
     print(f"Final J_N: {summary['objective']:.6f}")
     print(f"Minimum selected pair distance: {summary['minimum_distance']:.6f} km")
     print(f"Maximum selected pair distance: {summary['maximum_distance']:.6f} km")
-    print(f"Output: {output_path}")
+    print(f"Input candidate path: {input_path}")
+    print(f"Output path: {output_path}")
     return topology_df
+
+
+def _default_input_path() -> Path:
+    return (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "eua_melbourne_cbd_candidates.csv"
+    )
 
 
 def _default_output_path(num_servers: int) -> Path:
@@ -317,9 +313,14 @@ def _default_output_path(num_servers: int) -> Path:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Select a deterministic distance-balanced EUA topology."
+        description="Select a deterministic distance-balanced topology from EUA candidates."
     )
-    parser.add_argument("--input", required=True, type=Path, help="Raw EUA CSV path.")
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=_default_input_path(),
+        help="Candidate CSV path (default: data/eua_melbourne_cbd_candidates.csv).",
+    )
     parser.add_argument(
         "--num-servers", type=int, default=parameters.NUM_SERVERS,
         help=f"Selected server count (default: {parameters.NUM_SERVERS}).",

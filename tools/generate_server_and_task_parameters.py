@@ -177,9 +177,6 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
         task_info.append([task_id, task_size, float(computation_demand), None])
 
     task_df = pd.DataFrame(task_info, columns=TASK_INFO_COLUMNS)
-    task_df["Reliability_Requirement"] = pd.Series(
-        [None] * num_tasks, dtype=object
-    )
     task_df.to_excel(filename, index=False)
     return task_df
 
