@@ -1,8 +1,10 @@
 # mainLoop.py  (multi-model: DDPG / DQN / PPO)
 # - MainLoop signature simplified: no external buffer
-# - DDPG uses model.policy() -> continuous scores -> argmax -> (X,Y,Z), and trains via model.buffer
-# - DQN/PPO use model.select_action(state, epsilon) -> discrete action index -> (X,Y,Z)
+# - DDPG uses model.policy() -> scores -> argmax -> (server_A, server_B)
+# - DQN/PPO use model.select_action(state, epsilon) -> pair action index
 # - PPO trains once at end of episode; DQN trains online
+
+from itertools import combinations
 
 from core.server import Server
 from core.task import Task
@@ -374,13 +376,13 @@ class MainLoop:
                 self.G_action = self.model.addNoise(
                     self.G_action, self.this_episode, self.total_episodes
                 )
-                X, Y, Z = self.extract_parameters_from_action(self.G_action)
+                server_A, server_B = self.extract_parameters_from_action(self.G_action)
             else:
                 # DQN/PPO output a discrete action index.
                 eps = self.get_epsilon(self.this_episode)
                 action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
-                X, Y, Z = self.extract_parameters_from_index(self.G_action)
+                server_A, server_B = self.extract_parameters_from_index(self.G_action)
 
             if self.model_name == "ppo":
                 self.ppo_last_decision_state = self.G_state
@@ -390,7 +392,7 @@ class MainLoop:
                 # Store the legacy task-centric transition for DQN/DDPG.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
-            self.env.process(task.execute_task(X, Y, Z))
+            self.env.process(task.execute_task(server_A, server_B))
             self.pendingList.append(self.taskCounter)
             self.taskCounter += 1
 
@@ -747,10 +749,10 @@ class MainLoop:
     # ACTION DECODING
     # ---------------------------
     def extract_parameters_from_index(self, action_index: int):
-        primary_server_id, backup_server_id, z_parameter = self.index_of_actions[int(action_index)]
-        primary_server = self.env_state.get_server_by_id(primary_server_id)
-        backup_server = self.env_state.get_server_by_id(backup_server_id)
-        return primary_server, backup_server, z_parameter
+        server_A_id, server_B_id = self.index_of_actions[int(action_index)]
+        server_A = self.env_state.get_server_by_id(server_A_id)
+        server_B = self.env_state.get_server_by_id(server_B_id)
+        return server_A, server_B
 
     def extract_parameters_from_action(self, action_scores_list):
         # DDPG: choose argmax index from continuous scores
@@ -764,17 +766,12 @@ class MainLoop:
     # ---------------------------
     @staticmethod
     def generate_combinations():
-        numberOfServers = params.serverNo
-        index_of_actions = []
-
-        # z=0: ordered pairs (including i==j)
-        for i in range(1, numberOfServers + 1):
-            for j in range(1, numberOfServers + 1):
-                index_of_actions.append((i, j, 0))
-
-        # z=1: unique pairs (i<j)
-        for i in range(1, numberOfServers + 1):
-            for j in range(i + 1, numberOfServers + 1):
-                index_of_actions.append((i, j, 1))
-
+        index_of_actions = list(
+            combinations(range(1, params.NUM_SERVERS + 1), 2)
+        )
+        if len(index_of_actions) != params.num_actions:
+            raise RuntimeError(
+                f"Expected {params.num_actions} pair actions, "
+                f"generated {len(index_of_actions)}"
+            )
         return index_of_actions
