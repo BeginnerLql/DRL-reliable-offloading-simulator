@@ -513,12 +513,8 @@ class MainLoop:
             "replica_A_reliability": task.replica_A_reliability,
             "replica_B_reliability": task.replica_B_reliability,
             "pair_reliability": task.pair_reliability,
-            "requirement_satisfied": (
-                None
-                if task.reliability_requirement is None
-                else bool(
-                    task.pair_reliability >= task.reliability_requirement
-                )
+            "requirement_satisfied": bool(
+                task.pair_reliability >= task.reliability_requirement
             ),
         }
 
