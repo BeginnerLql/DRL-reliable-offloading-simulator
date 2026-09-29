@@ -222,16 +222,26 @@ class MainLoop:
             raise ValueError(f"{source_path} requires positive Computation_Demand values.")
         frame["Computation_Demand"] = computation.astype(float)
 
+        reliability = pd.to_numeric(frame["Reliability_Requirement"], errors="coerce")
+        if (
+            reliability.isna().any()
+            or not reliability.map(math.isfinite).all()
+            or not ((reliability > 0.0) & (reliability <= 1.0)).all()
+        ):
+            raise ValueError(
+                f"{source_path} requires finite Reliability_Requirement values in (0, 1]."
+            )
+        frame["Reliability_Requirement"] = reliability.astype(float)
+
         frame = frame.sort_values("Task_ID").reset_index(drop=True)
         profiles = {}
         for _, row in frame.iterrows():
             task_id = int(row["Task_ID"])
-            reliability = row["Reliability_Requirement"]
             profiles[task_id] = {
                 "Task_ID": task_id,
                 "Task_Size": int(row["Task_Size"]),
                 "Computation_Demand": float(row["Computation_Demand"]),
-                "Reliability_Requirement": None if pd.isna(reliability) else reliability,
+                "Reliability_Requirement": float(row["Reliability_Requirement"]),
             }
         return profiles
 

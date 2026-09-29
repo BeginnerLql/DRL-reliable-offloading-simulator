@@ -11,6 +11,8 @@ class parameters:
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (10, 100)
+    # Main-experiment task reliability requirement range.
+    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)
     Low_demand, High_demand = 1, 100  # MI
     taskno = 200
 

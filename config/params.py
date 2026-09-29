@@ -13,6 +13,9 @@ class params:
 
     # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
+    TASK_RELIABILITY_REQUIREMENT_RANGE = (
+        parameters.TASK_RELIABILITY_REQUIREMENT_RANGE
+    )
     Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
     taskno = parameters.taskno
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE

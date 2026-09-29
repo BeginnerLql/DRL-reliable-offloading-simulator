@@ -154,10 +154,12 @@ def generate_server_info(
 
 
 def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.DataFrame:
-    """Write synthetic task parameters and leave reliability requirements unset."""
+    """Write synthetic task parameters with reliability requirements."""
     task_info = []
     num_tasks = parameters.taskno
     size_range = parameters.TASK_SIZE_RANGE
+    reliability_low, reliability_high = parameters.TASK_RELIABILITY_REQUIREMENT_RANGE
+    reliability_rng = np.random.default_rng(parameters.MASTER_SEED)
 
     lower_demand, upper_demand = parameters.Low_demand, parameters.High_demand
     mean = (lower_demand + upper_demand) / 2
@@ -165,7 +167,6 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
     lower_bound = (lower_demand - mean) / standard_deviation
     upper_bound = (upper_demand - mean) / standard_deviation
 
-    # Reliability requirement distribution is intentionally unspecified for now.
     for task_id in range(1, num_tasks + 1):
         task_size = np.random.randint(size_range[0], size_range[1] + 1)
         computation_demand = truncnorm.rvs(
@@ -174,7 +175,15 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
             loc=mean,
             scale=standard_deviation,
         )
-        task_info.append([task_id, task_size, float(computation_demand), None])
+        reliability_requirement = reliability_rng.uniform(
+            reliability_low, reliability_high
+        )
+        task_info.append([
+            task_id,
+            task_size,
+            float(computation_demand),
+            float(reliability_requirement),
+        ])
 
     task_df = pd.DataFrame(task_info, columns=TASK_INFO_COLUMNS)
     task_df.to_excel(filename, index=False)

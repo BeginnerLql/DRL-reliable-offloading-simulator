@@ -200,10 +200,6 @@ class EnvironmentState:
 
     def is_reliability_requirement_satisfied(self, task, server_A, server_B):
         """Compare theoretical pair reliability with the task requirement."""
-        if task.reliability_requirement is None:
-            raise ValueError(
-                "Reliability_Requirement must be assigned before requirement comparison."
-            )
         return bool(
             self.compute_pair_reliability(task, server_A, server_B)
             >= task.reliability_requirement
@@ -317,21 +313,7 @@ class EnvironmentState:
                 f"[{demand_min}, {demand_max}] MI"
             )
 
-        reliability_requirement = task.reliability_requirement
-        reliability_error = (
-            "Reliability_Requirement must be assigned before constructing the state."
-        )
-        if isinstance(reliability_requirement, (str, bytes, bool, np.bool_)):
-            raise ValueError(reliability_error)
-        try:
-            reliability_requirement = float(reliability_requirement)
-        except (OverflowError, TypeError, ValueError) as exc:
-            raise ValueError(reliability_error) from exc
-        if (
-            not np.isfinite(reliability_requirement)
-            or not 0.0 < reliability_requirement <= 1.0
-        ):
-            raise ValueError(reliability_error)
+        reliability_requirement = float(task.reliability_requirement)
 
         normalized_frequencies = self.normalize(
             np.asarray(frequencies), frequency_min, frequency_max
