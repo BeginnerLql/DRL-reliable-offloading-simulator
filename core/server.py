@@ -12,6 +12,7 @@ class Server:
         site_id,
         processing_frequency,
         base_failure_rate,
+        transmission_rate,
         latitude,
         longitude,
     ):
@@ -21,6 +22,7 @@ class Server:
         self.queue = simpy.PriorityResource(env, capacity=1)
         self.processing_frequency = float(processing_frequency)
         self.base_failure_rate = float(base_failure_rate)
+        self.transmission_rate = float(transmission_rate)
         self.latitude = self._validate_coordinate(latitude, "latitude", -90.0, 90.0)
         self.longitude = self._validate_coordinate(longitude, "longitude", -180.0, 180.0)
 

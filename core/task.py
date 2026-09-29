@@ -35,7 +35,7 @@ class Task:
         self.task_completion_event = self.env.event()
 
     def get_transmission_rate(self, server):
-        raise NotImplementedError("Transmission-rate model is not defined yet.")
+        return server.transmission_rate
 
     def execute_task(self, server_A, server_B):
         self.replica_A["server_id"] = server_A.server_id

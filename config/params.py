@@ -10,6 +10,7 @@ class params:
 
     # Infrastructure
     NUM_SERVERS = parameters.NUM_SERVERS
+    SERVER_TRANSMISSION_RATES = parameters.SERVER_TRANSMISSION_RATES
 
     # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
@@ -30,8 +31,8 @@ class params:
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
     MASTER_SEED = parameters.MASTER_SEED
 
-    # New state and action dimensions; runtime state/action construction follows later.
-    num_states = 4 * NUM_SERVERS + 3
+    # State/action dimensions for the current observation and unordered pairs.
+    num_states = 5 * NUM_SERVERS + 3
     num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
     
     # ----------- DDPG ----------------

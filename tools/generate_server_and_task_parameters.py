@@ -23,6 +23,7 @@ SERVER_INFO_COLUMNS = [
     "Site_ID",
     "Processing_Frequency",
     "Base_Failure_Rate",
+    "Transmission_Rate",
     "Latitude",
     "Longitude",
 ]
@@ -139,6 +140,11 @@ def generate_server_info(
 ) -> pd.DataFrame:
     """Write unified server parameters with selected EUA locations."""
     count = _resolve_num_servers(num_servers)
+    transmission_rates = parameters.SERVER_TRANSMISSION_RATES
+    if len(transmission_rates) != count:
+        raise ValueError(
+            f"Expected {count} server transmission rates; found {len(transmission_rates)}."
+        )
     topology_df = load_eua_topology(topology_path, count)
     frequencies = generate_processing_frequencies(count)
     failure_rates = [
@@ -148,6 +154,10 @@ def generate_server_info(
     server_info = topology_df.copy()
     server_info["Processing_Frequency"] = frequencies
     server_info["Base_Failure_Rate"] = failure_rates
+    transmission_rate_by_id = dict(enumerate(transmission_rates, start=1))
+    server_info["Transmission_Rate"] = server_info["Server_ID"].map(
+        transmission_rate_by_id
+    )
     server_info = server_info[SERVER_INFO_COLUMNS]
     server_info.to_excel(filename, sheet_name="Servers", index=False)
     return server_info

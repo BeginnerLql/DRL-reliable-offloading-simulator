@@ -240,11 +240,11 @@ class EnvironmentState:
         return (val - min_val) / denominator
 
     def get_state(self, task):
-        expected_dimension = 4 * params.NUM_SERVERS + 3
+        expected_dimension = 5 * params.NUM_SERVERS + 3
         if params.num_states != expected_dimension:
             raise RuntimeError(
                 f"params.num_states ({params.num_states}) does not match "
-                f"the 4N+3 state dimension ({expected_dimension})"
+                f"the 5N+3 state dimension ({expected_dimension})"
             )
 
         expected_server_ids = list(range(1, params.NUM_SERVERS + 1))
@@ -260,16 +260,20 @@ class EnvironmentState:
 
         failure_rates = []
         frequencies = []
+        transmission_rates = []
         running_backlogs = []
         waiting_backlogs = []
 
         frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
+        transmission_rate_min = min(params.SERVER_TRANSMISSION_RATES)
+        transmission_rate_max = max(params.SERVER_TRANSMISSION_RATES)
 
         for server_id in server_ids:
             server_info = self.servers[server_id]
             server_object = server_info['server_object']
             failure_rate = float(self.get_active_failure_rate(server_id))
             frequency = float(server_object.processing_frequency)
+            transmission_rate = float(server_object.transmission_rate)
             if not np.isfinite(failure_rate) or failure_rate < 0.0:
                 raise ValueError(
                     f"Server {server_id} effective failure rate must be finite and non-negative"
@@ -288,6 +292,7 @@ class EnvironmentState:
             )
             failure_rates.append(failure_rate)
             frequencies.append(frequency)
+            transmission_rates.append(transmission_rate)
             running_backlogs.append(running_backlog)
             waiting_backlogs.append(waiting_backlog)
 
@@ -318,6 +323,11 @@ class EnvironmentState:
         normalized_frequencies = self.normalize(
             np.asarray(frequencies), frequency_min, frequency_max
         )
+        normalized_transmission_rates = self.normalize(
+            np.asarray(transmission_rates),
+            transmission_rate_min,
+            transmission_rate_max,
+        )
         normalized_running_backlogs = np.asarray(running_backlogs) / (
             np.asarray(running_backlogs) + scale
         )
@@ -334,6 +344,7 @@ class EnvironmentState:
         state = np.concatenate((
             np.asarray(failure_rates),
             np.asarray(normalized_frequencies),
+            np.asarray(normalized_transmission_rates),
             normalized_running_backlogs,
             normalized_waiting_backlogs,
             np.asarray([

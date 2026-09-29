@@ -93,6 +93,7 @@ class MainLoop:
             "Site_ID",
             "Processing_Frequency",
             "Base_Failure_Rate",
+            "Transmission_Rate",
             "Latitude",
             "Longitude",
         }
@@ -134,6 +135,7 @@ class MainLoop:
         numeric_ranges = (
             ("Processing_Frequency", 0.0, None),
             ("Base_Failure_Rate", 0.0, None),
+            ("Transmission_Rate", 0.0, None),
             ("Latitude", -90.0, 90.0),
             ("Longitude", -180.0, 180.0),
         )
@@ -145,6 +147,8 @@ class MainLoop:
                 raise ValueError(f"{source_path} requires positive Processing_Frequency values.")
             if column == "Base_Failure_Rate" and not values.ge(0).all():
                 raise ValueError(f"{source_path} requires non-negative Base_Failure_Rate values.")
+            if column == "Transmission_Rate" and not values.gt(0).all():
+                raise ValueError(f"{source_path} requires positive Transmission_Rate values.")
             if maximum is not None and not values.between(minimum, maximum).all():
                 raise ValueError(f"{source_path} contains out-of-range {column} values.")
             frame[column] = values.astype(float)
@@ -158,6 +162,7 @@ class MainLoop:
                 "Site_ID": str(row["Site_ID"]),
                 "Processing_Frequency": float(row["Processing_Frequency"]),
                 "Base_Failure_Rate": float(row["Base_Failure_Rate"]),
+                "Transmission_Rate": float(row["Transmission_Rate"]),
                 "Latitude": float(row["Latitude"]),
                 "Longitude": float(row["Longitude"]),
             }
@@ -609,6 +614,7 @@ class MainLoop:
                 profile["Site_ID"],
                 profile["Processing_Frequency"],
                 profile["Base_Failure_Rate"],
+                profile["Transmission_Rate"],
                 profile["Latitude"],
                 profile["Longitude"],
             )

@@ -10,13 +10,22 @@ class parameters:
 
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
-    TASK_SIZE_RANGE = (10, 100)
+    TASK_SIZE_RANGE = (10, 100)  # MB
     # Main-experiment task reliability requirement range.
     TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)
     Low_demand, High_demand = 1, 100  # MI
     taskno = 200
 
-    # TODO: Define task-to-edge transmission-rate configuration.
+    SERVER_TRANSMISSION_RATES = (
+        20.0,
+        24.0,
+        28.0,
+        32.0,
+        36.0,
+        40.0,
+        45.0,
+        50.0,
+    )  # MB/s, indexed by Server_ID 1..8
 
     # Unified server parameters
     # TEMPORARY: value to be calibrated later.
