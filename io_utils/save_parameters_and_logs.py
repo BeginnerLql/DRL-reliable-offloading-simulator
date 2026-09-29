@@ -4,7 +4,7 @@
 # - Reads Excel input files ONLY from data/
 # - Writes results per model
 # - Creates Excel-native charts (no PNG files)
-# - Adds Summary.AVG_Failure (rolling mean over last 40 episodes) + ONLY line chart in Summary
+# - Writes one TaskResults row per task after both replicas finish
 
 import os
 import pandas as pd
@@ -15,7 +15,7 @@ from openpyxl.chart import LineChart, Reference
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
-def save_params_and_logs(params, log_data, task_Assignments_info):
+def save_params_and_logs(params, log_data, task_results):
     # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
 
@@ -64,61 +64,29 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
         })
     df_logs = pd.DataFrame(logs_rows)
 
-    # ---------------------------
-    # TaskAssignments dataframe
-    # ---------------------------
-    df_task_Assignments = pd.DataFrame(
-        task_Assignments_info,
-        columns=[
-            "episode",
-            "task_id",
-            "Primary",
-            "Primary_Start",
-            "Primary_End",
-            "Primary_Status",
-            "Backup",
-            "Backup_Start",
-            "Backup_End",
-            "Backup_Status",
-            "Z",
-        ],
-    )
-
-    if not df_task_Assignments.empty:
-        # Final task failure means all required replica executions failed;
-        # it does not indicate that the selected servers became unavailable.
-        df_task_Assignments["Final_status"] = df_task_Assignments.apply(
-            lambda row: "failure"
-            if row["Primary_Status"] == "failure" and row["Backup_Status"] == "failure"
-            else "success",
-            axis=1,
-        )
-    else:
-        df_task_Assignments["Final_status"] = []
-
-    # ---------------------------
-    # Summary: counts per episode + AVG_Failure (rolling mean 40)
-    # ---------------------------
-    if not df_task_Assignments.empty:
-        summary_df = df_task_Assignments.groupby(["episode", "Final_status"]).size().unstack(fill_value=0)
-    else:
-        summary_df = pd.DataFrame()
-
-    if "failure" not in summary_df.columns:
-        summary_df["failure"] = 0
-    if "success" not in summary_df.columns:
-        summary_df["success"] = 0
-
-    summary_df = summary_df.rename(columns={"failure": "Failure", "success": "Success"}).reset_index()
-
-    # sort for rolling mean
-    if not summary_df.empty and "episode" in summary_df.columns:
-        summary_df = summary_df.sort_values("episode").reset_index(drop=True)
-
-    if not summary_df.empty:
-        summary_df["AVG_Failure"] = summary_df["Failure"].rolling(window=40, min_periods=1).mean()
-    else:
-        summary_df["AVG_Failure"] = []
+    task_result_columns = [
+        "episode",
+        "task_id",
+        "task_size",
+        "computation_demand",
+        "reliability_requirement",
+        "arrival_time",
+        "server_A_id",
+        "server_B_id",
+        "replica_A_queue_enter_time",
+        "replica_A_cpu_start_time",
+        "replica_A_finish_time",
+        "replica_B_queue_enter_time",
+        "replica_B_cpu_start_time",
+        "replica_B_finish_time",
+        "task_completion_time",
+        "task_latency",
+        "replica_A_reliability",
+        "replica_B_reliability",
+        "pair_reliability",
+        "requirement_satisfied",
+    ]
+    df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
 
     # ---------------------------
     # Write Excel
@@ -128,36 +96,12 @@ def save_params_and_logs(params, log_data, task_Assignments_info):
         task_df.to_excel(writer, sheet_name="Tasks", index=False)
         server_info.to_excel(writer, sheet_name="Servers", index=False)
         df_logs.to_excel(writer, sheet_name="Logs", index=False)
-        df_task_Assignments.to_excel(writer, sheet_name="TaskAssignments", index=False)
-        summary_df.to_excel(writer, sheet_name="Summary", index=False)
+        df_task_results.to_excel(writer, sheet_name="TaskResults", index=False)
 
     # ---------------------------
     # Add Excel-native charts
     # ---------------------------
     wb = load_workbook(filename)
-
-    # Summary: ONLY line chart for AVG_Failure
-    if "Summary" in wb.sheetnames:
-        ws_sum = wb["Summary"]
-
-        max_row = summary_df.shape[0] + 1  # header included
-        # columns: episode | Failure | Success | AVG_Failure
-        if max_row >= 2:
-            line = LineChart()
-            line.title = "Average Failure Over Episodes (Rolling 40)"
-            line.x_axis.title = "Episode"
-            line.y_axis.title = "AVG_Failure"
-
-            line_data = Reference(ws_sum, min_col=4, min_row=1, max_col=4, max_row=max_row)  # AVG_Failure
-            line_cats = Reference(ws_sum, min_col=1, min_row=2, max_row=max_row)             # episode
-
-            line.add_data(line_data, titles_from_data=True)
-            line.set_categories(line_cats)
-            line.width = 22
-            line.height = 10
-
-            # جایگذاری از بالا (چون بارچارت حذف شده، بهتره همون بالا باشه)
-            ws_sum.add_chart(line, "F2")
 
     # Logs charts (Rewards + optional Delay) - unchanged
     if "Logs" in wb.sheetnames:

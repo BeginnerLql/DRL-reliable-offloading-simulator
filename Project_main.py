@@ -101,7 +101,7 @@ def run_simulation():
     ml = MainLoop(model, params.total_episodes, params.taskno, params.num_states, params.num_actions)
     ml.EP()
 
-    save_params_and_logs(params, ml.log_data, ml.task_Assignments_info)
+    save_params_and_logs(params, ml.log_data, ml.task_results)
 
 
 def main():

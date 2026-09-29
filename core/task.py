@@ -14,6 +14,9 @@ class Task:
         self.task_size = task_profile["Task_Size"]
         self.computation_demand = task_profile["Computation_Demand"]
         self.reliability_requirement = task_profile["Reliability_Requirement"]
+        self.replica_A_reliability = None
+        self.replica_B_reliability = None
+        self.pair_reliability = None
 
         self.arrival_time = float(self.env.now)
         self.replica_A = {

@@ -60,7 +60,7 @@ class MainLoop:
         self.env_state = None
         self.spatial_risk_rng = np.random.default_rng(params.SPATIAL_RISK_SEED)
         self.log_data = []
-        self.task_Assignments_info = []
+        self.task_results = []
 
         # PPO-only arrival-driven SMDP bookkeeping.
         self.ppo_interval_reward = 0.0
@@ -260,6 +260,8 @@ class MainLoop:
             self._initialize_episode_spatial_risk()
             self.env.process(self.Iteration())
             self.env.run()
+            for task in sorted(self.env_state.tasks.values(), key=lambda item: item.id):
+                self.task_results.append(self.get_task_outcome_info(task))
 
 
     def _initialize_episode_spatial_risk(self):
@@ -384,6 +386,16 @@ class MainLoop:
                 self.G_action = int(action_index)
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
 
+            task.replica_A_reliability = (
+                self.env_state.compute_replica_reliability(task, server_A)
+            )
+            task.replica_B_reliability = (
+                self.env_state.compute_replica_reliability(task, server_B)
+            )
+            task.pair_reliability = (
+                self.env_state.compute_pair_reliability(task, server_A, server_B)
+            )
+
             if self.model_name == "ppo":
                 self.ppo_last_decision_state = self.G_state
                 self.ppo_last_decision_action = self.G_action
@@ -473,28 +485,42 @@ class MainLoop:
             yield self.env.any_of(completion_events)
 
     def _finalize_resolved_task(self, task_counter, reward, delay):
-        """Record common episode metrics and remove one resolved task."""
-        task = self.env_state.get_task_by_id(task_counter)
+        """Record common episode metrics and remove a task from pendingList."""
         self.episodic_reward += reward
         self.episodic_delay += delay
         self.rewardsAll.append(reward)
-        self.task_Assignments_info.append(
-            (
-                self.this_episode,
-                task.id,
-                task.primaryNode.server_id,
-                task.primaryStarted,
-                task.primaryFinished,
-                task.primaryStat,
-                task.backupNode.server_id,
-                task.backupStarted,
-                task.backupFinished,
-                task.backupStat,
-                task.z,
-            )
-        )
         self.pendingList.remove(task_counter)
-        self.env_state.remove_task(task_counter)
+
+    def get_task_outcome_info(self, task):
+        """Build task-level outcome data from its lifecycle and saved snapshot."""
+        return {
+            "episode": self.this_episode,
+            "task_id": task.id,
+            "task_size": task.task_size,
+            "computation_demand": task.computation_demand,
+            "reliability_requirement": task.reliability_requirement,
+            "arrival_time": task.arrival_time,
+            "server_A_id": task.replica_A["server_id"],
+            "server_B_id": task.replica_B["server_id"],
+            "replica_A_queue_enter_time": task.replica_A["queue_enter_time"],
+            "replica_A_cpu_start_time": task.replica_A["cpu_start_time"],
+            "replica_A_finish_time": task.replica_A["finish_time"],
+            "replica_B_queue_enter_time": task.replica_B["queue_enter_time"],
+            "replica_B_cpu_start_time": task.replica_B["cpu_start_time"],
+            "replica_B_finish_time": task.replica_B["finish_time"],
+            "task_completion_time": task.task_completion_time,
+            "task_latency": task.task_completion_time - task.arrival_time,
+            "replica_A_reliability": task.replica_A_reliability,
+            "replica_B_reliability": task.replica_B_reliability,
+            "pair_reliability": task.pair_reliability,
+            "requirement_satisfied": (
+                None
+                if task.reliability_requirement is None
+                else bool(
+                    task.pair_reliability >= task.reliability_requirement
+                )
+            ),
+        }
 
     def _get_task_outcome_time(self, task):
         """Return the timestamp when ``task`` became finally resolved."""
@@ -713,23 +739,6 @@ class MainLoop:
 
         for t in removeList:
             self.pendingList.remove(t)
-            task = self.env_state.get_task_by_id(t)
-            self.task_Assignments_info.append(
-                (
-                    self.this_episode,
-                    task.id,
-                    task.primaryNode.server_id,
-                    task.primaryStarted,
-                    task.primaryFinished,
-                    task.primaryStat,
-                    task.backupNode.server_id,
-                    task.backupStarted,
-                    task.backupFinished,
-                    task.backupStat,
-                    task.z,
-                )
-            )
-            self.env_state.remove_task(t)
 
     # ---------------------------
     # SERVERS 
