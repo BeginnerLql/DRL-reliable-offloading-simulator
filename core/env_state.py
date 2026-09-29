@@ -184,6 +184,31 @@ class EnvironmentState:
             )
         return self.effective_failure_rates[server_id]
 
+    def compute_replica_reliability(self, task, server):
+        """Compute decision-time reliability over CPU execution only."""
+        failure_rate = self.get_active_failure_rate(server.server_id)
+        execution_time = task.computation_demand / server.processing_frequency
+        return float(np.exp(-failure_rate * execution_time))
+
+    def compute_pair_reliability(self, task, server_A, server_B):
+        """Compute pair reliability under independent replica failures."""
+        reliability_A = self.compute_replica_reliability(task, server_A)
+        reliability_B = self.compute_replica_reliability(task, server_B)
+        return float(
+            1.0 - (1.0 - reliability_A) * (1.0 - reliability_B)
+        )
+
+    def is_reliability_requirement_satisfied(self, task, server_A, server_B):
+        """Compare theoretical pair reliability with the task requirement."""
+        if task.reliability_requirement is None:
+            raise ValueError(
+                "Reliability_Requirement must be assigned before requirement comparison."
+            )
+        return bool(
+            self.compute_pair_reliability(task, server_A, server_B)
+            >= task.reliability_requirement
+        )
+
     def add_task(self, task_object):
         """Add a task object to the environment state."""
         task_id = task_object.id  # Extract the task ID from the task object
