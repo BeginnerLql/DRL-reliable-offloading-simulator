@@ -39,7 +39,6 @@ class MainLoop:
 
         self.rewardsAll = []
         self.ep_reward_list = []
-        self.ep_delay_list = []
         self.avg_reward_list = []
         self.this_episode = 0
 
@@ -450,11 +449,15 @@ class MainLoop:
 
         # episode logs
         self.ep_reward_list.append(self.episodic_reward)
-        self.ep_delay_list.append(self.episodic_delay)
 
         avg_reward = np.mean(self.ep_reward_list[-40:])
-        avg_delay = np.mean(self.ep_delay_list[-40:])
-        self.log_data.append((self.this_episode, avg_reward, self.episodic_reward, avg_delay))
+        episode_avg_delay = self.episodic_delay / self.maxTask
+        self.log_data.append((
+            self.this_episode,
+            avg_reward,
+            self.episodic_reward,
+            episode_avg_delay,
+        ))
         self.avg_reward_list.append(avg_reward)
 
         print(f"Episode {self.this_episode} | Avg Reward: {avg_reward:.3f} | This Episode: {self.episodic_reward:.3f}")
@@ -528,75 +531,8 @@ class MainLoop:
             ),
         }
 
-    def _get_task_outcome_time(self, task):
-        """Return the timestamp when ``task`` became finally resolved."""
-        primary_stat = task.primaryStat
-        backup_stat = task.backupStat
-        primary_finished = task.primaryFinished
-        backup_finished = task.backupFinished
-
-        if task.z == 0:
-            if (
-                primary_stat == "success"
-                and backup_stat is None
-                and primary_finished is not None
-            ):
-                return float(primary_finished)
-            if (
-                primary_stat == "failure"
-                and backup_stat == "success"
-                and backup_finished is not None
-            ):
-                return float(backup_finished)
-            if (
-                primary_stat == "failure"
-                and backup_stat == "failure"
-                and backup_finished is not None
-            ):
-                return float(backup_finished)
-            return None
-
-        # Parallel first-result mode: one successful replica resolves the
-        # task immediately, while two failures require both timestamps.
-        if (
-            primary_stat == "success"
-            and backup_stat == "success"
-            and primary_finished is not None
-            and backup_finished is not None
-        ):
-            return float(min(primary_finished, backup_finished))
-        if (
-            primary_stat == "success"
-            and backup_stat == "failure"
-            and primary_finished is not None
-        ):
-            return float(primary_finished)
-        if (
-            primary_stat == "failure"
-            and backup_stat == "success"
-            and backup_finished is not None
-        ):
-            return float(backup_finished)
-        if (
-            primary_stat == "failure"
-            and backup_stat == "failure"
-            and primary_finished is not None
-            and backup_finished is not None
-        ):
-            return float(max(primary_finished, backup_finished))
-        if (
-            primary_stat == "success"
-            and backup_stat is None
-            and primary_finished is not None
-        ):
-            return float(primary_finished)
-        if (
-            primary_stat is None
-            and backup_stat == "success"
-            and backup_finished is not None
-        ):
-            return float(backup_finished)
-        return None
+    def compute_reward(self, outcome_info):
+        return -float(outcome_info["task_latency"])
 
     def _get_ppo_terminal_time(self):
         """Use the latest actual outcome timestamp for PPO terminal timing."""
@@ -613,97 +549,22 @@ class MainLoop:
                 raise RuntimeError(
                     f"Pending task {task_counter} is missing from the environment state"
                 )
-            task_reward, delay = self.calcReward(task_counter)
-            completion_event = getattr(task, "task_completion_event", None)
-            if task_reward is None:
-                if completion_event is not None and completion_event.triggered:
-                    raise RuntimeError(
-                        f"Task {task_counter} task completion event fired before "
-                        "calcReward produced an outcome"
-                    )
+            if not task.task_completion_event.triggered:
                 continue
-            if completion_event is not None and not completion_event.triggered:
-                raise RuntimeError(
-                    f"Task {task_counter} has a reward but its task completion event "
-                    "has not triggered"
-                )
 
-            task_outcome_time = self._get_task_outcome_time(task)
-            if task_outcome_time is None:
-                raise RuntimeError(
-                    "Resolved PPO task has no valid outcome timestamp"
-                )
-
+            outcome_info = self.get_task_outcome_info(task)
+            task_reward = self.compute_reward(outcome_info)
             self.ppo_interval_reward += task_reward
+            task_outcome_time = task.task_completion_time
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time
             else:
                 self.ppo_last_resolved_outcome_time = max(
                     self.ppo_last_resolved_outcome_time, task_outcome_time
                 )
-            self._finalize_resolved_task(task_counter, task_reward, delay)
-
-    # ---------------------------
-    # REWARD CALCULATION (unchanged)
-    # ---------------------------
-    def calcReward(self, taskID):
-        """Reward completed replica executions and task-level outcomes.
-
-        A ``failure`` status means the corresponding replica execution was
-        defeated by a transient fault. It does not mean that a server is down.
-        A final failure means that all required replicas failed.
-        """
-        task = self.env_state.get_task_by_id(taskID)
-        z = task.z
-        primaryStat = task.primaryStat
-        backupStat = task.backupStat
-        primaryFinished = task.primaryFinished
-        primaryStarted = task.primaryStarted
-        backupFinished = task.backupFinished
-        backupStarted = task.backupStarted
-
-        flag = "s"
-        delay = None
-
-        if z == 0:
-            if primaryStat == 'success' and backupStat is None and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'failure':
-                delay = backupFinished - primaryStarted
-                flag = "f"
-            else:
-                flag = "n"
-        else:
-            if primaryStat == 'success' and backupStat == 'success' and primaryFinished is not None and backupFinished is not None:
-                delay = min(primaryFinished, backupFinished) - primaryStarted
-            elif primaryStat == 'success' and backupStat == 'failure' and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat == 'failure' and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - backupStarted
-            elif primaryStat == 'failure' and backupStat == 'failure':
-                delay = max(backupFinished - backupStarted, primaryFinished - primaryStarted)
-                flag = "f"
-            elif primaryStat == 'success' and backupStat is None and primaryFinished is not None:
-                delay = primaryFinished - primaryStarted
-            elif primaryStat is None and backupStat == 'success' and backupFinished is not None:
-                delay = backupFinished - backupStarted
-            else:
-                flag = "n"
-
-        if flag == "f":
-            failure_penalty_weight = 3.0
-            reward = -failure_penalty_weight * delay
-            if reward > -3:
-                reward = -3
-        elif flag == "s":
-            success_reward_weight = 1.0
-            reward = success_reward_weight * (math.log(1 - (1 / math.exp(math.sqrt(delay)))) / math.log(0.995))
-        else:
-            reward = None
-
-        return reward, delay
+            self._finalize_resolved_task(
+                task_counter, task_reward, outcome_info["task_latency"]
+            )
 
     # ---------------------------
     # TRAINING (multi-model)
@@ -713,16 +574,14 @@ class MainLoop:
             self._collect_resolved_task_outcomes()
             return
 
-        removeList = []
-
         for task_counter in list(self.pendingList):
-            reward, delay = self.calcReward(task_counter)
-            if reward is None:
+            task = self.env_state.get_task_by_id(task_counter)
+            if not task.task_completion_event.triggered:
                 continue
 
-            self.episodic_reward += reward
-            self.episodic_delay += delay
-            self.rewardsAll.append(reward)
+            outcome_info = self.get_task_outcome_info(task)
+            reward = self.compute_reward(outcome_info)
+            delay = outcome_info["task_latency"]
 
             temp = list(self.tempbuffer[task_counter])
             temp[2] = reward
@@ -741,10 +600,7 @@ class MainLoop:
                 self.model.store_transition((s, int(a), r, s_))
                 self.model.train_step()
 
-            removeList.append(task_counter)
-
-        for t in removeList:
-            self.pendingList.remove(t)
+            self._finalize_resolved_task(task_counter, reward, delay)
 
     # ---------------------------
     # SERVERS 
