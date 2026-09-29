@@ -9,6 +9,7 @@ from core.task import Task
 from core.env_state import EnvironmentState
 from config.params import params
 from config.paths import DATA_DIR
+from pathlib import Path
 from core.spatial_risk import (
     build_distance_matrix,
     build_spatial_correlation_matrix,
@@ -19,7 +20,6 @@ from core.spatial_risk import (
 
 import simpy
 import numpy as np
-import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
@@ -31,6 +31,7 @@ class MainLoop:
         self.num_states = num_states
         self.num_actions = num_actions
         self.total_episodes = total_episodes
+        self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(getattr(params, "model_summary", "ddpg")).strip().lower()
 
@@ -66,6 +67,171 @@ class MainLoop:
         self.ppo_last_decision_time = None
         self.ppo_last_resolved_outcome_time = None
 
+
+    def _load_run_profiles(self):
+        """Load and validate the immutable server/task profiles for this run."""
+        server_path = Path(DATA_DIR) / "server_info.xlsx"
+        task_path = Path(DATA_DIR) / "task_parameters.xlsx"
+        missing_paths = [path for path in (server_path, task_path) if not path.is_file()]
+        if missing_paths:
+            missing = ", ".join(str(path) for path in missing_paths)
+            raise FileNotFoundError(f"Required run profile workbook not found: {missing}")
+
+        server_df = pd.read_excel(
+            server_path,
+            sheet_name="Servers",
+            dtype={"Site_ID": "string"},
+        )
+        task_df = pd.read_excel(task_path)
+        return (
+            self._validate_server_profiles(server_df, server_path),
+            self._validate_task_profiles(task_df, task_path),
+        )
+
+    @staticmethod
+    def _validate_server_profiles(server_df, source_path):
+        required_columns = {
+            "Server_ID",
+            "Site_ID",
+            "Processing_Frequency",
+            "Base_Failure_Rate",
+            "Latitude",
+            "Longitude",
+        }
+        missing = sorted(required_columns.difference(server_df.columns))
+        if missing:
+            raise ValueError(
+                f"{source_path} is missing required columns: " + ", ".join(missing)
+            )
+
+        server_count = int(params.NUM_SERVERS)
+        if len(server_df) != server_count:
+            raise ValueError(
+                f"{source_path} must contain {server_count} server rows; found {len(server_df)}."
+            )
+
+        frame = server_df.copy()
+        server_ids = pd.to_numeric(frame["Server_ID"], errors="coerce")
+        if (
+            server_ids.isna().any()
+            or not server_ids.map(math.isfinite).all()
+            or not server_ids.map(lambda value: float(value).is_integer()).all()
+        ):
+            raise ValueError(f"{source_path} contains invalid Server_ID values.")
+        frame["Server_ID"] = server_ids.astype(int)
+        expected_ids = list(range(1, server_count + 1))
+        if (
+            frame["Server_ID"].duplicated().any()
+            or sorted(frame["Server_ID"].tolist()) != expected_ids
+        ):
+            raise ValueError(f"{source_path} must have unique Server_ID values 1..N.")
+
+        site_ids = frame["Site_ID"].astype("string").str.strip()
+        if site_ids.isna().any() or site_ids.eq("").any():
+            raise ValueError(f"{source_path} contains an empty Site_ID.")
+        if site_ids.duplicated().any():
+            raise ValueError(f"{source_path} contains duplicate Site_ID values.")
+        frame["Site_ID"] = site_ids
+
+        numeric_ranges = (
+            ("Processing_Frequency", 0.0, None),
+            ("Base_Failure_Rate", 0.0, None),
+            ("Latitude", -90.0, 90.0),
+            ("Longitude", -180.0, 180.0),
+        )
+        for column, minimum, maximum in numeric_ranges:
+            values = pd.to_numeric(frame[column], errors="coerce")
+            if values.isna().any() or not values.map(math.isfinite).all():
+                raise ValueError(f"{source_path} contains invalid {column} values.")
+            if column == "Processing_Frequency" and not values.gt(0).all():
+                raise ValueError(f"{source_path} requires positive Processing_Frequency values.")
+            if column == "Base_Failure_Rate" and not values.ge(0).all():
+                raise ValueError(f"{source_path} requires non-negative Base_Failure_Rate values.")
+            if maximum is not None and not values.between(minimum, maximum).all():
+                raise ValueError(f"{source_path} contains out-of-range {column} values.")
+            frame[column] = values.astype(float)
+
+        frame = frame.sort_values("Server_ID").reset_index(drop=True)
+        profiles = {}
+        for _, row in frame.iterrows():
+            server_id = int(row["Server_ID"])
+            profiles[server_id] = {
+                "Server_ID": server_id,
+                "Site_ID": str(row["Site_ID"]),
+                "Processing_Frequency": float(row["Processing_Frequency"]),
+                "Base_Failure_Rate": float(row["Base_Failure_Rate"]),
+                "Latitude": float(row["Latitude"]),
+                "Longitude": float(row["Longitude"]),
+            }
+        return profiles
+
+    @staticmethod
+    def _validate_task_profiles(task_df, source_path):
+        required_columns = {
+            "Task_ID",
+            "Task_Size",
+            "Computation_Demand",
+            "Reliability_Requirement",
+        }
+        missing = sorted(required_columns.difference(task_df.columns))
+        if missing:
+            raise ValueError(
+                f"{source_path} is missing required columns: " + ", ".join(missing)
+            )
+
+        task_count = int(params.taskno)
+        if len(task_df) != task_count:
+            raise ValueError(
+                f"{source_path} must contain {task_count} task rows; found {len(task_df)}."
+            )
+
+        frame = task_df.copy()
+        task_ids = pd.to_numeric(frame["Task_ID"], errors="coerce")
+        if (
+            task_ids.isna().any()
+            or not task_ids.map(math.isfinite).all()
+            or not task_ids.map(lambda value: float(value).is_integer()).all()
+        ):
+            raise ValueError(f"{source_path} contains invalid Task_ID values.")
+        frame["Task_ID"] = task_ids.astype(int)
+        expected_ids = list(range(1, task_count + 1))
+        if (
+            frame["Task_ID"].duplicated().any()
+            or sorted(frame["Task_ID"].tolist()) != expected_ids
+        ):
+            raise ValueError(f"{source_path} must have unique Task_ID values 1..T.")
+
+        task_sizes = pd.to_numeric(frame["Task_Size"], errors="coerce")
+        if (
+            task_sizes.isna().any()
+            or not task_sizes.map(math.isfinite).all()
+            or not task_sizes.map(lambda value: float(value).is_integer()).all()
+        ):
+            raise ValueError(f"{source_path} contains invalid Task_Size values.")
+        minimum_size, maximum_size = params.TASK_SIZE_RANGE
+        if not task_sizes.between(minimum_size, maximum_size).all():
+            raise ValueError(f"{source_path} contains out-of-range Task_Size values.")
+        frame["Task_Size"] = task_sizes.astype(int)
+
+        computation = pd.to_numeric(frame["Computation_Demand"], errors="coerce")
+        if computation.isna().any() or not computation.map(math.isfinite).all():
+            raise ValueError(f"{source_path} contains invalid Computation_Demand values.")
+        if not computation.gt(0).all():
+            raise ValueError(f"{source_path} requires positive Computation_Demand values.")
+        frame["Computation_Demand"] = computation.astype(float)
+
+        frame = frame.sort_values("Task_ID").reset_index(drop=True)
+        profiles = {}
+        for _, row in frame.iterrows():
+            task_id = int(row["Task_ID"])
+            reliability = row["Reliability_Requirement"]
+            profiles[task_id] = {
+                "Task_ID": task_id,
+                "Task_Size": int(row["Task_Size"]),
+                "Computation_Demand": float(row["Computation_Demand"]),
+                "Reliability_Requirement": None if pd.isna(reliability) else reliability,
+            }
+        return profiles
 
     # ---------------------------
     # EPISODE LOOP
@@ -118,7 +284,7 @@ class MainLoop:
             rng=self.spatial_risk_rng,
         )
         base_failure_rates = np.array([
-            self.env_state.get_server_by_id(server_id).failure_rate
+            self.env_state.get_server_by_id(server_id).base_failure_rate
             for server_id in server_ids
         ], dtype=float)
         effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
@@ -172,7 +338,9 @@ class MainLoop:
             if self.model_name == "ppo":
                 self._collect_resolved_task_outcomes()
 
-            task = Task(self.env, self.env_state, self.taskCounter)
+            task_id = self.taskCounter
+            task_profile = self.task_profiles[task_id]
+            task = Task(self.env, self.env_state, task_id, task_profile)
             self.env_state.add_task(task)
             self.G_state = self.env_state.get_state(task)
 
@@ -562,39 +730,16 @@ class MainLoop:
     # SERVERS 
     # ---------------------------
     def setServers(self):
-        excel_file = os.path.join(DATA_DIR, "server_info.xlsx")
-        server_info_df = pd.read_excel(excel_file)
-        required_columns = {
-            "Server_ID",
-            "Server_Type",
-            "Processing_Frequency",
-            "Failure_Rate",
-            "Latitude",
-            "Longitude",
-        }
-        missing_columns = sorted(required_columns.difference(server_info_df.columns))
-        if missing_columns:
-            raise ValueError(
-                "server_info.xlsx is missing required columns: "
-                + ", ".join(missing_columns)
-            )
-
-        for _, row in server_info_df.iterrows():
-            server_id = int(row["Server_ID"])
-            server_type = str(row["Server_Type"])
-            processing_frequency = float(row["Processing_Frequency"])
-            failure_rate = float(row["Failure_Rate"])
-            latitude = float(row["Latitude"])
-            longitude = float(row["Longitude"])
-
+        """Create fresh episode-level servers from run-level profiles."""
+        for server_id, profile in self.server_profiles.items():
             server = Server(
                 self.env,
-                server_type,
                 server_id,
-                processing_frequency,
-                failure_rate,
-                latitude,
-                longitude,
+                profile["Site_ID"],
+                profile["Processing_Frequency"],
+                profile["Base_Failure_Rate"],
+                profile["Latitude"],
+                profile["Longitude"],
             )
             self.env_state.add_server_and_init_environment(server)
 

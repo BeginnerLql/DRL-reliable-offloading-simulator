@@ -112,7 +112,7 @@ def load_eua_topology(
     if not resolved_path.exists():
         raise FileNotFoundError(
             f"Selected EUA topology not found: {resolved_path}. "
-            "Run tools/prepare_eua_topology.py with the raw EUA CSV first."
+            "Run tools/prepare_eua_topology.py first."
         )
     topology_df = pd.read_csv(resolved_path, dtype={"Site_ID": "string"})
     return _validate_topology(topology_df, resolved_path, count)

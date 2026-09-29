@@ -1,30 +1,26 @@
+"""Runtime task initialized from a run-level task profile."""
 
-"""core.task
-
-Task object used by the SimPy environment.
-
-Change in the modular refactor:
-- Excel files live in data/... (config.paths.DATA_DIR)
-- So, default params_file is resolved via DATA_DIR.
-"""
-
-import os
-import pandas as pd
 import math
 import random
 
 from config.params import params
-from config.paths import DATA_DIR
 
 
 class Task:
+    def __init__(self, env, state, task_id, task_profile):
+        profile_task_id = task_profile["Task_ID"]
+        if profile_task_id != task_id:
+            raise ValueError(
+                f"Task profile ID {profile_task_id} does not match task_id {task_id}."
+            )
 
-    def __init__(self, env, state, id, params_file: str = "task_parameters.xlsx"):
         self.env = env
         self.env_state = state
-        self.id = id
-        
-        # Other attributes
+        self.id = task_id
+        self.task_size = task_profile["Task_Size"]
+        self.computation_demand = task_profile["Computation_Demand"]
+        self.reliability_requirement = task_profile["Reliability_Requirement"]
+
         self.primaryNode = None
         self.backupNode = None
         self.z = None
@@ -37,22 +33,8 @@ class Task:
         self.backupFinished = None
         self.backupStat = None
 
-        # Task-level event used by the episode drain. This is triggered once
-        # when the current primary/backup semantics produce a final outcome;
-        # it is not a replica CPU-completion event.
         self.resolution_event = self.env.event()
-
-        # Resolve params_file:
-        # - If an absolute path is passed, use it.
-        # - If only a filename is passed, read it from data/.
-        resolved = params_file
-        if not os.path.isabs(resolved):
-            resolved = os.path.join(DATA_DIR, resolved)
-        task_info_df = pd.read_excel(resolved)
-        task_row = task_info_df.loc[task_info_df['Task_ID'] == self.id]
-        self.task_size = task_row['Task_Size'].values[0]
-        self.computation_demand = task_row['Computation_Demand'].values[0]
-        self.teta = None  
+        self.teta = None
 
     def execute_task(self, X, Y, Z):
 

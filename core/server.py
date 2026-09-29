@@ -8,24 +8,19 @@ class Server:
     def __init__(
         self,
         env,
-        server_type,
         server_id,
+        site_id,
         processing_frequency,
-        failure_rate,
+        base_failure_rate,
         latitude,
         longitude,
     ):
         self.env = env
-        self.server_type = server_type
-        self.server_id = server_id
-        #self.queue = simpy.Resource(env, capacity=1)
+        self.server_id = int(server_id)
+        self.site_id = str(site_id)
         self.queue = simpy.PriorityResource(env, capacity=1)
-
-        self.processing_frequency = processing_frequency  # fn(t)
-        # Observable estimated transient server-fault arrival rate λ_n, unit: 1/s.
-        # A transient fault can fail the current task replica without
-        # permanently disabling this server.
-        self.failure_rate = failure_rate
+        self.processing_frequency = float(processing_frequency)
+        self.base_failure_rate = float(base_failure_rate)
         self.latitude = self._validate_coordinate(latitude, "latitude", -90.0, 90.0)
         self.longitude = self._validate_coordinate(longitude, "longitude", -180.0, 180.0)
 
