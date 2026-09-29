@@ -1,11 +1,5 @@
 """Runtime task initialized from a run-level task profile."""
 
-import math
-import random
-
-from config.params import params
-
-
 class Task:
     def __init__(self, env, state, task_id, task_profile):
         profile_task_id = task_profile["Task_ID"]
@@ -21,203 +15,67 @@ class Task:
         self.computation_demand = task_profile["Computation_Demand"]
         self.reliability_requirement = task_profile["Reliability_Requirement"]
 
-        self.primaryNode = None
-        self.backupNode = None
-        self.z = None
+        self.arrival_time = float(self.env.now)
+        self.replica_A = {
+            "server_id": None,
+            "queue_enter_time": None,
+            "cpu_start_time": None,
+            "finish_time": None,
+        }
+        self.replica_B = {
+            "server_id": None,
+            "queue_enter_time": None,
+            "cpu_start_time": None,
+            "finish_time": None,
+        }
+        self.task_completion_time = None
+        self.task_completion_event = self.env.event()
 
-        self.primaryStarted = None
-        self.primaryFinished = None
-        self.primaryStat = None
-        self.primary_service_time = None
-        self.backupStarted = None
-        self.backupFinished = None
-        self.backupStat = None
+    def get_transmission_rate(self, server):
+        raise NotImplementedError("Transmission-rate model is not defined yet.")
 
-        self.resolution_event = self.env.event()
+    def execute_task(self, server_A, server_B):
+        self.replica_A["server_id"] = server_A.server_id
+        self.replica_B["server_id"] = server_B.server_id
 
-    def execute_task(self, X, Y, Z):
+        process_A = self.env.process(
+            self._run_replica(server_A, "replica_A", self.replica_A)
+        )
+        process_B = self.env.process(
+            self._run_replica(server_B, "replica_B", self.replica_B)
+        )
+        yield self.env.all_of([process_A, process_B])
 
-        self.primaryNode=X
-        self.backupNode=Y
-        self.z = Z
-        if self.z == 0:
-            self.primaryStarted = self.env.now
-            yield self.env.process(self.primary())
-            # Retry/failover follows a primary replica execution failure.
-            # The fault is transient, so the selected server remains usable.
-            if self.primaryStat == "failure":
+    def _run_replica(self, server, replica_name, replica_info):
+        transmission_rate = self.get_transmission_rate(server)
+        transmission_time = self.task_size / transmission_rate
+        yield self.env.timeout(transmission_time)
 
-                yield self.env.timeout(0)
-                self.backupStarted = self.env.now
-                self.env.process(self.backup())
-            
-        else: ## z==1
-            self.primaryStarted = self.backupStarted = self.env.now
-            self.env.process(self.primary())
-            self.env.process(self.backup())
-
-    
-    def primary(self):
-        
-        inpDelay , outDelay = self.calc_input_output_delay(self.primaryNode)
-              
-        yield self.env.timeout(inpDelay)
-
-        
-        self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
+        replica_info["queue_enter_time"] = float(self.env.now)
+        service_time = self.computation_demand / server.processing_frequency
         self.env_state.register_waiting_replica(
-            self.primaryNode.server_id, self, "primary", self.primary_service_time
+            server.server_id, self, replica_name, service_time
         )
-        with self.primaryNode.queue.request(priority=1) as req:
-            yield req  # Queueing time in server
+        with server.queue.request(priority=1) as request:
+            yield request
+            replica_info["cpu_start_time"] = float(self.env.now)
             self.env_state.start_replica_execution(
-                self.primaryNode.server_id, self, "primary",
-                self.primary_service_time, self.env.now
+                server.server_id,
+                self,
+                replica_name,
+                service_time,
+                replica_info["cpu_start_time"],
             )
-            failure_rate=self.set_failure_rate(self.primaryNode)
-            # Simulate execution either success or failed
-            yield self.env.timeout(self.primary_service_time)
+            yield self.env.timeout(service_time)
+            replica_info["finish_time"] = float(self.env.now)
             self.env_state.complete_replica_execution(
-                self.primaryNode.server_id, self, "primary"
-            )
-            
-        # Probability that at least one transient server fault occurs during
-        # this primary replica's execution interval.
-        fault_prob= 1-math.exp(-failure_rate * self.primary_service_time)
-        r=random.uniform(0, 1)
-        if(r<fault_prob):
-            # This is a primary replica execution failure, not a permanent
-            # failure of the selected server.
-            self.primaryStat = "failure"
-            
-        else:
-            yield self.env.timeout(outDelay)
-            self.primaryStat = "success"
-
-        self.primaryFinished = self.env.now
-        
-        #print(f"Task {self.id} {'succeeded' if self.primaryStat == 'success' else 'failed'} on primary server {self.primaryNode.server_id}")
-        self._signal_resolution_if_ready()
-
-    def backup(self):
-
-        inpDelay , outDelay = self.calc_input_output_delay(self.backupNode)
-
-        # Use PriorityRequest if backupNode is the same as primaryNode.
-        # Retry is allowed because the preceding fault is transient and has
-        # negligible recovery time in this model.
-        if self.backupNode == self.primaryNode: # Retry strategy
-            # no inpDelay
-            backup_service_time = self.primary_service_time # as primary
-            self.env_state.register_waiting_replica(
-                self.backupNode.server_id, self, "backup", backup_service_time
-            )
-            with self.backupNode.queue.request(priority=0) as req: # high priority
-                yield req
-                self.env_state.start_replica_execution(
-                    self.backupNode.server_id, self, "backup",
-                    backup_service_time, self.env.now
-                )
-                failure_rate=self.set_failure_rate(self.backupNode)
-                yield self.env.timeout(backup_service_time)
-                self.env_state.complete_replica_execution(
-                    self.backupNode.server_id, self, "backup"
-                )
-
-        else: # recovery block or first result strategy
-            yield self.env.timeout(inpDelay)
-            backup_service_time = self.computation_demand / self.backupNode.processing_frequency # may differ from primary according to frequency of backup server
-            self.env_state.register_waiting_replica(
-                self.backupNode.server_id, self, "backup", backup_service_time
-            )
-            with self.backupNode.queue.request(priority=1) as req:
-                yield req
-                self.env_state.start_replica_execution(
-                    self.backupNode.server_id, self, "backup",
-                    backup_service_time, self.env.now
-                )
-                failure_rate=self.set_failure_rate(self.backupNode)
-                yield self.env.timeout(backup_service_time)
-                self.env_state.complete_replica_execution(
-                    self.backupNode.server_id, self, "backup"
-                )
-
-            
-        
-        
-        # Probability that at least one transient server fault occurs during
-        # this backup replica's execution interval.
-        fault_prob= 1-math.exp(-failure_rate * backup_service_time)
-        r=random.uniform(0, 1)
-        if(r<fault_prob):
-            # This is a backup replica execution failure; the server remains
-            # available for later tasks and retries.
-            self.backupStat = "failure"
-        else:
-            yield self.env.timeout(outDelay)
-            self.backupStat = "success"
-         
-        self.backupFinished = self.env.now
-        
-        #print(f"Task {self.id} {'succeeded' if self.backupStat == 'success' else 'failed'} on backup server {self.backupNode.server_id}")
-        self._signal_resolution_if_ready()
-
-    def _is_resolved(self):
-        """Match MainLoop.calcReward() final-outcome conditions."""
-        if self.z == 0:
-            return (
-                (
-                    self.primaryStat == "success"
-                    and self.primaryFinished is not None
-                    and self.backupStat is None
-                )
-                or (
-                    self.primaryStat == "failure"
-                    and self.backupStat == "success"
-                    and self.backupFinished is not None
-                )
-                or (
-                    self.primaryStat == "failure"
-                    and self.backupStat == "failure"
-                    and self.backupFinished is not None
-                )
+                server.server_id, self, replica_name
             )
 
-        # Parallel first-result semantics: one success resolves immediately;
-        # two failures require both replica timestamps.
-        return (
-            (self.primaryStat == "success" and self.primaryFinished is not None)
-            or (self.backupStat == "success" and self.backupFinished is not None)
-            or (
-                self.primaryStat == "failure"
-                and self.backupStat == "failure"
-                and self.primaryFinished is not None
-                and self.backupFinished is not None
-            )
-        )
+        self._signal_task_completion()
 
-    def _signal_resolution_if_ready(self):
-        """Signal the task-level resolution event at most once."""
-        if self.resolution_event.triggered:
+    def _signal_task_completion(self):
+        if self.task_completion_event.triggered:
             return
-        if self._is_resolved():
-            self.resolution_event.succeed(float(self.env.now))
-
-    def calc_input_output_delay(self, server_object):
-        if server_object.server_type == "Edge":
-            # Calculate input delay for Edge
-            
-            inpDelay = 0
-        else:
-            # Calculate input delay for Cloud
-            inpDelay = self.task_size / params.rsu_to_cloud_bandwidth
-
-
-        # Output delay is the same as input delay
-        outDelay = inpDelay   
-        return inpDelay, outDelay
-    
-    
-    def set_failure_rate(self, server_object):
-        """Return this episode's effective transient fault arrival rate (1/s)."""
-        return self.env_state.get_active_failure_rate(server_object.server_id)
+        self.task_completion_time = float(self.env.now)
+        self.task_completion_event.succeed(self.task_completion_time)

@@ -26,30 +26,32 @@ class EnvironmentState:
             'running_replica': None
         }
 
-    def register_waiting_replica(self, server_id, task, selection, service_time):
+    def register_waiting_replica(self, server_id, task, replica_name, service_time):
         """Register a replica waiting for CPU service on a server."""
         server_info = self.servers[server_id]
-        identity = (task.id, selection)
-        if any((item['task'].id, item['selection']) == identity
+        identity = (task.id, replica_name)
+        if any((item['task'].id, item['replica']) == identity
                for item in server_info['waiting_replicas']):
             raise RuntimeError(f"Replica {identity} is already waiting on server {server_id}")
         if (server_info['running_replica'] is not None
                 and (server_info['running_replica']['task'].id,
-                     server_info['running_replica']['selection']) == identity):
+                     server_info['running_replica']['replica']) == identity):
             raise RuntimeError(f"Replica {identity} is already running on server {server_id}")
         server_info['waiting_replicas'].append({
             'task': task,
-            'selection': selection,
+            'replica': replica_name,
             'service_time': float(service_time),
         })
 
-    def start_replica_execution(self, server_id, task, selection, service_time, service_start_time):
+    def start_replica_execution(
+        self, server_id, task, replica_name, service_time, service_start_time
+    ):
         """Move a waiting replica to running metadata after CPU acquisition."""
         server_info = self.servers[server_id]
-        identity = (task.id, selection)
+        identity = (task.id, replica_name)
         waiting = server_info['waiting_replicas']
         match = next((item for item in waiting
-                      if (item['task'].id, item['selection']) == identity), None)
+                      if (item['task'].id, item['replica']) == identity), None)
         if match is None:
             raise RuntimeError(f"Replica {identity} is not registered on server {server_id}")
         waiting.remove(match)
@@ -57,16 +59,16 @@ class EnvironmentState:
             raise RuntimeError(f"Server {server_id} already has a running replica")
         server_info['running_replica'] = {
             'task': task,
-            'selection': selection,
+            'replica': replica_name,
             'service_time': float(service_time),
             'service_start_time': float(service_start_time),
         }
 
-    def complete_replica_execution(self, server_id, task, selection):
+    def complete_replica_execution(self, server_id, task, replica_name):
         """Clear running metadata when CPU service completes."""
         running = self.servers[server_id]['running_replica']
-        identity = (task.id, selection)
-        if running is None or (running['task'].id, running['selection']) != identity:
+        identity = (task.id, replica_name)
+        if running is None or (running['task'].id, running['replica']) != identity:
             raise RuntimeError(f"Replica {identity} is not running on server {server_id}")
         self.servers[server_id]['running_replica'] = None
 

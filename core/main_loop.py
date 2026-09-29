@@ -403,7 +403,7 @@ class MainLoop:
                 last[3] = self.G_state
                 self.tempbuffer[self.taskCounter - 1] = tuple(last)
 
-        # Drain pending tasks by waiting for real task-level resolution events.
+        # Drain pending tasks by waiting for first-replica task completion events.
         yield from self._drain_pending_tasks()
 
         if self.model_name == "ppo":
@@ -438,7 +438,7 @@ class MainLoop:
         print(f"Episode {self.this_episode} | Avg Reward: {avg_reward:.3f} | This Episode: {self.episodic_reward:.3f}")
 
     def _drain_pending_tasks(self):
-        """Resolve pending tasks using task-level SimPy events, not polling."""
+        """Wait for pending tasks' first-replica completion events."""
         while len(self.pendingList) > 0:
             if self.model_name == "ppo":
                 self._collect_resolved_task_outcomes()
@@ -448,28 +448,29 @@ class MainLoop:
             if len(self.pendingList) == 0:
                 break
 
-            resolution_events = []
+            completion_events = []
             for task_id in self.pendingList:
                 task = self.env_state.get_task_by_id(task_id)
                 if task is None:
                     raise RuntimeError(
                         f"Pending task {task_id} is missing from the environment state"
                     )
-                resolution_event = getattr(task, "resolution_event", None)
-                if resolution_event is None:
+                completion_event = getattr(task, "task_completion_event", None)
+                if completion_event is None:
                     raise RuntimeError(
-                        f"Pending task {task_id} has no resolution event"
+                        f"Pending task {task_id} has no task completion event"
                     )
-                if resolution_event.triggered:
+                if completion_event.triggered:
                     raise RuntimeError(
-                        f"Pending task {task_id} has a triggered event but no resolved reward"
+                        f"Pending task {task_id} has a triggered task completion event "
+                        "but is still pending"
                     )
-                resolution_events.append(resolution_event)
+                completion_events.append(completion_event)
 
-            if not resolution_events:
-                raise RuntimeError("No resolution events remain for pending tasks")
+            if not completion_events:
+                raise RuntimeError("No task completion events remain for pending tasks")
 
-            yield self.env.any_of(resolution_events)
+            yield self.env.any_of(completion_events)
 
     def _finalize_resolved_task(self, task_counter, reward, delay):
         """Record common episode metrics and remove one resolved task."""
@@ -581,16 +582,18 @@ class MainLoop:
                     f"Pending task {task_counter} is missing from the environment state"
                 )
             task_reward, delay = self.calcReward(task_counter)
-            resolution_event = getattr(task, "resolution_event", None)
+            completion_event = getattr(task, "task_completion_event", None)
             if task_reward is None:
-                if resolution_event is not None and resolution_event.triggered:
+                if completion_event is not None and completion_event.triggered:
                     raise RuntimeError(
-                        f"Task {task_counter} resolution event fired before calcReward resolved"
+                        f"Task {task_counter} task completion event fired before "
+                        "calcReward produced an outcome"
                     )
                 continue
-            if resolution_event is not None and not resolution_event.triggered:
+            if completion_event is not None and not completion_event.triggered:
                 raise RuntimeError(
-                    f"Task {task_counter} has a reward but its resolution event is not triggered"
+                    f"Task {task_counter} has a reward but its task completion event "
+                    "has not triggered"
                 )
 
             task_outcome_time = self._get_task_outcome_time(task)
