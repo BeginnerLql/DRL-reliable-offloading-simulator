@@ -34,7 +34,6 @@ class Task:
         self.backupStat = None
 
         self.resolution_event = self.env.event()
-        self.teta = None
 
     def execute_task(self, X, Y, Z):
 
@@ -65,14 +64,12 @@ class Task:
         yield self.env.timeout(inpDelay)
 
         
-        Q_time= self.env.now
         self.primary_service_time = self.computation_demand / self.primaryNode.processing_frequency
         self.env_state.register_waiting_replica(
             self.primaryNode.server_id, self, "primary", self.primary_service_time
         )
         with self.primaryNode.queue.request(priority=1) as req:
             yield req  # Queueing time in server
-            Q_time= self.env.now - Q_time
             self.env_state.start_replica_execution(
                 self.primaryNode.server_id, self, "primary",
                 self.primary_service_time, self.env.now
@@ -100,9 +97,6 @@ class Task:
         self.primaryFinished = self.env.now
         
         #print(f"Task {self.id} {'succeeded' if self.primaryStat == 'success' else 'failed'} on primary server {self.primaryNode.server_id}")
-        self.env_state.complete_task(self.primaryNode.server_id, self, 'primary', self.primary_service_time)
-        
-        self.teta= 1.5 * (self.primary_service_time + inpDelay + outDelay + Q_time)
         self._signal_resolution_if_ready()
 
     def backup(self):
@@ -166,7 +160,6 @@ class Task:
         self.backupFinished = self.env.now
         
         #print(f"Task {self.id} {'succeeded' if self.backupStat == 'success' else 'failed'} on backup server {self.backupNode.server_id}")
-        self.env_state.complete_task(self.backupNode.server_id, self, "backup", backup_service_time)
         self._signal_resolution_if_ready()
 
     def _is_resolved(self):

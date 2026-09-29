@@ -10,7 +10,6 @@ class EnvironmentState:
     def __init__(self):
         self.servers = {}  # Server objects and CPU backlog metadata.
         self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
-        self.num_completed_tasks = 0  # Number of completed tasks at all servers
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None
@@ -94,10 +93,6 @@ class EnvironmentState:
         assert backlog_time >= -1e-8
         return backlog_time
 
-    def complete_task(self, server_id, task, selection, execute_time):
-        """Record a completed replica without changing CPU backlog metadata."""
-        self.num_completed_tasks += 1
-
     def get_server_by_id(self, server_id):
         """Get a server object by its ID."""
         server_info = self.servers.get(server_id)
@@ -178,7 +173,7 @@ class EnvironmentState:
         if server_object is None:
             raise RuntimeError(f"Unknown server_id {server_id}")
         if self.effective_failure_rates is None:
-            return server_object.failure_rate
+            return server_object.base_failure_rate
         if server_id not in self.effective_failure_rates:
             raise RuntimeError(
                 f"Spatial risk context has no effective failure rate for server_id {server_id}"
@@ -201,25 +196,10 @@ class EnvironmentState:
         """Get a task object by its ID."""
         return self.tasks.get(task_id)
    
-    def get_min_computation_demand(self):
-        """Get the minimum computation demand among all tasks."""
-        if not self.tasks:
-            print("No tasks available.")
-            return None
-        
-        min_demand = float('inf')  # Initialize min_demand with positive infinity
-        
-        for task_id, task_obj in self.tasks.items():
-            if task_obj.computation_demand < min_demand:
-                min_demand = task_obj.computation_demand
-        
-        return min_demand
-
     def reset(self):
         """Reset the environment state."""
         self.servers = {}
         self.tasks= {}
-        self.num_completed_tasks = 0
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None
@@ -283,5 +263,4 @@ class EnvironmentState:
         ], dtype=np.float32)
         assert len(normalized_arr) == params.num_states
         return normalized_arr
-
 

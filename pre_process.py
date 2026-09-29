@@ -18,7 +18,10 @@ def _add_project_root_to_syspath():
 
 def main():
     _add_project_root_to_syspath()
+    from tools.prepare_eua_topology import prepare_topology
     from tools.generate_server_and_task_parameters import main as gen_main
+
+    prepare_topology()
     gen_main()
 
 

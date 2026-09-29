@@ -19,8 +19,6 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 RESULTS_DIR = os.path.join(PROJECT_ROOT, "results")
 
-# Keep legacy support: older scripts used to drop results in root.
-# Now everything should go into RESULTS_DIR.
 
 def ensure_dirs() -> None:
     os.makedirs(DATA_DIR, exist_ok=True)

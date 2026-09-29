@@ -10,7 +10,8 @@ environmental risk correlation; it is not a failure-event Pearson
 correlation, a failure probability, or a joint failure probability.
 
 This module only computes matrices or samples explicitly requested latent risk
-fields.  It does not modify ``Server.failure_rate`` or mutate simulator state.
+fields.  It does not modify ``Server.base_failure_rate`` or mutate simulator
+state.
 """
 
 from __future__ import annotations
