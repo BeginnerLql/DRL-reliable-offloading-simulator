@@ -70,8 +70,8 @@ class EnvironmentState:
             raise RuntimeError(f"Replica {identity} is not running on server {server_id}")
         self.servers[server_id]['running_replica'] = None
 
-    def get_server_backlog_time(self, server_id, current_time=None):
-        """Return running remaining service plus waiting service time in seconds."""
+    def get_server_backlog_components(self, server_id, current_time=None):
+        """Return running remaining and queued service times in seconds."""
         server_info = self.servers[server_id]
         running = server_info['running_replica']
         waiting = server_info['waiting_replicas']
@@ -83,15 +83,17 @@ class EnvironmentState:
             else:
                 current_time = 0.0
 
-        running_remaining_time = 0.0
+        running_backlog = 0.0
         if running is not None:
-            elapsed = max(float(current_time) - running['service_start_time'], 0.0)
-            running_remaining_time = max(running['service_time'] - elapsed, 0.0)
-        waiting_service_time = sum(max(item['service_time'], 0.0)
-                                   for item in waiting)
-        backlog_time = max(running_remaining_time + waiting_service_time, 0.0)
-        assert backlog_time >= -1e-8
-        return backlog_time
+            elapsed = current_time - running['service_start_time']
+            running_backlog = max(running['service_time'] - elapsed, 0.0)
+        waiting_backlog = sum(replica['service_time'] for replica in waiting)
+
+        if not np.isfinite(running_backlog) or running_backlog < 0.0:
+            raise ValueError("Running CPU backlog must be finite and non-negative")
+        if not np.isfinite(waiting_backlog) or waiting_backlog < 0.0:
+            raise ValueError("Waiting CPU backlog must be finite and non-negative")
+        return float(running_backlog), float(waiting_backlog)
 
     def get_server_by_id(self, server_id):
         """Get a server object by its ID."""
@@ -215,52 +217,128 @@ class EnvironmentState:
         return (val - min_val) / denominator
 
     def get_state(self, task):
-        failure_rates = []
-        frequencies = []
-        backlog_times = []
-
-        for server_id, server_info in self.servers.items():
-            server_object = server_info['server_object']
-            failure_rates.append(server_object.failure_rate)
-            frequencies.append(server_object.processing_frequency)
-            backlog_times.append(
-                self.get_server_backlog_time(server_id, task.env.now)
+        expected_dimension = 4 * params.NUM_SERVERS + 3
+        if params.num_states != expected_dimension:
+            raise RuntimeError(
+                f"params.num_states ({params.num_states}) does not match "
+                f"the 4N+3 state dimension ({expected_dimension})"
             )
 
-        min_failure_rate = min(
-            params.EDGE_FAILURE_RATE_RANGE[0],
-            params.CLOUD_FAILURE_RATE_RANGE[0]
-        )
-        max_failure_rate = max(
-            params.EDGE_FAILURE_RATE_RANGE[1],
-            params.CLOUD_FAILURE_RATE_RANGE[1]
-        )
-        normalized_failure_rates = self.normalize(
-            np.array(failure_rates), min_failure_rate, max_failure_rate
-        )
-        normalized_processing_frequencies = self.normalize(
-            np.array(frequencies),
-            params.EDGE_PROCESSING_FREQ_RANGE[0],
-            params.CLOUD_PROCESSING_FREQ_RANGE[1]
-        )
-        normalized_backlog_times = np.array([
-            backlog_time / (backlog_time + params.BACKLOG_TIME_SCALE_SEC)
-            for backlog_time in backlog_times
-        ], dtype=np.float32)
+        expected_server_ids = list(range(1, params.NUM_SERVERS + 1))
+        try:
+            server_ids = sorted(self.servers)
+        except TypeError as exc:
+            raise RuntimeError("Server IDs must be 1..N") from exc
+        if len(server_ids) != params.NUM_SERVERS or server_ids != expected_server_ids:
+            raise RuntimeError(
+                f"Expected {params.NUM_SERVERS} servers with IDs 1..{params.NUM_SERVERS}; "
+                f"found IDs {server_ids}"
+            )
 
+        failure_rates = []
+        frequencies = []
+        running_backlogs = []
+        waiting_backlogs = []
+
+        frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
+
+        for server_id in server_ids:
+            server_info = self.servers[server_id]
+            server_object = server_info['server_object']
+            failure_rate = float(self.get_active_failure_rate(server_id))
+            frequency = float(server_object.processing_frequency)
+            if not np.isfinite(failure_rate) or failure_rate < 0.0:
+                raise ValueError(
+                    f"Server {server_id} effective failure rate must be finite and non-negative"
+                )
+            if (
+                not np.isfinite(frequency)
+                or not frequency_min <= frequency <= frequency_max
+            ):
+                raise ValueError(
+                    f"Server {server_id} processing_frequency must be finite and in "
+                    f"[{frequency_min}, {frequency_max}] MIPS"
+                )
+
+            running_backlog, waiting_backlog = self.get_server_backlog_components(
+                server_id, task.env.now
+            )
+            failure_rates.append(failure_rate)
+            frequencies.append(frequency)
+            running_backlogs.append(running_backlog)
+            waiting_backlogs.append(waiting_backlog)
+
+        scale = params.BACKLOG_TIME_SCALE_SEC
+        task_size = float(task.task_size)
+        task_size_min, task_size_max = params.TASK_SIZE_RANGE
+        if (
+            not np.isfinite(task_size)
+            or not task_size_min <= task_size <= task_size_max
+        ):
+            raise ValueError(
+                f"task.task_size must be finite and in [{task_size_min}, {task_size_max}]"
+            )
+
+        computation_demand = float(task.computation_demand)
+        demand_min, demand_max = params.Low_demand, params.High_demand
+        if (
+            not np.isfinite(computation_demand)
+            or not demand_min <= computation_demand <= demand_max
+        ):
+            raise ValueError(
+                "task.computation_demand must be finite and in "
+                f"[{demand_min}, {demand_max}] MI"
+            )
+
+        reliability_requirement = task.reliability_requirement
+        reliability_error = (
+            "Reliability_Requirement must be assigned before constructing the state."
+        )
+        if isinstance(reliability_requirement, (str, bytes, bool, np.bool_)):
+            raise ValueError(reliability_error)
+        try:
+            reliability_requirement = float(reliability_requirement)
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise ValueError(reliability_error) from exc
+        if (
+            not np.isfinite(reliability_requirement)
+            or not 0.0 < reliability_requirement <= 1.0
+        ):
+            raise ValueError(reliability_error)
+
+        normalized_frequencies = self.normalize(
+            np.asarray(frequencies), frequency_min, frequency_max
+        )
+        normalized_running_backlogs = np.asarray(running_backlogs) / (
+            np.asarray(running_backlogs) + scale
+        )
+        normalized_waiting_backlogs = np.asarray(waiting_backlogs) / (
+            np.asarray(waiting_backlogs) + scale
+        )
         normalized_task_size = self.normalize(
-            task.task_size, params.TASK_SIZE_RANGE[0], params.TASK_SIZE_RANGE[1]
+            task_size, task_size_min, task_size_max
         )
         normalized_computation_demand = self.normalize(
-            task.computation_demand, params.Low_demand, params.High_demand
+            computation_demand, demand_min, demand_max
         )
 
-        normalized_arr = np.concatenate([
-            normalized_failure_rates,
-            normalized_processing_frequencies,
-            normalized_backlog_times,
-            [normalized_task_size, normalized_computation_demand]
-        ], dtype=np.float32)
-        assert len(normalized_arr) == params.num_states
-        return normalized_arr
-
+        state = np.concatenate((
+            np.asarray(failure_rates),
+            np.asarray(normalized_frequencies),
+            normalized_running_backlogs,
+            normalized_waiting_backlogs,
+            np.asarray([
+                normalized_task_size,
+                normalized_computation_demand,
+                reliability_requirement,
+            ]),
+        ))
+        with np.errstate(over="ignore", invalid="ignore"):
+            state = state.astype(np.float32, copy=False)
+        if state.shape != (params.num_states,):
+            raise RuntimeError(
+                f"State shape {state.shape} does not match ({params.num_states},)"
+            )
+        if not np.isfinite(state).all():
+            raise ValueError("State features must be finite when represented as float32")
+        return state
