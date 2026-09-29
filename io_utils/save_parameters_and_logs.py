@@ -51,18 +51,18 @@ def save_params_and_logs(params, log_data, task_results):
     df_params.columns = ["Parameter", "Value"]
 
     # ---------------------------
-    # Logs dataframe
-    # expected: (episode, avg_reward, episodic_reward, avg_delay)
-    # ---------------------------
-    logs_rows = []
-    for log in log_data:
-        logs_rows.append({
-            "Episode": log[0],
-            "Avg Reward": log[1] if len(log) > 1 else None,
-            "Episode Reward": log[2] if len(log) > 2 else None,
-            "Avg Delay": log[3] if len(log) > 3 else None,
-        })
-    df_logs = pd.DataFrame(logs_rows)
+    # Logs dataframe: one raw episode reward and current episode mean task latency.
+    df_logs = pd.DataFrame(
+        [
+            {
+                "Episode": episode,
+                "Episode Reward": episodic_reward,
+                "task_Avg_Delay": task_avg_delay,
+            }
+            for episode, episodic_reward, task_avg_delay in log_data
+        ],
+        columns=["Episode", "Episode Reward", "task_Avg_Delay"],
+    )
 
     task_result_columns = [
         "episode",
@@ -103,7 +103,7 @@ def save_params_and_logs(params, log_data, task_results):
     # ---------------------------
     wb = load_workbook(filename)
 
-    # Logs charts (Rewards + optional Delay) - unchanged
+    # Logs charts (Episode Reward + task_Avg_Delay).
     if "Logs" in wb.sheetnames:
         ws_logs = wb["Logs"]
         header = [cell.value for cell in ws_logs[1]]
@@ -115,23 +115,25 @@ def save_params_and_logs(params, log_data, task_results):
                 return None
 
         c_episode = col_idx("Episode")
-        c_avg_reward = col_idx("Avg Reward")
         c_ep_reward = col_idx("Episode Reward")
-        c_avg_delay = col_idx("Avg Delay")
+        c_task_avg_delay = col_idx("task_Avg_Delay")
 
         max_row_logs = ws_logs.max_row
 
         # Rewards chart
-        if c_episode and (c_avg_reward or c_ep_reward) and max_row_logs >= 2:
+        if c_episode and c_ep_reward and max_row_logs >= 2:
             rewards_chart = LineChart()
             rewards_chart.title = "Rewards per Episode"
             rewards_chart.y_axis.title = "Reward"
             rewards_chart.x_axis.title = "Episode"
 
-            min_col = min([c for c in [c_avg_reward, c_ep_reward] if c is not None])
-            max_col = max([c for c in [c_avg_reward, c_ep_reward] if c is not None])
-
-            data = Reference(ws_logs, min_col=min_col, min_row=1, max_col=max_col, max_row=max_row_logs)
+            data = Reference(
+                ws_logs,
+                min_col=c_ep_reward,
+                min_row=1,
+                max_col=c_ep_reward,
+                max_row=max_row_logs,
+            )
             cats = Reference(ws_logs, min_col=c_episode, min_row=2, max_row=max_row_logs)
 
             rewards_chart.add_data(data, titles_from_data=True)
@@ -140,13 +142,19 @@ def save_params_and_logs(params, log_data, task_results):
             ws_logs.add_chart(rewards_chart, "F2")
 
         # Delay chart
-        if c_episode and c_avg_delay and max_row_logs >= 2:
+        if c_episode and c_task_avg_delay and max_row_logs >= 2:
             delay_chart = LineChart()
-            delay_chart.title = "Avg Delay per Episode"
-            delay_chart.y_axis.title = "Delay"
+            delay_chart.title = "task_Avg_Delay per Episode"
+            delay_chart.y_axis.title = "task_Avg_Delay (s)"
             delay_chart.x_axis.title = "Episode"
 
-            data = Reference(ws_logs, min_col=c_avg_delay, min_row=1, max_col=c_avg_delay, max_row=max_row_logs)
+            data = Reference(
+                ws_logs,
+                min_col=c_task_avg_delay,
+                min_row=1,
+                max_col=c_task_avg_delay,
+                max_row=max_row_logs,
+            )
             cats = Reference(ws_logs, min_col=c_episode, min_row=2, max_row=max_row_logs)
 
             delay_chart.add_data(data, titles_from_data=True)

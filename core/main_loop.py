@@ -37,9 +37,6 @@ class MainLoop:
 
         self.model_name = str(getattr(params, "model_summary", "ddpg")).strip().lower()
 
-        self.rewardsAll = []
-        self.ep_reward_list = []
-        self.avg_reward_list = []
         self.this_episode = 0
 
         self.G_state = []
@@ -57,7 +54,7 @@ class MainLoop:
 
         self.env = None
         self.env_state = None
-        self.spatial_risk_rng = np.random.default_rng(params.SPATIAL_RISK_SEED)
+        self.spatial_risk_rng = np.random.default_rng(params.MASTER_SEED)
         self.log_data = []
         self.task_results = []
 
@@ -448,19 +445,18 @@ class MainLoop:
             self.model.train_step()
 
         # episode logs
-        self.ep_reward_list.append(self.episodic_reward)
-
-        avg_reward = np.mean(self.ep_reward_list[-40:])
-        episode_avg_delay = self.episodic_delay / self.maxTask
+        task_avg_delay = self.episodic_delay / self.maxTask
         self.log_data.append((
             self.this_episode,
-            avg_reward,
             self.episodic_reward,
-            episode_avg_delay,
+            task_avg_delay,
         ))
-        self.avg_reward_list.append(avg_reward)
 
-        print(f"Episode {self.this_episode} | Avg Reward: {avg_reward:.3f} | This Episode: {self.episodic_reward:.3f}")
+        print(
+            f"Episode {self.this_episode} | "
+            f"Episode Reward: {self.episodic_reward:.3f} | "
+            f"task_Avg_Delay: {task_avg_delay:.3f} s"
+        )
 
     def _drain_pending_tasks(self):
         """Wait for pending tasks' first-replica completion events."""
@@ -501,7 +497,6 @@ class MainLoop:
         """Record common episode metrics and remove a task from pendingList."""
         self.episodic_reward += reward
         self.episodic_delay += delay
-        self.rewardsAll.append(reward)
         self.pendingList.remove(task_counter)
 
     def get_task_outcome_info(self, task):
