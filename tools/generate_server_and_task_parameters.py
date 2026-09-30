@@ -168,8 +168,13 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
     task_info = []
     num_tasks = parameters.taskno
     size_range = parameters.TASK_SIZE_RANGE
-    reliability_low, reliability_high = parameters.TASK_RELIABILITY_REQUIREMENT_RANGE
+    reliability_levels = parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
+    if num_tasks % len(reliability_levels):
+        raise ValueError("taskno must be divisible by the number of reliability levels.")
     reliability_rng = np.random.default_rng(parameters.MASTER_SEED)
+    reliability_requirements = reliability_rng.permutation(
+        np.repeat(reliability_levels, num_tasks // len(reliability_levels))
+    )
 
     lower_demand, upper_demand = parameters.Low_demand, parameters.High_demand
     mean = (lower_demand + upper_demand) / 2
@@ -177,16 +182,13 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
     lower_bound = (lower_demand - mean) / standard_deviation
     upper_bound = (upper_demand - mean) / standard_deviation
 
-    for task_id in range(1, num_tasks + 1):
+    for task_id, reliability_requirement in enumerate(reliability_requirements, start=1):
         task_size = np.random.randint(size_range[0], size_range[1] + 1)
         computation_demand = truncnorm.rvs(
             lower_bound,
             upper_bound,
             loc=mean,
             scale=standard_deviation,
-        )
-        reliability_requirement = reliability_rng.uniform(
-            reliability_low, reliability_high
         )
         task_info.append([
             task_id,

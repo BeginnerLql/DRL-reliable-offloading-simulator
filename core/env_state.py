@@ -239,6 +239,10 @@ class EnvironmentState:
             return 0.0
         return (val - min_val) / denominator
 
+    def normalize_reliability_requirement(self, reliability_requirement):
+        levels = params.TASK_RELIABILITY_REQUIREMENT_LEVELS
+        return levels.index(reliability_requirement) / (len(levels) - 1)
+
     def get_state(self, task):
         expected_dimension = 5 * params.NUM_SERVERS + 3
         if params.num_states != expected_dimension:
@@ -319,6 +323,9 @@ class EnvironmentState:
             )
 
         reliability_requirement = float(task.reliability_requirement)
+        normalized_reliability_requirement = self.normalize_reliability_requirement(
+            reliability_requirement
+        )
 
         normalized_frequencies = self.normalize(
             np.asarray(frequencies), frequency_min, frequency_max
@@ -350,7 +357,7 @@ class EnvironmentState:
             np.asarray([
                 normalized_task_size,
                 normalized_computation_demand,
-                reliability_requirement,
+                normalized_reliability_requirement,
             ]),
         ))
         with np.errstate(over="ignore", invalid="ignore"):

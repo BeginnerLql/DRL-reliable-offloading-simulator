@@ -11,8 +11,8 @@ class parameters:
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (10, 100)  # MB
-    # Main-experiment task reliability requirement range.
-    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)
+    # Main-experiment task reliability requirement tiers.
+    TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
     Low_demand, High_demand = 1, 100  # MI
     taskno = 200
 
@@ -37,9 +37,11 @@ class parameters:
     BACKLOG_TIME_SCALE_SEC = 4.0
 
     # One quasi-static spatial-risk field is sampled per episode when enabled.
-    SPATIAL_RISK_ENABLED = False
+    SPATIAL_RISK_ENABLED = True
     SPATIAL_CORRELATION_LENGTH_KM = 0.5
-    SPATIAL_RISK_BETA_P = None
+    # TEMPORARY exploratory calibration value.
+    # Not yet a literature-calibrated final experiment parameter.
+    SPATIAL_RISK_BETA_P = 0.5
     MASTER_SEED = 2026
 
     # ======================================================================
