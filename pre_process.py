@@ -6,18 +6,7 @@ Generates input Excel files into data/:
 - task_parameters.xlsx
 """
 
-import os
-import sys
-
-
-def _add_project_root_to_syspath():
-    project_root = os.path.dirname(os.path.abspath(__file__))
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
-
 def main():
-    _add_project_root_to_syspath()
     from tools.prepare_eua_topology import prepare_topology
     from tools.generate_server_and_task_parameters import main as gen_main
 

@@ -14,12 +14,10 @@ import torch.nn.functional as F
 
 def _to_torch_tensor(x, dtype=torch.float32, device="cpu"):
     """
-    Accepts numpy / list / torch tensor / TF tensor-like (has .numpy()) and returns torch.FloatTensor.
+    Convert NumPy arrays, lists, or PyTorch tensors to the requested device and dtype.
     """
     if isinstance(x, torch.Tensor):
         return x.to(device=device, dtype=dtype)
-    if hasattr(x, "numpy"):  # TF tensor-like
-        x = x.numpy()
     x = np.asarray(x, dtype=np.float32)
     return torch.tensor(x, dtype=dtype, device=device)
 
@@ -31,17 +29,6 @@ class _BaseNet(nn.Module):
     def variables(self):
         # Mimic TF "variables" usage in your code
         return list(self.parameters())
-
-    def get_weights(self):
-        # Mimic keras get_weights(): list of numpy arrays
-        return [p.detach().cpu().numpy().copy() for p in self.parameters()]
-
-    def set_weights(self, weights_list):
-        # Mimic keras set_weights(): assign from list of numpy arrays
-        with torch.no_grad():
-            for p, w in zip(self.parameters(), weights_list):
-                w_t = torch.tensor(w, dtype=p.dtype, device=p.device)
-                p.copy_(w_t)
 
 
 class _ActorNet(_BaseNet):

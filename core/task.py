@@ -2,12 +2,6 @@
 
 class Task:
     def __init__(self, env, state, task_id, task_profile):
-        profile_task_id = task_profile["Task_ID"]
-        if profile_task_id != task_id:
-            raise ValueError(
-                f"Task profile ID {profile_task_id} does not match task_id {task_id}."
-            )
-
         self.env = env
         self.env_state = state
         self.id = task_id
@@ -71,9 +65,7 @@ class Task:
             )
             yield self.env.timeout(service_time)
             replica_info["finish_time"] = float(self.env.now)
-            self.env_state.complete_replica_execution(
-                server.server_id, self, replica_name
-            )
+            self.env_state.complete_replica_execution(server.server_id)
 
         self._signal_task_completion()
 

@@ -1,0 +1,125 @@
+{
+  "baseline_commit": "2884d5b83133295b3e93f934fa9cbe64e6613773",
+  "control": {
+    "seed": 2026,
+    "python_random": true,
+    "numpy_global": true,
+    "torch": true,
+    "spatial_rng": true,
+    "torch_threads": 1
+  },
+  "controlled_comparison": {
+    "Params": {
+      "exactly_equal": true,
+      "rows": 54,
+      "columns": 2
+    },
+    "Servers": {
+      "exactly_equal": true,
+      "rows": 8,
+      "columns": 7
+    },
+    "Tasks": {
+      "exactly_equal": true,
+      "rows": 200,
+      "columns": 4
+    },
+    "Logs": {
+      "exactly_equal": true,
+      "rows": 100,
+      "columns": 3
+    },
+    "TaskResults": {
+      "exactly_equal": true,
+      "rows": 20000,
+      "columns": 20
+    },
+    "diagnostic_csvs": {
+      "feasibility_by_episode_tier.csv": true,
+      "pair_selection_summary.csv": true,
+      "spatial_episode_summary.csv": true
+    }
+  },
+  "hashes": {
+    "baseline": {
+      "seed": 2026,
+      "torch_threads": 1,
+      "episodes": 100,
+      "tasks": 20000,
+      "transition_sha256": "b39c342bbb299ea1d3c241f3db5ecb69c464b81ad2dd1931244e0944867b9b50",
+      "model_sha256": "463996170ea1dd4704ad5b43a55bc7664bef61ee28d195a51026e8f8415172a9",
+      "elapsed_seconds": 17.170541645000412
+    },
+    "current": {
+      "seed": 2026,
+      "torch_threads": 1,
+      "episodes": 100,
+      "tasks": 20000,
+      "transition_sha256": "b39c342bbb299ea1d3c241f3db5ecb69c464b81ad2dd1931244e0944867b9b50",
+      "model_sha256": "463996170ea1dd4704ad5b43a55bc7664bef61ee28d195a51026e8f8415172a9",
+      "elapsed_seconds": 14.87385955300033
+    }
+  },
+  "historical_comparison": {
+    "Tasks": {
+      "exactly_equal": true,
+      "changed_cells": 0
+    },
+    "Servers": {
+      "exactly_equal": true,
+      "changed_cells": 0
+    },
+    "Logs": {
+      "exactly_equal": false,
+      "changed_cells": 200
+    },
+    "TaskResults": {
+      "exactly_equal": false,
+      "changed_cells": 265761
+    },
+    "spatial_context_exactly_equal": true,
+    "feasibility_exactly_equal": true
+  },
+  "summary": {
+    "baseline": {
+      "RSR": 0.9047,
+      "mean_latency_s": 6.962760023371852,
+      "median_latency_s": 6.496071473786486,
+      "p95_latency_s": 12.132711274234063,
+      "mean_episode_reward": -1392.5520046743704,
+      "tier_RSR": {
+        "0.9": 1.0,
+        "0.99": 1.0,
+        "0.999": 0.9928,
+        "0.9999": 0.626
+      }
+    },
+    "current": {
+      "RSR": 0.9047,
+      "mean_latency_s": 6.962760023371852,
+      "median_latency_s": 6.496071473786486,
+      "p95_latency_s": 12.132711274234063,
+      "mean_episode_reward": -1392.5520046743704,
+      "tier_RSR": {
+        "0.9": 1.0,
+        "0.99": 1.0,
+        "0.999": 0.9928,
+        "0.9999": 0.626
+      }
+    },
+    "historical": {
+      "RSR": 0.9031,
+      "mean_latency_s": 7.070413338939022,
+      "median_latency_s": 6.579506532956088,
+      "p95_latency_s": 12.408968574731839,
+      "mean_episode_reward": -1414.0826677878044,
+      "tier_RSR": {
+        "0.9": 1.0,
+        "0.99": 1.0,
+        "0.999": 0.9932,
+        "0.9999": 0.6192
+      }
+    }
+  },
+  "original_protected_files_unchanged": true
+}

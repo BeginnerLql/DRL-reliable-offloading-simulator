@@ -19,7 +19,7 @@ def save_params_and_logs(params, log_data, task_results):
     # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
 
-    model_name = str(getattr(params, "model_summary", "model")).strip().lower()
+    model_name = str(params.model_summary).strip().lower()
 
     # ---------------------------
     # Results folder + filename
@@ -39,8 +39,6 @@ def save_params_and_logs(params, log_data, task_results):
     # Load Tasks (from data/)
     # ---------------------------
     task_path = os.path.join(DATA_DIR, "task_parameters.xlsx")
-    if not os.path.exists(task_path):
-        raise FileNotFoundError(f"File not found: {task_path}")
     task_df = pd.read_excel(task_path)
 
     # ---------------------------
@@ -103,64 +101,23 @@ def save_params_and_logs(params, log_data, task_results):
     # ---------------------------
     wb = load_workbook(filename)
 
-    # Logs charts (Episode Reward + task_Avg_Delay).
-    if "Logs" in wb.sheetnames:
-        ws_logs = wb["Logs"]
-        header = [cell.value for cell in ws_logs[1]]
-
-        def col_idx(name):
-            try:
-                return header.index(name) + 1
-            except ValueError:
-                return None
-
-        c_episode = col_idx("Episode")
-        c_ep_reward = col_idx("Episode Reward")
-        c_task_avg_delay = col_idx("task_Avg_Delay")
-
-        max_row_logs = ws_logs.max_row
-
-        # Rewards chart
-        if c_episode and c_ep_reward and max_row_logs >= 2:
-            rewards_chart = LineChart()
-            rewards_chart.title = "Rewards per Episode"
-            rewards_chart.y_axis.title = "Reward"
-            rewards_chart.x_axis.title = "Episode"
-
-            data = Reference(
-                ws_logs,
-                min_col=c_ep_reward,
-                min_row=1,
-                max_col=c_ep_reward,
-                max_row=max_row_logs,
-            )
-            cats = Reference(ws_logs, min_col=c_episode, min_row=2, max_row=max_row_logs)
-
-            rewards_chart.add_data(data, titles_from_data=True)
-            rewards_chart.set_categories(cats)
-
-            ws_logs.add_chart(rewards_chart, "F2")
-
-        # Delay chart
-        if c_episode and c_task_avg_delay and max_row_logs >= 2:
-            delay_chart = LineChart()
-            delay_chart.title = "task_Avg_Delay per Episode"
-            delay_chart.y_axis.title = "task_Avg_Delay (s)"
-            delay_chart.x_axis.title = "Episode"
-
-            data = Reference(
-                ws_logs,
-                min_col=c_task_avg_delay,
-                min_row=1,
-                max_col=c_task_avg_delay,
-                max_row=max_row_logs,
-            )
-            cats = Reference(ws_logs, min_col=c_episode, min_row=2, max_row=max_row_logs)
-
-            delay_chart.add_data(data, titles_from_data=True)
-            delay_chart.set_categories(cats)
-
-            ws_logs.add_chart(delay_chart, "F20")
+    ws_logs = wb["Logs"]
+    for column, title, axis_title, anchor in (
+        (2, "Rewards per Episode", "Reward", "F2"),
+        (3, "task_Avg_Delay per Episode", "task_Avg_Delay (s)", "F20"),
+    ):
+        chart = LineChart()
+        chart.title = title
+        chart.y_axis.title = axis_title
+        chart.x_axis.title = "Episode"
+        data = Reference(
+            ws_logs, min_col=column, min_row=1,
+            max_col=column, max_row=ws_logs.max_row,
+        )
+        categories = Reference(ws_logs, min_col=1, min_row=2, max_row=ws_logs.max_row)
+        chart.add_data(data, titles_from_data=True)
+        chart.set_categories(categories)
+        ws_logs.add_chart(chart, anchor)
 
     wb.save(filename)
     print("successfully saved logs !")

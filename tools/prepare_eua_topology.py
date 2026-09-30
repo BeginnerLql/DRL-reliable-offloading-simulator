@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import math
 import sys
-import warnings
 from pathlib import Path
 from typing import Sequence
 
@@ -20,13 +19,7 @@ from config.configuration import parameters
 
 
 EARTH_RADIUS_KM = 6371.0088
-EXPECTED_HIGH_PRECISION_COUNT = 99
 TOPOLOGY_COLUMNS = ["Server_ID", "Site_ID", "Latitude", "Longitude"]
-CANDIDATE_COLUMNS = ["Site_ID", "Latitude", "Longitude"]
-
-
-class TopologyValidationError(ValueError):
-    """Raised when EUA site records cannot form a valid topology."""
 
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -60,53 +53,14 @@ def _normalized_candidates(candidates: pd.DataFrame) -> pd.DataFrame:
         "LONGITUDE": "Longitude",
     }
     frame = candidates.rename(columns=column_names).copy()
-    required = {"Site_ID", "Latitude", "Longitude"}
-    missing = sorted(required.difference(frame.columns))
-    if missing:
-        raise TopologyValidationError(
-            "Candidate sites are missing required columns: " + ", ".join(missing)
-        )
-
     frame = frame[["Site_ID", "Latitude", "Longitude"]]
     frame["Site_ID"] = frame["Site_ID"].astype("string").str.strip()
-    if frame["Site_ID"].isna().any() or frame["Site_ID"].eq("").any():
-        raise TopologyValidationError("Candidate sites contain an empty Site_ID.")
-    if frame["Site_ID"].duplicated().any():
-        duplicates = frame.loc[frame["Site_ID"].duplicated(keep=False), "Site_ID"]
-        values = sorted(set(duplicates.tolist()), key=_site_id_sort_key)
-        raise TopologyValidationError(
-            "Candidate sites contain duplicate Site_ID values: "
-            + ", ".join(values)
-        )
-
-    for column, lower, upper in (
-        ("Latitude", -90.0, 90.0),
-        ("Longitude", -180.0, 180.0),
-    ):
-        frame[column] = pd.to_numeric(frame[column], errors="coerce")
-        if frame[column].isna().any() or not frame[column].map(math.isfinite).all():
-            raise TopologyValidationError(
-                f"Candidate sites contain a non-numeric or non-finite {column}."
-            )
-        if not frame[column].between(lower, upper).all():
-            raise TopologyValidationError(
-                f"Candidate sites contain out-of-range {column} values."
-            )
+    frame[["Latitude", "Longitude"]] = frame[["Latitude", "Longitude"]].astype(float)
 
     frame = frame.sort_values(
         "Site_ID", key=lambda values: values.map(_site_id_sort_key)
     ).reset_index(drop=True)
     return frame
-
-
-def _validate_candidate_pool(candidate_df: pd.DataFrame) -> pd.DataFrame:
-    """Validate a cleaned candidate pool before topology selection."""
-    missing = sorted(set(CANDIDATE_COLUMNS).difference(candidate_df.columns))
-    if missing:
-        raise TopologyValidationError(
-            "Candidate CSV is missing required columns: " + ", ".join(missing)
-        )
-    return _normalized_candidates(candidate_df)
 
 
 def _distance_profile(candidates: pd.DataFrame) -> tuple[np.ndarray, float, float]:
@@ -139,8 +93,6 @@ def _pair_bin_counts(indices: Sequence[int], bins: np.ndarray) -> tuple[int, int
 def _objective(indices: Sequence[int], bins: np.ndarray) -> tuple[float, tuple[int, int, int]]:
     counts = _pair_bin_counts(indices, bins)
     pair_count = len(indices) * (len(indices) - 1) // 2
-    if sum(counts) != pair_count:
-        raise RuntimeError("Distance-bin counts do not match the selected pair count.")
     target = pair_count / 3.0
     score = sum((count - target) ** 2 for count in counts)
     return score, counts
@@ -156,11 +108,7 @@ def _select_balanced_topology(
 ) -> tuple[pd.DataFrame, dict[str, object]]:
     frame = _normalized_candidates(candidates)
     K = len(frame)
-    if isinstance(num_servers, bool) or not isinstance(num_servers, (int, np.integer)):
-        raise ValueError("num_servers must be an integer.")
     N = int(num_servers)
-    if not 2 <= N <= K:
-        raise ValueError(f"num_servers must satisfy 2 <= N <= K; got N={N}, K={K}.")
 
     bins, q33, q67 = _distance_profile(frame)
     coordinates = frame[["Latitude", "Longitude"]].to_numpy(dtype=float)
@@ -258,25 +206,12 @@ def prepare_topology(
         if output_path is not None
         else _default_output_path(num_servers)
     )
-    if input_path.resolve() == output_path.resolve():
-        raise ValueError("Output path must differ from the candidate CSV path.")
-
     candidate_df = pd.read_csv(
         input_path,
         encoding="utf-8-sig",
         dtype={"Site_ID": "string"},
     )
-    candidates = _validate_candidate_pool(candidate_df)
-    K = len(candidates)
-    if K != EXPECTED_HIGH_PRECISION_COUNT:
-        warnings.warn(
-            "Expected about 99 candidate sites, "
-            f"but found {K}; using the actual candidate count.",
-            UserWarning,
-            stacklevel=2,
-        )
-
-    topology_df, summary = _select_balanced_topology(candidates, num_servers)
+    topology_df, summary = _select_balanced_topology(candidate_df, num_servers)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     topology_df.to_csv(output_path, index=False, lineterminator="\n")
 

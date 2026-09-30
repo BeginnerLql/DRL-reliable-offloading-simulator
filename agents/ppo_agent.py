@@ -150,10 +150,6 @@ class PPOAgent:
         self.old_log_probs = []
         self.delta_times = []
 
-        # Compatibility placeholder:
-        # Some parts of the project check agent.replay_buffer length (DQN-style).
-        self.replay_buffer = []
-
     # -----------------------------
     # utilities
     # -----------------------------
@@ -164,19 +160,16 @@ class PPOAgent:
     # -----------------------------
     # action selection
     # -----------------------------
-    def select_action(self, state, epsilon, use_softmax=False, temperature=1.5):
+    def select_action(self, state, epsilon):
         """
         PPO action selection.
         NOTE: The signature matches other agents in this project for compatibility.
-              epsilon/use_softmax/temperature are not used by PPO here.
+              epsilon is unused by PPO.
         """
         state_tensor = self._to_tensor(state).unsqueeze(0)
         with torch.no_grad():
             # Sample from policy_old for more stable on-policy behavior
             logits = self.policy_old(state_tensor)
-            if not torch.isfinite(logits).all():
-                # Fallback: if logits become invalid, return a random action
-                return int(np.random.randint(0, self.num_actions))
             dist = Categorical(logits=logits)
             action = dist.sample()
         return int(action.item())
@@ -190,15 +183,7 @@ class PPOAgent:
         ``delta_t`` is the elapsed simulation time to the next decision
         epoch (or terminal drain), measured in seconds.
         """
-        if r is None:
-            return
-
         delta_t = float(delta_t)
-        if not np.isfinite(delta_t):
-            raise ValueError(f"PPO delta_t must be finite, got {delta_t}")
-        if delta_t < -1e-8:
-            raise ValueError(f"PPO delta_t cannot be negative, got {delta_t}")
-        delta_t = max(delta_t, 0.0)
 
         self.states.append(np.array(s, copy=True))
         self.actions.append(int(a))
@@ -211,15 +196,9 @@ class PPOAgent:
         with torch.no_grad():
             s_tensor = self._to_tensor(s).unsqueeze(0)
             logits = self.policy_old(s_tensor)
-            if not torch.isfinite(logits).all():
-                self.old_log_probs.append(0.0)
-            else:
-                dist = Categorical(logits=logits)
-                a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
-                log_prob = dist.log_prob(a_tensor).item()
-                if not np.isfinite(log_prob):
-                    log_prob = 0.0
-                self.old_log_probs.append(float(log_prob))
+            dist = Categorical(logits=logits)
+            a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
+            self.old_log_probs.append(float(dist.log_prob(a_tensor).item()))
 
     # -----------------------------
     # training: end of episode
@@ -229,18 +208,6 @@ class PPOAgent:
         N = len(self.states)
         if N == 0:
             return
-
-        if not (
-            len(self.actions) == len(self.rewards) == len(self.next_states)
-            == len(self.dones) == len(self.old_log_probs) == len(self.delta_times) == N
-        ):
-            self.clear_rollout()
-            raise RuntimeError("PPO rollout buffers have inconsistent lengths")
-
-        # A normal episode must explicitly provide a terminal transition.
-        if not any(self.dones):
-            self.clear_rollout()
-            raise RuntimeError("PPO rollout is missing its terminal transition")
 
         if N < self.min_rollout:
             self.clear_rollout()
@@ -259,16 +226,6 @@ class PPOAgent:
         old_log_probs = torch.tensor(
             self.old_log_probs, dtype=torch.float32, device=self.device
         )
-
-        if (
-            not torch.isfinite(states).all()
-            or not torch.isfinite(next_states).all()
-            or not torch.isfinite(rewards).all()
-            or not torch.isfinite(delta_times).all()
-            or torch.any(delta_times < 0.0)
-        ):
-            self.clear_rollout()
-            return
 
         values = self.value_net(states)
 
@@ -298,20 +255,12 @@ class PPOAgent:
 
             returns = advantages + values.detach()
 
-            if not torch.isfinite(advantages).all() or not torch.isfinite(returns).all():
-                self.clear_rollout()
-                return
-
             adv_mean = advantages.mean()
             adv_std = advantages.std(unbiased=False)
-            if (not torch.isfinite(adv_std)) or adv_std.item() < 1e-8:
+            if adv_std.item() < 1e-8:
                 advantages = advantages - adv_mean
             else:
                 advantages = (advantages - adv_mean) / (adv_std + 1e-8)
-
-            if not torch.isfinite(advantages).all():
-                self.clear_rollout()
-                return
 
         batch_size = min(int(self.batch_size), N)
 
@@ -331,9 +280,6 @@ class PPOAgent:
                 b_old_log_probs = old_log_probs[batch_idx]
 
                 logits = self.policy_net(b_states)
-                if not torch.isfinite(logits).all():
-                    continue
-
                 dist = Categorical(logits=logits)
                 log_probs = dist.log_prob(b_actions)
                 entropy = dist.entropy().mean()
@@ -354,7 +300,7 @@ class PPOAgent:
                 total_loss = policy_loss + value_loss
 
                 if not torch.isfinite(total_loss):
-                    continue
+                    raise FloatingPointError("Non-finite PPO loss")
 
                 self.optimizer_policy.zero_grad(set_to_none=True)
                 self.optimizer_value.zero_grad(set_to_none=True)

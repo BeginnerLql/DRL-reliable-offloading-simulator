@@ -17,14 +17,11 @@ from core.spatial_risk import (
     build_spatial_correlation_matrix,
     map_spatial_risk_to_effective_failure_rates,
     sample_spatial_risk_field,
-    validate_correlation_matrix,
 )
 
 import simpy
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import math
 
 
 class MainLoop:
@@ -35,7 +32,7 @@ class MainLoop:
         self.total_episodes = total_episodes
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
-        self.model_name = str(getattr(params, "model_summary", "ddpg")).strip().lower()
+        self.model_name = str(params.model_summary).strip().lower()
 
         self.this_episode = 0
 
@@ -67,14 +64,9 @@ class MainLoop:
 
 
     def _load_run_profiles(self):
-        """Load and validate the immutable server/task profiles for this run."""
+        """Load the immutable server/task profiles for this run."""
         server_path = Path(DATA_DIR) / "server_info.xlsx"
         task_path = Path(DATA_DIR) / "task_parameters.xlsx"
-        missing_paths = [path for path in (server_path, task_path) if not path.is_file()]
-        if missing_paths:
-            missing = ", ".join(str(path) for path in missing_paths)
-            raise FileNotFoundError(f"Required run profile workbook not found: {missing}")
-
         server_df = pd.read_excel(
             server_path,
             sheet_name="Servers",
@@ -82,83 +74,16 @@ class MainLoop:
         )
         task_df = pd.read_excel(task_path)
         return (
-            self._validate_server_profiles(server_df, server_path),
-            self._validate_task_profiles(task_df, task_path),
+            self._build_server_profiles(server_df),
+            self._build_task_profiles(task_df),
         )
 
     @staticmethod
-    def _validate_server_profiles(server_df, source_path):
-        required_columns = {
-            "Server_ID",
-            "Site_ID",
-            "Processing_Frequency",
-            "Base_Failure_Rate",
-            "Transmission_Rate",
-            "Latitude",
-            "Longitude",
-        }
-        missing = sorted(required_columns.difference(server_df.columns))
-        if missing:
-            raise ValueError(
-                f"{source_path} is missing required columns: " + ", ".join(missing)
-            )
-
-        server_count = int(params.NUM_SERVERS)
-        if len(server_df) != server_count:
-            raise ValueError(
-                f"{source_path} must contain {server_count} server rows; found {len(server_df)}."
-            )
-
-        frame = server_df.copy()
-        server_ids = pd.to_numeric(frame["Server_ID"], errors="coerce")
-        if (
-            server_ids.isna().any()
-            or not server_ids.map(math.isfinite).all()
-            or not server_ids.map(lambda value: float(value).is_integer()).all()
-        ):
-            raise ValueError(f"{source_path} contains invalid Server_ID values.")
-        frame["Server_ID"] = server_ids.astype(int)
-        expected_ids = list(range(1, server_count + 1))
-        if (
-            frame["Server_ID"].duplicated().any()
-            or sorted(frame["Server_ID"].tolist()) != expected_ids
-        ):
-            raise ValueError(f"{source_path} must have unique Server_ID values 1..N.")
-
-        site_ids = frame["Site_ID"].astype("string").str.strip()
-        if site_ids.isna().any() or site_ids.eq("").any():
-            raise ValueError(f"{source_path} contains an empty Site_ID.")
-        if site_ids.duplicated().any():
-            raise ValueError(f"{source_path} contains duplicate Site_ID values.")
-        frame["Site_ID"] = site_ids
-
-        numeric_ranges = (
-            ("Processing_Frequency", 0.0, None),
-            ("Base_Failure_Rate", 0.0, None),
-            ("Transmission_Rate", 0.0, None),
-            ("Latitude", -90.0, 90.0),
-            ("Longitude", -180.0, 180.0),
-        )
-        for column, minimum, maximum in numeric_ranges:
-            values = pd.to_numeric(frame[column], errors="coerce")
-            if values.isna().any() or not values.map(math.isfinite).all():
-                raise ValueError(f"{source_path} contains invalid {column} values.")
-            if column == "Processing_Frequency" and not values.gt(0).all():
-                raise ValueError(f"{source_path} requires positive Processing_Frequency values.")
-            if column == "Base_Failure_Rate" and not values.ge(0).all():
-                raise ValueError(f"{source_path} requires non-negative Base_Failure_Rate values.")
-            if column == "Transmission_Rate" and not values.gt(0).all():
-                raise ValueError(f"{source_path} requires positive Transmission_Rate values.")
-            if maximum is not None and not values.between(minimum, maximum).all():
-                raise ValueError(f"{source_path} contains out-of-range {column} values.")
-            frame[column] = values.astype(float)
-
-        frame = frame.sort_values("Server_ID").reset_index(drop=True)
-        profiles = {}
-        for _, row in frame.iterrows():
-            server_id = int(row["Server_ID"])
-            profiles[server_id] = {
-                "Server_ID": server_id,
+    def _build_server_profiles(server_df):
+        frame = server_df.sort_values("Server_ID").reset_index(drop=True)
+        return {
+            int(row["Server_ID"]): {
+                "Server_ID": int(row["Server_ID"]),
                 "Site_ID": str(row["Site_ID"]),
                 "Processing_Frequency": float(row["Processing_Frequency"]),
                 "Base_Failure_Rate": float(row["Base_Failure_Rate"]),
@@ -166,85 +91,21 @@ class MainLoop:
                 "Latitude": float(row["Latitude"]),
                 "Longitude": float(row["Longitude"]),
             }
-        return profiles
+            for _, row in frame.iterrows()
+        }
 
     @staticmethod
-    def _validate_task_profiles(task_df, source_path):
-        required_columns = {
-            "Task_ID",
-            "Task_Size",
-            "Computation_Demand",
-            "Reliability_Requirement",
-        }
-        missing = sorted(required_columns.difference(task_df.columns))
-        if missing:
-            raise ValueError(
-                f"{source_path} is missing required columns: " + ", ".join(missing)
-            )
-
-        task_count = int(params.taskno)
-        if len(task_df) != task_count:
-            raise ValueError(
-                f"{source_path} must contain {task_count} task rows; found {len(task_df)}."
-            )
-
-        frame = task_df.copy()
-        task_ids = pd.to_numeric(frame["Task_ID"], errors="coerce")
-        if (
-            task_ids.isna().any()
-            or not task_ids.map(math.isfinite).all()
-            or not task_ids.map(lambda value: float(value).is_integer()).all()
-        ):
-            raise ValueError(f"{source_path} contains invalid Task_ID values.")
-        frame["Task_ID"] = task_ids.astype(int)
-        expected_ids = list(range(1, task_count + 1))
-        if (
-            frame["Task_ID"].duplicated().any()
-            or sorted(frame["Task_ID"].tolist()) != expected_ids
-        ):
-            raise ValueError(f"{source_path} must have unique Task_ID values 1..T.")
-
-        task_sizes = pd.to_numeric(frame["Task_Size"], errors="coerce")
-        if (
-            task_sizes.isna().any()
-            or not task_sizes.map(math.isfinite).all()
-            or not task_sizes.map(lambda value: float(value).is_integer()).all()
-        ):
-            raise ValueError(f"{source_path} contains invalid Task_Size values.")
-        minimum_size, maximum_size = params.TASK_SIZE_RANGE
-        if not task_sizes.between(minimum_size, maximum_size).all():
-            raise ValueError(f"{source_path} contains out-of-range Task_Size values.")
-        frame["Task_Size"] = task_sizes.astype(int)
-
-        computation = pd.to_numeric(frame["Computation_Demand"], errors="coerce")
-        if computation.isna().any() or not computation.map(math.isfinite).all():
-            raise ValueError(f"{source_path} contains invalid Computation_Demand values.")
-        if not computation.gt(0).all():
-            raise ValueError(f"{source_path} requires positive Computation_Demand values.")
-        frame["Computation_Demand"] = computation.astype(float)
-
-        reliability = pd.to_numeric(frame["Reliability_Requirement"], errors="coerce")
-        if (
-            reliability.isna().any()
-            or not reliability.map(math.isfinite).all()
-            or not ((reliability > 0.0) & (reliability <= 1.0)).all()
-        ):
-            raise ValueError(
-                f"{source_path} requires finite Reliability_Requirement values in (0, 1]."
-            )
-        frame["Reliability_Requirement"] = reliability.astype(float)
-
-        frame = frame.sort_values("Task_ID").reset_index(drop=True)
-        profiles = {}
-        for _, row in frame.iterrows():
-            task_id = int(row["Task_ID"])
-            profiles[task_id] = {
-                "Task_ID": task_id,
+    def _build_task_profiles(task_df):
+        frame = task_df.sort_values("Task_ID").reset_index(drop=True)
+        return {
+            int(row["Task_ID"]): {
+                "Task_ID": int(row["Task_ID"]),
                 "Task_Size": int(row["Task_Size"]),
                 "Computation_Demand": float(row["Computation_Demand"]),
                 "Reliability_Requirement": float(row["Reliability_Requirement"]),
             }
-        return profiles
+            for _, row in frame.iterrows()
+        }
 
     # ---------------------------
     # EPISODE LOOP
@@ -279,11 +140,6 @@ class MainLoop:
         """Sample and store one quasi-static spatial risk field for this episode."""
         if not params.SPATIAL_RISK_ENABLED:
             return
-        if params.SPATIAL_RISK_BETA_P is None:
-            raise ValueError(
-                "beta_p must be explicitly configured when spatial risk is enabled."
-            )
-
         server_objects = [
             server_info["server_object"]
             for server_info in self.env_state.servers.values()
@@ -293,7 +149,6 @@ class MainLoop:
             distance_matrix,
             params.SPATIAL_CORRELATION_LENGTH_KM,
         )
-        validate_correlation_matrix(correlation_matrix)
         spatial_risk_field = sample_spatial_risk_field(
             correlation_matrix,
             rng=self.spatial_risk_rng,
@@ -319,10 +174,6 @@ class MainLoop:
     def _sample_interarrival_time(self):
         """Sample one inter-arrival time for the common Poisson workload."""
         arrival_rate = float(params.TASK_ARRIVAL_RATE)
-        if arrival_rate <= 0:
-            raise ValueError(
-                "TASK_ARRIVAL_RATE must be positive and measured in tasks/s"
-            )
         return float(
             np.random.exponential(scale=1.0 / arrival_rate)
         )
@@ -333,9 +184,9 @@ class MainLoop:
     def get_epsilon(self, episode):
         if self.model_name != "dqn":
             return 0.0
-        eps_start = getattr(params, "epsilon_start_dqn", 1.0)
-        eps_end = getattr(params, "epsilon_end_dqn", 0.01)
-        eps_decay = getattr(params, "epsilon_decay_dqn", 300)
+        eps_start = params.epsilon_start_dqn
+        eps_end = params.epsilon_end_dqn
+        eps_decay = params.epsilon_decay_dqn
         # linear decay 
         return max(eps_end, eps_start - (episode / float(eps_decay)))
 
@@ -362,14 +213,12 @@ class MainLoop:
             if self.model_name == "ppo":
                 if self.ppo_last_decision_state is not None:
                     delta_t = current_time - self.ppo_last_decision_time
-                    if delta_t < -1e-8:
-                        raise ValueError(f"Negative PPO decision interval: {delta_t}")
                     self.model.store_transition(
                         self.ppo_last_decision_state,
                         self.ppo_last_decision_action,
                         self.ppo_interval_reward,
                         self.G_state,
-                        delta_t=max(float(delta_t), 0.0),
+                        delta_t=float(delta_t),
                         done=False,
                     )
                     self.ppo_interval_reward = 0.0
@@ -435,14 +284,12 @@ class MainLoop:
                 terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
                 terminal_time = self._get_ppo_terminal_time()
                 delta_t = terminal_time - self.ppo_last_decision_time
-                if delta_t < -1e-8:
-                    raise ValueError(f"Negative PPO terminal interval: {delta_t}")
                 self.model.store_transition(
                     self.ppo_last_decision_state,
                     self.ppo_last_decision_action,
                     self.ppo_interval_reward,
                     terminal_next_state,
-                    delta_t=max(float(delta_t), 0.0),
+                    delta_t=float(delta_t),
                     done=True,
                 )
                 self.ppo_interval_reward = 0.0
@@ -474,28 +321,10 @@ class MainLoop:
             if len(self.pendingList) == 0:
                 break
 
-            completion_events = []
-            for task_id in self.pendingList:
-                task = self.env_state.get_task_by_id(task_id)
-                if task is None:
-                    raise RuntimeError(
-                        f"Pending task {task_id} is missing from the environment state"
-                    )
-                completion_event = getattr(task, "task_completion_event", None)
-                if completion_event is None:
-                    raise RuntimeError(
-                        f"Pending task {task_id} has no task completion event"
-                    )
-                if completion_event.triggered:
-                    raise RuntimeError(
-                        f"Pending task {task_id} has a triggered task completion event "
-                        "but is still pending"
-                    )
-                completion_events.append(completion_event)
-
-            if not completion_events:
-                raise RuntimeError("No task completion events remain for pending tasks")
-
+            completion_events = [
+                self.env_state.tasks[task_id].task_completion_event
+                for task_id in self.pendingList
+            ]
             yield self.env.any_of(completion_events)
 
     def _finalize_resolved_task(self, task_counter, reward, delay):
@@ -544,11 +373,7 @@ class MainLoop:
     def _collect_resolved_task_outcomes(self):
         """Accumulate completed task rewards into the current PPO interval."""
         for task_counter in list(self.pendingList):
-            task = self.env_state.get_task_by_id(task_counter)
-            if task is None:
-                raise RuntimeError(
-                    f"Pending task {task_counter} is missing from the environment state"
-                )
+            task = self.env_state.tasks[task_counter]
             if not task.task_completion_event.triggered:
                 continue
 
@@ -575,7 +400,7 @@ class MainLoop:
             return
 
         for task_counter in list(self.pendingList):
-            task = self.env_state.get_task_by_id(task_counter)
+            task = self.env_state.tasks[task_counter]
             if not task.task_completion_event.triggered:
                 continue
 
@@ -631,8 +456,6 @@ class MainLoop:
 
     def extract_parameters_from_action(self, action_scores_list):
         # DDPG: choose argmax index from continuous scores
-        if not action_scores_list:
-            raise ValueError("Action scores list is empty")
         max_index = int(action_scores_list.index(max(action_scores_list)))
         return self.extract_parameters_from_index(max_index)
 
@@ -644,9 +467,4 @@ class MainLoop:
         index_of_actions = list(
             combinations(range(1, params.NUM_SERVERS + 1), 2)
         )
-        if len(index_of_actions) != params.num_actions:
-            raise RuntimeError(
-                f"Expected {params.num_actions} pair actions, "
-                f"generated {len(index_of_actions)}"
-            )
         return index_of_actions

@@ -5,14 +5,6 @@
 # - Updated imports/paths to match the new modular structure.
 # ------------------------------------------------------------
 
-import os
-import sys
-
-# Ensure the project root is on PYTHONPATH when running directly.
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
 from io_utils.save_parameters_and_logs import save_params_and_logs
 from config.params import params
 from core.main_loop import MainLoop

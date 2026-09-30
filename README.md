@@ -1,7 +1,7 @@
 # DRL-Based Reliable Offloading Simulator
 
 This repository provides a **generic and modular simulator** for reliability-aware
-task offloading in **distributed Edge/Cloud computing systems**.
+task offloading in **eight unified Edge servers**.
 The simulator supports pluggable Deep Reinforcement Learning (DRL) agents
 (e.g., **DQN**, **PPO**, **DDPG**) and is not tied to any specific application domain
 (e.g., vehicular or RSU-based systems).
@@ -94,14 +94,16 @@ results/fixed_rate_results/<model>_results.xlsx
 
 ---
 
-### 3) Post-process results (optional)
+### 3) Analyze the saved run
 
 ```bash
-python post_process.py
+python diagnostics/analyze_spatial_four_tier_run.py
+python diagnostics/plot_spatial_four_tier_run.py
 ```
 
-This step augments result workbooks with additional analysis sheets and may generate
-a global aggregated file (e.g., `Final_Result_All.xlsx`) inside the `results/` directory.
+The diagnostics reconstruct reliability independently and check the saved task
+outcomes. `post_process.py` and `io_utils/post_process_results.py` still depend on
+obsolete result schemas and require a separate migration before use.
 
 ---
 
@@ -116,46 +118,28 @@ Key parameters include:
   Selects the DRL algorithm used for decision making. The corresponding agent
   implementation is instantiated from the `agents/` directory.
 
-- `EDGE_FAILURE_RATE_RANGE = (0.001, 0.005)` (1/s).
-- `CLOUD_FAILURE_RATE_RANGE = (0.0001, 0.001)` (1/s).
+- `SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)` (1/s).
+- `NUM_SERVERS = 8`, with 28 unordered pairs of distinct servers.
+- `TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)`;
+  the generated 200-task profile contains 50 tasks at each level.
 
-Pre-processing generates `data/server_info.xlsx` with one `Servers` sheet and
-`data/task_parameters.xlsx`. Each server's base failure rate is sampled uniformly
-from its type's range, then remains fixed throughout execution. Episodes load the
-same server parameters. Regenerate inputs after changing the ranges.
+Input profiles are loaded once per run. Servers have fixed processing frequencies,
+base failure rates and transmission rates (20/24/28/32/36/40/45/50 MB/s).
+The profile builders sort records, convert field types and build dictionaries;
+Python and the underlying libraries report malformed inputs directly.
 
-Primary and backup use their respective server's rate with execution time
-`computation_demand / processing_frequency`: failure probability is
-`1 - exp(-failure_rate * service_time)`, followed by uniform random sampling.
-Queue length does not adjust this rate. The default algorithm remains PPO.
-The result workbook's `Servers` sheet records the rates used in the simulation.
+## PPO/SMDP state representation
 
-## PPO/MDP state representation
+Each server contributes its effective failure intensity, normalized processing
+frequency, normalized transmission rate, normalized remaining CPU service time,
+and normalized queued CPU service time. Running and waiting backlogs are each
+normalized as `B / (B + BACKLOG_TIME_SCALE_SEC)` with scale 4.0 seconds.
 
-Each server contributes three normalized state features:
-
-1. its observable estimated base transient fault arrival rate `lambda_n`;
-2. its processing frequency;
-3. its current backlog service time.
-
-The backlog time of server `n` is the remaining service time of its currently
-executing replica plus the service times of all replicas waiting in its CPU queue:
-
-```text
-B_n(t) = R_n(t) + sum(C_q / f_n)
-```
-
-It is normalized with the fixed scale `BACKLOG_TIME_SCALE_SEC = 4.0`:
-
-```text
-normalized_backlog_time = B_n(t) / (B_n(t) + 4.0)
-```
-
-The current task contributes normalized task size and computation demand. The
-state is ordered as `[failure_rates, frequencies, backlog_times, task_size, demand]`,
-so its dimension remains `3N + 2`. With the current eight servers, PPO receives
-26 state features. Backlog time represents CPU service backlog only; network
-input/output delay is not included.
+The task contributes normalized size, normalized computation demand and its
+reliability tier encoded as 0, 1/3, 2/3 or 1. The state is ordered as
+`[failure_rates, frequencies, transmission_rates, running_backlogs,
+waiting_backlogs, task_size, demand, reliability_tier]`: `5N + 3 = 43` features.
+CPU backlogs exclude transmission time.
 
 ## Task arrival process
 
@@ -184,8 +168,7 @@ transitions in task-arrival order:
 ```
 
 `r_k_interval` is the sum of final task outcome rewards that become resolved
-during `[t_k, t_(k+1))`. Individual task rewards still use the unchanged
-`calcReward` formula; completion order does not reorder the PPO rollout. The
+during `[t_k, t_(k+1))`. Individual task rewards are `-task_latency`; completion order does not reorder the PPO rollout. The
 last arrival closes an explicit terminal interval after all pending replicas
 are drained. The drain waits on task-level resolution events instead of using a
 computation-demand value as a simulation-time polling timeout. For this final
@@ -204,33 +187,18 @@ A_k = delta_k + gamma_k * gae_lambda * (1 - done_k) * A_(k+1)
 GAE is computed before PPO minibatch shuffling. DQN and DDPG retain their
 existing transition and discount behavior.
 
-## Transient server-fault model
+## Analytical reliability and task completion
 
-Each Edge or Cloud server has a fixed transient fault arrival rate, `lambda_n`,
-measured in `1/s`. The ranges are configured by
-`EDGE_FAILURE_RATE_RANGE` and `CLOUD_FAILURE_RATE_RANGE` and are sampled once
-when `data/server_info.xlsx` is generated.
+Spatial risk samples one Gaussian field per episode with physical correlation
+length 0.5 km and beta 0.5. Effective failure intensity is
+`lambda_eff = lambda_0 * exp(beta * Z - beta**2 / 2)`.
+With spatial risk disabled, the base failure intensity is used directly.
 
-For a task replica with computation demand `C_i` running on a server with
-processing frequency `f_n`, the execution interval is:
-
-```text
-t_i,n = C_i / f_n
-```
-
-The probability that at least one transient server fault occurs during that
-interval is:
-
-```text
-P(replica failure) = 1 - exp(-lambda_n * t_i,n)
-```
-
-The simulator samples this probability independently for the primary and backup
-replicas. A `failure` status means that the current replica execution failed due
-to a transient fault. The server does not enter a permanent DOWN state, and the
-fault recovery interval is treated as negligible. Therefore later tasks and a
-retry on the same server remain allowed. A task-level failure means that all
-required replicas failed. Correlated or common-cause faults are not modeled.
+Decision-time replica reliability is `exp(-lambda_eff * C / f)`. Pair reliability
+is `1 - (1 - R_A) * (1 - R_B)`, and requirement satisfaction compares this snapshot
+against the task's raw requirement. Reliability does not mask actions or affect
+physical completion: both replicas transmit and queue independently; the first
+CPU finish completes the task, and the losing replica continues to completion.
 
 ---
 
@@ -241,7 +209,7 @@ that learning algorithms can be replaced without modifying the environment logic
 
 - **Discrete-action agents (DQN / PPO):**
   ```text
-  select_action(state) -> int
+  select_action(state, epsilon) -> int
   ```
 
 - **Continuous scoring agents (DDPG):**
@@ -277,7 +245,7 @@ simulation environment or episode loop.
 ## Notes
 
 - All scripts should be executed from the **project root**.
-- Input data (`data/`) and experiment outputs (`results/`) are generated automatically
-  and are not expected to be present in the repository.
+- Frozen input profiles and saved experiment outputs are tracked in the repository.
+  Regenerate or overwrite them only when explicitly required.
 - Root-level launcher scripts are provided to avoid Python import issues when running
   utility modules.

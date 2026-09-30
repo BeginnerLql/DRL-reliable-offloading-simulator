@@ -1,6 +1,4 @@
 # server.py
-import math
-
 import simpy
 
 
@@ -23,20 +21,5 @@ class Server:
         self.processing_frequency = float(processing_frequency)
         self.base_failure_rate = float(base_failure_rate)
         self.transmission_rate = float(transmission_rate)
-        self.latitude = self._validate_coordinate(latitude, "latitude", -90.0, 90.0)
-        self.longitude = self._validate_coordinate(longitude, "longitude", -180.0, 180.0)
-
-    @staticmethod
-    def _validate_coordinate(value, name, minimum, maximum):
-        try:
-            coordinate = float(value)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"{name} must be a finite number") from exc
-
-        if not math.isfinite(coordinate):
-            raise ValueError(f"{name} must be a finite number")
-        if not minimum <= coordinate <= maximum:
-            raise ValueError(
-                f"{name} must be in [{minimum}, {maximum}], got {coordinate}"
-            )
-        return coordinate
+        self.latitude = float(latitude)
+        self.longitude = float(longitude)
