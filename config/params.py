@@ -30,7 +30,8 @@ class params:
     SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
     SPATIAL_CORRELATION_LENGTH_KM = parameters.SPATIAL_CORRELATION_LENGTH_KM
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
-    MASTER_SEED = parameters.MASTER_SEED
+    PROFILE_SEED = parameters.PROFILE_SEED
+    EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
 
     # State/action dimensions for the current observation and unordered pairs.
     num_states = 5 * NUM_SERVERS + 3

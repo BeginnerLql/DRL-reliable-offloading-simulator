@@ -44,7 +44,9 @@ class parameters:
     # TEMPORARY exploratory calibration value.
     # Not yet a literature-calibrated final experiment parameter.
     SPATIAL_RISK_BETA_P = 0.5
-    MASTER_SEED = 2026
+    # Frozen profile generation and runtime randomness use separate seeds.
+    PROFILE_SEED = 2026
+    EXPERIMENT_SEED = 2026
 
     # RL hyperparameters
 

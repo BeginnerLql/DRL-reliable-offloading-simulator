@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import numpy as np
+import torch
+
 from io_utils.save_parameters_and_logs import save_params_and_logs
 from config.params import params
 from core.main_loop import MainLoop
@@ -77,6 +80,8 @@ def build_model():
 
 def run_simulation():
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    np.random.seed(params.EXPERIMENT_SEED)
+    torch.manual_seed(params.EXPERIMENT_SEED)
     model = build_model()
 
     ml = MainLoop(model, params.total_episodes, params.taskno, params.num_states, params.num_actions)

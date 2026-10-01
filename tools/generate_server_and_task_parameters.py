@@ -93,8 +93,7 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
     reliability_levels = parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
     if num_tasks % len(reliability_levels):
         raise ValueError("taskno must be divisible by the number of reliability levels.")
-    reliability_rng = np.random.default_rng(parameters.MASTER_SEED)
-    reliability_requirements = reliability_rng.permutation(
+    reliability_requirements = np.random.permutation(
         np.repeat(reliability_levels, num_tasks // len(reliability_levels))
     )
 
@@ -126,6 +125,8 @@ def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.Da
 
 def main() -> None:
     """Write server and task parameter files into the data directory."""
+    random.seed(parameters.PROFILE_SEED)
+    np.random.seed(parameters.PROFILE_SEED)
     ensure_dirs()
     generate_server_info(Path(DATA_DIR) / "server_info.xlsx")
     generate_task_params(Path(DATA_DIR) / "task_parameters.xlsx")

@@ -45,7 +45,8 @@ class MainLoop:
 
         self.env = None
         self.env_state = None
-        self.spatial_risk_rng = np.random.default_rng(params.MASTER_SEED)
+        self.arrival_rng = np.random.default_rng(params.EXPERIMENT_SEED)
+        self.spatial_risk_rng = np.random.default_rng(params.EXPERIMENT_SEED + 1)
         self.log_data = []
         self.task_results = []
 
@@ -163,7 +164,7 @@ class MainLoop:
         """Sample one inter-arrival time for the common Poisson workload."""
         arrival_rate = float(params.TASK_ARRIVAL_RATE)
         return float(
-            np.random.exponential(scale=1.0 / arrival_rate)
+            self.arrival_rng.exponential(scale=1.0 / arrival_rate)
         )
 
     # epsilon schedule (DQN only; PPO ignores epsilon in its select_action signature)

@@ -77,6 +77,12 @@ python pre_process.py
 ```
 
 This script generates all required Excel files into the `data/` directory.
+`PROFILE_SEED` controls server/task profile generation.
+
+`EXPERIMENT_SEED` controls PPO initialization, action sampling and minibatch
+shuffling, plus the environment arrival and spatial fields. Arrival and spatial
+fields use dedicated environment RNGs, so PPO random-number consumption does
+not change either environment trace.
 
 ---
 
@@ -181,7 +187,7 @@ E[Delta_T_k] = 1 / lambda_a
 ```
 
 The simulator samples each interval with
-`np.random.exponential(scale=1.0 / TASK_ARRIVAL_RATE)` and keeps the resulting
+`self.arrival_rng.exponential(scale=1.0 / TASK_ARRIVAL_RATE)` and keeps the resulting
 floating-point value. With the current `TASK_ARRIVAL_RATE = 0.5` tasks/s, the
 mean inter-arrival time is 2.0 seconds.
 
