@@ -84,7 +84,7 @@ def run_simulation():
 
     save_params_and_logs(
         params, ml.log_data, ml.task_results,
-        run_id=run_id, experiment_tag=params.EXPERIMENT_TAG,
+        run_id=run_id,
     )
 
 

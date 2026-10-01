@@ -8,13 +8,13 @@ from openpyxl.chart import LineChart, Reference
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
-def save_params_and_logs(params, log_data, task_results, run_id, experiment_tag):
+def save_params_and_logs(params, log_data, task_results, run_id):
     ensure_dirs()
 
     model_name = str(params.model_summary).strip().lower()
 
     filename = os.path.join(
-        RESULTS_DIR, f"{model_name}_{run_id}_{experiment_tag}.xlsx",
+        RESULTS_DIR, f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.xlsx",
     )
 
     servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
@@ -24,7 +24,7 @@ def save_params_and_logs(params, log_data, task_results, run_id, experiment_tag)
     task_df = pd.read_excel(task_path)
 
     params_data = {attr: [value] for attr, value in vars(params).items()}
-    params_data.update({"run_id": [run_id], "experiment_tag": [experiment_tag]})
+    params_data["run_id"] = [run_id]
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
 

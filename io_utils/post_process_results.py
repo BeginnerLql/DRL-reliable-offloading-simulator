@@ -28,7 +28,7 @@ def process_all_results(root_dir: str):
         metadata = {
             "Model": params_map["model_summary"],
             "Run_ID": params_map["run_id"],
-            "Experiment_Tag": params_map["experiment_tag"],
+            "Experiment_Tag": params_map["EXPERIMENT_TAG"],
             "Source_File": path.name,
         }
         summaries.append({

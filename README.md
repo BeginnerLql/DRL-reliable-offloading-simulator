@@ -99,7 +99,7 @@ files cannot be overwritten: a filename collision raises `FileExistsError`.
 
 Each experiment workbook contains five sheets:
 
-- `Params`: the configuration snapshot plus `run_id` and `experiment_tag`.
+- `Params`: the configuration snapshot plus `run_id` and `EXPERIMENT_TAG`.
 - `Tasks`: the full task profile snapshot used for this experiment.
 - `Servers`: the full server profile snapshot used for this experiment.
 - `Logs`: episode-level reward and mean task latency.
