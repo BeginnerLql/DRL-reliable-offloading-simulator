@@ -1,4 +1,3 @@
-# server.py
 import simpy
 
 

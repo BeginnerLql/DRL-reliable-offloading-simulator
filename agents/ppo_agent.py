@@ -1,10 +1,3 @@
-# PPO_template.py
-# Project-specific PPO implementation (on-policy), designed to work with the existing simulation codebase.
-# Notes:
-# - Rollout buffer is collected within an episode.
-# - train_step() is intended to run at the end of the episode.
-# - Function signatures keep compatibility with the DQN interface used elsewhere in the project.
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -13,17 +6,14 @@ from torch.distributions import Categorical
 
 
 class PPOPolicyNetwork(nn.Module):
-    # Actor network: maps state -> action logits
     def __init__(self, input_dim, output_dim, hidden_layers, activation="tanh"):
         super(PPOPolicyNetwork, self).__init__()
         layers = []
         prev_dim = input_dim
 
-        # Build MLP body
         for h in hidden_layers:
             layers.append(nn.Linear(prev_dim, h))
 
-            # Activation selection
             if activation == "relu":
                 layers.append(nn.ReLU())
             elif activation == "leaky_relu":
@@ -39,23 +29,19 @@ class PPOPolicyNetwork(nn.Module):
         self.output_layer = nn.Linear(prev_dim, output_dim)
 
     def forward(self, x):
-        # Returns action logits (Categorical distribution will be formed from logits)
         x = self.hidden_layers(x)
-        return self.output_layer(x)  # logits
+        return self.output_layer(x)
 
 
 class PPOValueNetwork(nn.Module):
-    # Critic network: maps state -> scalar value V(s)
     def __init__(self, input_dim, hidden_layers, activation="tanh"):
         super(PPOValueNetwork, self).__init__()
         layers = []
         prev_dim = input_dim
 
-        # Build MLP body
         for h in hidden_layers:
             layers.append(nn.Linear(prev_dim, h))
 
-            # Activation selection
             if activation == "relu":
                 layers.append(nn.ReLU())
             elif activation == "leaky_relu":
@@ -71,19 +57,12 @@ class PPOValueNetwork(nn.Module):
         self.output_layer = nn.Linear(prev_dim, 1)
 
     def forward(self, x):
-        # Squeeze last dimension to return shape [batch] instead of [batch, 1]
         x = self.hidden_layers(x)
-        return self.output_layer(x).squeeze(-1)  # V(s)
+        return self.output_layer(x).squeeze(-1)
 
 
 class PPOAgent:
-    """
-    Project-specific PPO agent (on-policy).
-
-    Key assumptions in this project:
-    - Rollout data is collected only for the current episode.
-    - train_step() is called at the end of the episode.
-    """
+    """On-policy PPO collected and trained once per episode."""
 
     def __init__(
         self,
@@ -99,16 +78,15 @@ class PPOAgent:
         batch_size=64,
         entropy_coef=0.01,
         reward_scale=1.0,
-        gae_lambda=0.95,        # GAE coefficient for ordered event-driven rollout
+        gae_lambda=0.95,  # GAE for the ordered event-driven rollout
         value_loss_coef=0.5,
         max_grad_norm=0.5,
         activation="tanh",
-        min_rollout=8,          # Minimum number of transitions required before performing an update
+        min_rollout=8,  # Minimum transitions per update
     ):
         self.device = torch.device(device)
         self.num_actions = num_actions
 
-        # PPO / RL hyperparameters
         self.gamma = gamma
         self.clip_eps = clip_eps
         self.k_epochs = k_epochs
@@ -120,9 +98,7 @@ class PPOAgent:
         self.max_grad_norm = max_grad_norm
         self.min_rollout = int(min_rollout)
 
-        # Policy networks:
-        # - policy_net: trainable policy
-        # - policy_old: frozen snapshot used for sampling and stable old log-prob computation
+        # policy_old is frozen during rollout sampling and log-prob computation.
         self.policy_net = PPOPolicyNetwork(
             num_states, num_actions, hidden_layers, activation
         ).to(self.device)
@@ -132,12 +108,10 @@ class PPOAgent:
         ).to(self.device)
         self.policy_old.load_state_dict(self.policy_net.state_dict())
 
-        # Value network (critic)
         self.value_net = PPOValueNetwork(
             num_states, hidden_layers, activation
         ).to(self.device)
 
-        # Separate optimizers for actor and critic
         self.optimizer_policy = optim.Adam(self.policy_net.parameters(), lr=actor_lr)
         self.optimizer_value = optim.Adam(self.value_net.parameters(), lr=critic_lr)
 
@@ -150,22 +124,11 @@ class PPOAgent:
         self.old_log_probs = []
         self.delta_times = []
 
-    # -----------------------------
-    # utilities
-    # -----------------------------
     def _to_tensor(self, x):
-        # Convert numpy-like input to float32 tensor on target device
         return torch.tensor(np.array(x), dtype=torch.float32, device=self.device)
 
-    # -----------------------------
-    # action selection
-    # -----------------------------
     def select_action(self, state, epsilon):
-        """
-        PPO action selection.
-        NOTE: The signature matches other agents in this project for compatibility.
-              epsilon is unused by PPO.
-        """
+        """Sample from policy_old; epsilon is unused by PPO."""
         state_tensor = self._to_tensor(state).unsqueeze(0)
         with torch.no_grad():
             # Sample from policy_old for more stable on-policy behavior
@@ -174,9 +137,6 @@ class PPOAgent:
             action = dist.sample()
         return int(action.item())
 
-    # -----------------------------
-    # store transition
-    # -----------------------------
     def store_transition(self, s, a, r, s_next, delta_t, done=False):
         """Store one arrival-ordered SMDP transition.
 
@@ -200,9 +160,6 @@ class PPOAgent:
             a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
             self.old_log_probs.append(float(dist.log_prob(a_tensor).item()))
 
-    # -----------------------------
-    # training: end of episode
-    # -----------------------------
     def train_step(self):
         """Optimize the arrival-ordered event-driven PPO rollout."""
         N = len(self.states)
@@ -315,11 +272,7 @@ class PPOAgent:
         self.policy_old.load_state_dict(self.policy_net.state_dict())
         self.clear_rollout()
 
-    # -----------------------------
-    # saving / loading
-    # -----------------------------
     def save_model(self, path):
-        # Save actor/critic parameters and optimizer states
         torch.save(
             {
                 "policy_net": self.policy_net.state_dict(),
@@ -332,7 +285,6 @@ class PPOAgent:
         )
 
     def load_model(self, path):
-        # Load actor/critic parameters and (optionally) optimizer states
         checkpoint = torch.load(path, map_location=self.device)
         self.policy_net.load_state_dict(checkpoint["policy_net"])
         if "policy_old" in checkpoint:
@@ -345,11 +297,7 @@ class PPOAgent:
         if "opt_value" in checkpoint:
             self.optimizer_value.load_state_dict(checkpoint["opt_value"])
 
-    # -----------------------------
-    # rollout management
-    # -----------------------------
     def clear_rollout(self):
-        # Clear per-episode rollout buffer
         self.states.clear()
         self.actions.clear()
         self.rewards.clear()

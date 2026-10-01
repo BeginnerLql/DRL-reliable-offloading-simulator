@@ -1,9 +1,3 @@
-# mainLoop.py  (multi-model: DDPG / DQN / PPO)
-# - MainLoop signature simplified: no external buffer
-# - DDPG uses model.policy() -> scores -> argmax -> (server_A, server_B)
-# - DQN/PPO use model.select_action(state, epsilon) -> pair action index
-# - PPO trains once at end of episode; DQN trains online
-
 from itertools import combinations
 
 from core.server import Server
@@ -43,7 +37,7 @@ class MainLoop:
         self.episodic_reward = 0
         self.episodic_delay = 0
 
-        # Legacy DQN/DDPG buffer: tempbuffer[taskCounter] = (s, a, r, s')
+        # DQN/DDPG task transitions: tempbuffer[taskCounter] = (s, a, r, s')
         self.tempbuffer = {}
         self.taskCounter = 1
         self.pendingList = []
@@ -61,7 +55,6 @@ class MainLoop:
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
         self.ppo_last_resolved_outcome_time = None
-
 
     def _load_run_profiles(self):
         """Load the immutable server/task profiles for this run."""
@@ -107,9 +100,6 @@ class MainLoop:
             for _, row in frame.iterrows()
         }
 
-    # ---------------------------
-    # EPISODE LOOP
-    # ---------------------------
     def EP(self):
         while self.this_episode < self.total_episodes:
             self.this_episode += 1
@@ -134,7 +124,6 @@ class MainLoop:
             self.env.run()
             for task in sorted(self.env_state.tasks.values(), key=lambda item: item.id):
                 self.task_results.append(self.get_task_outcome_info(task))
-
 
     def _initialize_episode_spatial_risk(self):
         """Sample and store one quasi-static spatial risk field for this episode."""
@@ -170,7 +159,6 @@ class MainLoop:
             effective_failure_rates,
         )
 
-
     def _sample_interarrival_time(self):
         """Sample one inter-arrival time for the common Poisson workload."""
         arrival_rate = float(params.TASK_ARRIVAL_RATE)
@@ -178,29 +166,25 @@ class MainLoop:
             np.random.exponential(scale=1.0 / arrival_rate)
         )
 
-    # ---------------------------
     # epsilon schedule (DQN only; PPO ignores epsilon in its select_action signature)
-    # ---------------------------
+
     def get_epsilon(self, episode):
         if self.model_name != "dqn":
             return 0.0
         eps_start = params.epsilon_start_dqn
         eps_end = params.epsilon_end_dqn
         eps_decay = params.epsilon_decay_dqn
-        # linear decay 
+
         return max(eps_end, eps_start - (episode / float(eps_decay)))
 
-    # ---------------------------
-    # MAIN SIMULATION ITERATION
-    # ---------------------------
     def Iteration(self):
         while self.taskCounter <= self.maxTask:
             yield self.env.timeout(self._sample_interarrival_time())
             current_time = float(self.env.now)
 
             # PPO closes the previous arrival-to-arrival interval before
-            # observing the new task. Other algorithms keep their original
-            # task-centric bookkeeping path below.
+            # observing the new task. DQN/DDPG use
+            # task-centric bookkeeping below.
             if self.model_name == "ppo":
                 self._collect_resolved_task_outcomes()
 
@@ -224,15 +208,13 @@ class MainLoop:
                     self.ppo_interval_reward = 0.0
             elif self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
-                # resolved tasks using the legacy DQN/DDPG path.
+                # resolved DQN/DDPG task transitions.
                 prev = list(self.tempbuffer[self.taskCounter - 1])
                 prev[3] = self.G_state
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
                 self.add_train()
 
-            # -------- action selection --------
             if self.model_name == "ddpg":
-                # DDPG outputs continuous scores over actions.
                 action_scores = self.model.policy(self.G_state)
                 self.G_action = action_scores.numpy().tolist()
                 self.G_action = self.model.addNoise(
@@ -240,12 +222,12 @@ class MainLoop:
                 )
                 server_A, server_B = self.extract_parameters_from_action(self.G_action)
             else:
-                # DQN/PPO output a discrete action index.
                 eps = self.get_epsilon(self.this_episode)
                 action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
 
+            # Freeze the decision-time reliability snapshot before execution.
             task.replica_A_reliability = (
                 self.env_state.compute_replica_reliability(task, server_A)
             )
@@ -261,7 +243,7 @@ class MainLoop:
                 self.ppo_last_decision_action = self.G_action
                 self.ppo_last_decision_time = current_time
             else:
-                # Store the legacy task-centric transition for DQN/DDPG.
+                # Store the DQN/DDPG task transition.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
             self.env.process(task.execute_task(server_A, server_B))
@@ -269,7 +251,7 @@ class MainLoop:
             self.taskCounter += 1
 
         if self.model_name != "ppo":
-            # Preserve the legacy final next-state placeholder for DQN/DDPG.
+            # The final DQN/DDPG transition uses the last observed state.
             if self.taskCounter > 1:
                 last = list(self.tempbuffer[self.taskCounter - 1])
                 last[3] = self.G_state
@@ -296,7 +278,6 @@ class MainLoop:
             # PPO remains on-policy and updates once after the episode.
             self.model.train_step()
 
-        # episode logs
         task_avg_delay = self.episodic_delay / self.maxTask
         self.log_data.append((
             self.this_episode,
@@ -391,9 +372,6 @@ class MainLoop:
                 task_counter, task_reward, outcome_info["task_latency"]
             )
 
-    # ---------------------------
-    # TRAINING (multi-model)
-    # ---------------------------
     def add_train(self):
         if self.model_name == "ppo":
             self._collect_resolved_task_outcomes()
@@ -415,7 +393,6 @@ class MainLoop:
             s, a, r, s_ = self.tempbuffer[task_counter]
 
             if self.model_name == "ddpg":
-                # a is the score-vector (len=num_actions) -> OK for ddpg buffer
                 self.model.buffer.record((s, a, r, s_))
                 self.model.buffer.learn()
                 self.model.update_target(self.model.target_actor.variables, self.model.actor_model.variables)
@@ -427,9 +404,6 @@ class MainLoop:
 
             self._finalize_resolved_task(task_counter, reward, delay)
 
-    # ---------------------------
-    # SERVERS 
-    # ---------------------------
     def setServers(self):
         """Create fresh episode-level servers from run-level profiles."""
         for server_id, profile in self.server_profiles.items():
@@ -445,9 +419,6 @@ class MainLoop:
             )
             self.env_state.add_server_and_init_environment(server)
 
-    # ---------------------------
-    # ACTION DECODING
-    # ---------------------------
     def extract_parameters_from_index(self, action_index: int):
         server_A_id, server_B_id = self.index_of_actions[int(action_index)]
         server_A = self.env_state.get_server_by_id(server_A_id)
@@ -455,13 +426,9 @@ class MainLoop:
         return server_A, server_B
 
     def extract_parameters_from_action(self, action_scores_list):
-        # DDPG: choose argmax index from continuous scores
         max_index = int(action_scores_list.index(max(action_scores_list)))
         return self.extract_parameters_from_index(max_index)
 
-    # ---------------------------
-    # ACTION INDEX LIST 
-    # ---------------------------
     @staticmethod
     def generate_combinations():
         index_of_actions = list(

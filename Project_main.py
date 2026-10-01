@@ -1,24 +1,10 @@
-# Project_main.py
-# ------------------------------------------------------------
-# Entry point for the simulator.
-# - Original logic preserved.
-# - Updated imports/paths to match the new modular structure.
-# ------------------------------------------------------------
-
 from io_utils.save_parameters_and_logs import save_params_and_logs
 from config.params import params
 from core.main_loop import MainLoop
 
 
 def build_model():
-    """Build and return the model/agent object based on params.model_summary.
-
-    NOTE:
-      - Replay buffer (if any) is created INSIDE the model (DDPG/DQN).
-      - MainLoop only relies on the agent "contract":
-          * DQN/PPO: select_action(state, epsilon) -> int
-          * DDPG   : policy(state) -> score vector (len=num_actions)
-    """
+    """Build the configured DQN, PPO or DDPG agent."""
     model_name = str(params.model_summary).strip().lower()
 
     if model_name == "ddpg":
@@ -98,7 +84,6 @@ def run_simulation():
 
 def main():
     run_simulation()
-
 
 if __name__ == "__main__":
     main()

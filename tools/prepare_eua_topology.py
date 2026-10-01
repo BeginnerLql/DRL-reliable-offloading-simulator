@@ -17,7 +17,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from config.configuration import parameters
 
-
 EARTH_RADIUS_KM = 6371.0088
 TOPOLOGY_COLUMNS = ["Server_ID", "Site_ID", "Latitude", "Longitude"]
 
@@ -270,7 +269,6 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> None:
     args = parse_args(argv)
     prepare_topology(args.input, args.output, args.num_servers)
-
 
 if __name__ == "__main__":
     main()

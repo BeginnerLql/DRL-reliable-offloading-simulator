@@ -1,54 +1,33 @@
-# save_parameters_and_logs.py
-# - Fixed base failure rates, fixed local paths only
-# - No Permutation_Number
-# - Reads Excel input files ONLY from data/
-# - Writes results per model
-# - Creates Excel-native charts (no PNG files)
-# - Writes one TaskResults row per task after both replicas finish
+"""Write task outcomes after both replicas finish, with fixed-schema logs."""
 
 import os
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.chart import LineChart, Reference
 
-
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
 def save_params_and_logs(params, log_data, task_results):
-    # Always write/read relative to project_root, not cwd, not this script's folder.
     ensure_dirs()
 
     model_name = str(params.model_summary).strip().lower()
 
-    # ---------------------------
-    # Results folder + filename
-    # ---------------------------
     results_dir = os.path.join(RESULTS_DIR, "fixed_rate_results")
     os.makedirs(results_dir, exist_ok=True)
 
     filename = os.path.join(results_dir, f"{model_name}_results.xlsx")
 
-    # ---------------------------
-    # Load Servers (from data/)
-    # ---------------------------
     servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
     server_info = pd.read_excel(servers_path)
 
-    # ---------------------------
-    # Load Tasks (from data/)
-    # ---------------------------
     task_path = os.path.join(DATA_DIR, "task_parameters.xlsx")
     task_df = pd.read_excel(task_path)
 
-    # ---------------------------
-    # Params dataframe
-    # ---------------------------
     params_data = {attr: [value] for attr, value in vars(params).items()}
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
 
-    # ---------------------------
     # Logs dataframe: one raw episode reward and current episode mean task latency.
     df_logs = pd.DataFrame(
         [
@@ -86,9 +65,6 @@ def save_params_and_logs(params, log_data, task_results):
     ]
     df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
 
-    # ---------------------------
-    # Write Excel
-    # ---------------------------
     with pd.ExcelWriter(filename) as writer:
         df_params.to_excel(writer, sheet_name="Params", index=False)
         task_df.to_excel(writer, sheet_name="Tasks", index=False)
@@ -96,9 +72,6 @@ def save_params_and_logs(params, log_data, task_results):
         df_logs.to_excel(writer, sheet_name="Logs", index=False)
         df_task_results.to_excel(writer, sheet_name="TaskResults", index=False)
 
-    # ---------------------------
-    # Add Excel-native charts
-    # ---------------------------
     wb = load_workbook(filename)
 
     ws_logs = wb["Logs"]

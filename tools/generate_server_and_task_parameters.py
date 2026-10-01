@@ -15,7 +15,6 @@ if str(PROJECT_ROOT) not in sys.path:
 from config.configuration import parameters
 from config.paths import DATA_DIR, ensure_dirs
 
-
 SERVER_INFO_COLUMNS = [
     "Server_ID",
     "Site_ID",
@@ -131,7 +130,6 @@ def main() -> None:
     generate_server_info(Path(DATA_DIR) / "server_info.xlsx")
     generate_task_params(Path(DATA_DIR) / "task_parameters.xlsx")
     print("Parameters defined in Excel files!")
-
 
 if __name__ == "__main__":
     main()

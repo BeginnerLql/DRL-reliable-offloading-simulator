@@ -2,7 +2,7 @@
 
 Baseline commit: `2884d5b83133295b3e93f934fa9cbe64e6613773`.
 Both baseline and current source ran 100 episodes × 200 tasks, using the unchanged PPO configuration and frozen profiles.
-The temporary harness calls `Project_main.build_model()` and `MainLoop.EP()`; outputs are redirected to this verification directory.
+The temporary harness calls `Project_main.build_model()` and `MainLoop.EP()`; outputs were redirected to temporary verification subdirectories.
 Only the verification processes set Python random, global NumPy and PyTorch seeds to 2026 and PyTorch CPU threads to 1. Spatial RNG retains MASTER_SEED=2026.
 No source or permanent seed configuration changed for this verification. Original experiment files remain unchanged.
 
@@ -31,4 +31,4 @@ The historical and current runs have identical Tasks, Servers, all 100 spatial c
 That difference alone is not a cleanup regression; the controlled full-run comparison above isolates the source change and is exactly equal.
 
 Full details: [comparison.json](comparison.json).
-Current run diagnostic: [STEP13_REPORT.md](current/diagnostics/STEP13_REPORT.md).
+The one-off verification workbooks and figures have been removed; the comparison, hashes and conclusions remain in these three verification records.

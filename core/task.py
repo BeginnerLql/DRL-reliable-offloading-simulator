@@ -1,5 +1,6 @@
 """Runtime task initialized from a run-level task profile."""
 
+
 class Task:
     def __init__(self, env, state, task_id, task_profile):
         self.env = env
@@ -41,6 +42,7 @@ class Task:
         process_B = self.env.process(
             self._run_replica(server_B, "replica_B", self.replica_B)
         )
+        # The losing replica continues after first-replica task completion.
         yield self.env.all_of([process_A, process_B])
 
     def _run_replica(self, server, replica_name, replica_info):

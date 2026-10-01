@@ -1,5 +1,6 @@
 """Central configuration for simulator parameters."""
 
+
 class parameters:
     # Experiment
     model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg"
@@ -44,19 +45,18 @@ class parameters:
     SPATIAL_RISK_BETA_P = 0.5
     MASTER_SEED = 2026
 
-    # ======================================================================
     # RL hyperparameters
-    # ======================================================================
-    # ----------- DDPG ----------------
+
+    # DDPG
     std_dev_ddpg = 0.25
-    critic_lr_ddpg = 0.001   #0.002  
-    actor_lr_ddpg = 0.0003 #  0.0005  # 0.0005
-    gamma_ddpg = 0.85 # 0.9
-    tau_ddpg = 0.005 #0.01
-    buffer_capacity_ddpg = 100000 #50000
-    batch_size_ddpg = 256 #64
-    activation_function_ddpg ="softmax" 
-    # ------------- DQN --------------
+    critic_lr_ddpg = 0.001
+    actor_lr_ddpg = 0.0003
+    gamma_ddpg = 0.85
+    tau_ddpg = 0.005
+    buffer_capacity_ddpg = 100000
+    batch_size_ddpg = 256
+    activation_function_ddpg = "softmax"
+    # DQN
     hidden_layers_dqn = [128, 64]
     af_dqn = "relu"
     lr_dqn = 5e-4
@@ -67,7 +67,7 @@ class parameters:
     epsilon_start_dqn = 1.0
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
-    # ----------- PPO --------------
+    # PPO
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4

@@ -16,5 +16,5 @@ No cleanup-induced regression was found in the reviewed code and tested paths.
 - All 15 original protected data/results files retain their original SHA256.
 - No source changes, permanent config changes, commit or push were made during this additional review.
 
-The obsolete post-process schema and historical unseeded workload/policy behavior remain pre-existing limitations; neither was introduced by cleanup.
+At the time of this review, post-processing used an obsolete schema; it has since been migrated to the current result schema. Historical unseeded workload/policy behavior is unchanged.
 This review is evidence for the tested paths, not a proof for every possible input or environment.

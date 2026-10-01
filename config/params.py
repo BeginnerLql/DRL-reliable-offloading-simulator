@@ -2,8 +2,8 @@
 
 from config.configuration import parameters
 
-class params:
 
+class params:
     # Experiment
     model_summary = parameters.model_summary  # Options: "dqn", "ppo", "ddpg"
     total_episodes = parameters.total_episodes
@@ -34,8 +34,8 @@ class params:
     # State/action dimensions for the current observation and unordered pairs.
     num_states = 5 * NUM_SERVERS + 3
     num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
-    
-    # ----------- DDPG ----------------
+
+    # DDPG
     std_dev_ddpg = parameters.std_dev_ddpg
     critic_lr_ddpg = parameters.critic_lr_ddpg
     actor_lr_ddpg = parameters.actor_lr_ddpg
@@ -43,8 +43,8 @@ class params:
     tau_ddpg = parameters.tau_ddpg
     buffer_capacity_ddpg = parameters.buffer_capacity_ddpg
     batch_size_ddpg = parameters.batch_size_ddpg
-    activation_function_ddpg =parameters.activation_function_ddpg
-    # ------------- DQN --------------
+    activation_function_ddpg = parameters.activation_function_ddpg
+    # DQN
     hidden_layers_dqn = parameters.hidden_layers_dqn
     af_dqn = parameters.af_dqn
     lr_dqn = parameters.lr_dqn
@@ -55,7 +55,7 @@ class params:
     epsilon_start_dqn = parameters.epsilon_start_dqn
     epsilon_end_dqn = parameters.epsilon_end_dqn
     epsilon_decay_dqn = parameters.epsilon_decay_dqn
-    # ----------- PPO --------------
+    # PPO
     hidden_layers_ppo = parameters.hidden_layers_ppo
     af_ppo = parameters.af_ppo
     actor_lr_ppo = parameters.actor_lr_ppo

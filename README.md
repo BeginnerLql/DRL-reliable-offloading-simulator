@@ -102,8 +102,28 @@ python diagnostics/plot_spatial_four_tier_run.py
 ```
 
 The diagnostics reconstruct reliability independently and check the saved task
-outcomes. `post_process.py` and `io_utils/post_process_results.py` still depend on
-obsolete result schemas and require a separate migration before use.
+outcomes. The plotting script writes three PNG figures to
+`diagnostics/results/spatial_four_tier_run/`.
+
+### 4) Summarize saved model results
+
+```bash
+python post_process.py
+```
+
+This reads current-schema workbooks from `results/fixed_rate_results/*.xlsx`
+and writes a separate `results/Final_Result_All.xlsx`. Input workbooks are
+unchanged. The output contains:
+
+- `ModelSummary`: episode/task counts, mean episode reward, mean episode latency,
+  overall RSR, mean task latency and P95 task latency for each model.
+- `EpisodeMetrics`: episode reward, mean task latency, task count, RSR and P95
+  task latency, identified by model and source file.
+- `PairSelection`: counts and shares for all unordered server pairs across all
+  task outcomes, including pairs with zero selections.
+
+RSR is the mean of the saved `requirement_satisfied` boolean values; latency is
+measured in seconds. Multiple model workbooks are summarized in the same tables.
 
 ---
 
@@ -191,7 +211,7 @@ existing transition and discount behavior.
 
 Spatial risk samples one Gaussian field per episode with physical correlation
 length 0.5 km and beta 0.5. Effective failure intensity is
-`lambda_eff = lambda_0 * exp(beta * Z - beta**2 / 2)`.
+`lambda_eff = lambda_0 * exp(beta * Z_phy - beta**2 / 2)`.
 With spatial risk disabled, the base failure intensity is used directly.
 
 Decision-time replica reliability is `exp(-lambda_eff * C / f)`. Pair reliability

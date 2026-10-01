@@ -26,8 +26,7 @@ COLORS = {
 
 def save_figure(figure, stem):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    for extension in ("png", "pdf"):
-        figure.savefig(OUTPUT_DIR / f"{stem}.{extension}", dpi=220, bbox_inches="tight")
+    figure.savefig(OUTPUT_DIR / f"{stem}.png", dpi=220, bbox_inches="tight")
     plt.close(figure)
 
 
@@ -183,7 +182,7 @@ def main():
     plot_feasibility_and_rsr(tasks, outcomes, safe_counts)
     plot_performance(outcomes, logs, episodes, pairs)
     plot_spatial_correlation(correlation)
-    print("Saved three Step 13 figures as PNG and PDF in", OUTPUT_DIR)
+    print("Saved three Step 13 figures as PNG in", OUTPUT_DIR)
 
 
 if __name__ == "__main__":

@@ -1,19 +1,7 @@
-"""config.paths
-
-Single source of truth for project paths.
-
-Why?
-- Avoids 'File not found' errors after moving files into folders.
-- Makes the project runnable from ANY working directory.
-
-Rule:
-- NEVER hardcode file paths in core/agents/io/tools.
-- Always build paths from PROJECT_ROOT.
-"""
+"""Central paths resolved relative to the project root."""
 
 import os
 
-# project_root = folder containing Project_main.py
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")

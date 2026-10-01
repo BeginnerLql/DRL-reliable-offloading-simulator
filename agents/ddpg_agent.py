@@ -1,16 +1,9 @@
-# DDPG_template.py  (PyTorch DDPG with INTERNAL replay buffer)
-# - Same overall structure/behavior as your TF template (actor/critic/target + OU noise + replay buffer learning)
-# - Buffer is created INSIDE ddpgModel (__init__) and accessible as dm.buffer
-# - No need to create Buffer externally in Project_main.py
-
 import numpy as np
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-# ---------------------------- Utilities ----------------------------
 
 def _to_torch_tensor(x, dtype=torch.float32, device="cpu"):
     """
@@ -22,12 +15,9 @@ def _to_torch_tensor(x, dtype=torch.float32, device="cpu"):
     return torch.tensor(x, dtype=dtype, device=device)
 
 
-# ---------------------------- Networks ----------------------------
-
 class _BaseNet(nn.Module):
     @property
     def variables(self):
-        # Mimic TF "variables" usage in your code
         return list(self.parameters())
 
 
@@ -43,7 +33,6 @@ class _ActorNet(_BaseNet):
         self.fc2 = nn.Linear(300, 200)
         self.out = nn.Linear(200, num_actions)
 
-        # TF: RandomUniform(minval=-0.003, maxval=0.003) for last layer kernel
         nn.init.uniform_(self.out.weight, a=-0.003, b=0.003)
         nn.init.uniform_(self.out.bias, a=-0.003, b=0.003)
 
@@ -72,14 +61,11 @@ class _CriticNet(_BaseNet):
         self.num_states = num_states
         self.num_actions = num_actions
 
-        # state path
         self.s_fc1 = nn.Linear(num_states, 300)
         self.s_fc2 = nn.Linear(300, 200)
 
-        # action path
         self.a_fc1 = nn.Linear(num_actions, 200)
 
-        # after concat
         self.ln_concat = nn.LayerNorm(400)
         self.c_fc1 = nn.Linear(400, 200)
         self.out = nn.Linear(200, 1)
@@ -95,8 +81,6 @@ class _CriticNet(_BaseNet):
         x = F.relu(self.c_fc1(x))
         return self.out(x)
 
-
-# ---------------------------- OU Noise ----------------------------
 
 class OUActionNoise:
     def __init__(self, mean, std_deviation, theta=0.15, dt=1e-2, x_initial=None):
@@ -120,8 +104,6 @@ class OUActionNoise:
         self.x_prev = self.x_initial if self.x_initial is not None else np.zeros_like(self.mean)
 
 
-# ---------------------------- Replay Buffer ----------------------------
-
 class Buffer:
     def __init__(self, ddpgObj, buffer_capacity=100000, batch_size=64):
         self.ddpgObj = ddpgObj
@@ -143,7 +125,6 @@ class Buffer:
         self.buffer_counter += 1
 
     def update(self, state_batch, action_batch, reward_batch, next_state_batch):
-        # ----- Critic update -----
         with torch.no_grad():
             target_actions = self.ddpgObj.target_actor(next_state_batch)
             y = reward_batch + self.ddpgObj.gamma * self.ddpgObj.target_critic(next_state_batch, target_actions)
@@ -155,7 +136,6 @@ class Buffer:
         critic_loss.backward()
         self.ddpgObj.critic_optimizer.step()
 
-        # ----- Actor update -----
         actions = self.ddpgObj.actor_model(state_batch)
         actor_value = self.ddpgObj.critic_model(state_batch, actions)
         actor_loss = -torch.mean(actor_value)
@@ -179,12 +159,10 @@ class Buffer:
         self.update(state_batch, action_batch, reward_batch, next_state_batch)
 
 
-# ---------------------------- DDPG ----------------------------
-
 class ddpgModel:
     def __init__(self, num_states, num_actions, std_dev, critic_lr, actor_lr, gamma, tau, activationFunction,
                  buffer_capacity=100000, batch_size=64):
-        self.activationFunction = activationFunction  # string: tanh , softmax
+        self.activationFunction = activationFunction
         self.num_states = num_states
         self.num_actions = num_actions
         self.std_dev = std_dev
@@ -195,27 +173,21 @@ class ddpgModel:
 
         self.device = "cpu"
 
-        # OU noise
         self.ou_noise = OUActionNoise(mean=np.zeros(1), std_deviation=float(std_dev) * np.ones(1), theta=0.2)
 
-        # Networks
         self.actor_model = self.get_actor()
         self.critic_model = self.get_critic()
         self.target_actor = self.get_actor()
         self.target_critic = self.get_critic()
 
-        # Hard copy target weights
         self.target_actor.load_state_dict(self.actor_model.state_dict())
         self.target_critic.load_state_dict(self.critic_model.state_dict())
 
-        # Optimizers
         self.critic_optimizer = torch.optim.Adam(self.critic_model.parameters(), lr=self.critic_lr)
         self.actor_optimizer = torch.optim.Adam(self.actor_model.parameters(), lr=self.actor_lr)
 
-        # ✅ Internal replay buffer (no external Buffer needed)
         self.buffer = Buffer(self, buffer_capacity=buffer_capacity, batch_size=batch_size)
 
-    # Soft-update targets
     def update_target(self, target_weights, weights):
         with torch.no_grad():
             for (a, b) in zip(target_weights, weights):

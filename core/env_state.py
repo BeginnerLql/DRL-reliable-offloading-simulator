@@ -1,15 +1,13 @@
-
-"""core.env_state
-Environment state container.
-"""
+"""Server CPU metadata, task objects and episode spatial context."""
 
 import numpy as np
 from config.params import params
 
+
 class EnvironmentState:
     def __init__(self):
         self.servers = {}  # Server objects and CPU backlog metadata.
-        self.tasks = {}  # Dictionary to store generated task objects {task_id: task_object}
+        self.tasks = {}
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None
@@ -18,7 +16,7 @@ class EnvironmentState:
 
     def add_server_and_init_environment(self, server_object):
         """Add a server object to the environment state."""
-        server_id = server_object.server_id  # Extract the server ID from the server object
+        server_id = server_object.server_id
         self.servers[server_id] = {
             'server_object': server_object,
             'waiting_replicas': [],
@@ -120,13 +118,13 @@ class EnvironmentState:
 
     def add_task(self, task_object):
         """Add a task object to the environment state."""
-        task_id = task_object.id  # Extract the task ID from the task object
+        task_id = task_object.id
         self.tasks[task_id] = task_object
 
     def reset(self):
         """Reset the environment state."""
         self.servers = {}
-        self.tasks= {}
+        self.tasks = {}
         self.spatial_risk_server_ids = None
         self.spatial_distance_matrix = None
         self.spatial_correlation_matrix = None
