@@ -23,7 +23,14 @@ def save_params_and_logs(params, log_data, task_results, run_id):
     task_path = os.path.join(DATA_DIR, "task_parameters.xlsx")
     task_df = pd.read_excel(task_path)
 
-    params_data = {attr: [value] for attr, value in vars(params).items()}
+    other_model_suffixes = tuple(
+        f"_{name}" for name in ("ppo", "dqn", "ddpg") if name != model_name
+    )
+    params_data = {
+        attr: [value]
+        for attr, value in vars(params).items()
+        if not attr.startswith("_") and not attr.endswith(other_model_suffixes)
+    }
     params_data["run_id"] = [run_id]
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
