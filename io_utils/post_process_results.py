@@ -15,37 +15,42 @@ def process_all_results(root_dir: str):
     episode_tables = []
     pair_tables = []
 
-    for path in sorted((root / "fixed_rate_results").glob("*.xlsx")):
-        if path.name.startswith("~$"):
+    for path in sorted(root.glob("*.xlsx")):
+        if path.name.startswith("~$") or path.name == "Final_Result_All.xlsx":
             continue
-        model = path.stem.removesuffix("_results")
         with pd.ExcelFile(path) as workbook:
+            params_df = pd.read_excel(workbook, sheet_name="Params")
             logs = pd.read_excel(workbook, sheet_name="Logs")
             outcomes = pd.read_excel(workbook, sheet_name="TaskResults")
             servers = pd.read_excel(workbook, sheet_name="Servers")
 
-        summaries.append({
-            "Model": model,
+        params_map = dict(zip(params_df["Parameter"], params_df["Value"]))
+        metadata = {
+            "Model": params_map["model_summary"],
+            "Run_ID": params_map["run_id"],
+            "Experiment_Tag": params_map["experiment_tag"],
             "Source_File": path.name,
+        }
+        summaries.append({
+            **metadata,
             "Episodes": len(logs),
-            "Tasks": len(outcomes),
+            "Task_Outcomes": len(outcomes),
             "Mean_Episode_Reward": logs["Episode Reward"].mean(),
-            "Mean_Episode_Latency_s": logs["task_Avg_Delay"].mean(),
             "Overall_RSR": outcomes["requirement_satisfied"].mean(),
             "Mean_Task_Latency_s": outcomes["task_latency"].mean(),
             "P95_Task_Latency_s": outcomes["task_latency"].quantile(0.95),
         })
 
         episode_metrics = outcomes.groupby("episode").agg(
-            Tasks=("task_id", "size"),
+            Task_Count=("task_id", "size"),
             RSR=("requirement_satisfied", "mean"),
             P95_Task_Latency_s=("task_latency", lambda values: values.quantile(0.95)),
         )
         episodes = logs[["Episode", "Episode Reward", "task_Avg_Delay"]].merge(
             episode_metrics, left_on="Episode", right_index=True,
         ).sort_values("Episode")
-        episodes.insert(0, "Model", model)
-        episodes.insert(1, "Source_File", path.name)
+        for index, (key, value) in enumerate(metadata.items()):
+            episodes.insert(index, key, value)
         episode_tables.append(episodes)
 
         # Pair order does not distinguish the two replicas.
@@ -60,10 +65,13 @@ def process_all_results(root_dir: str):
         )
         pairs = counts.reindex(all_pairs, fill_value=0).rename("Selections").reset_index()
         pairs["Share"] = pairs["Selections"] / len(outcomes)
-        pairs.insert(0, "Model", model)
-        pairs.insert(1, "Source_File", path.name)
+        for index, (key, value) in enumerate(metadata.items()):
+            pairs.insert(index, key, value)
         pair_tables.append(pairs)
         print(f"Read {path.name}: {len(logs)} episodes, {len(outcomes)} task outcomes")
+
+    if not summaries:
+        raise ValueError("No experiment result workbooks found.")
 
     output_path = root / "Final_Result_All.xlsx"
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:

@@ -86,44 +86,52 @@ This script generates all required Excel files into the `data/` directory.
 python Project_main.py
 ```
 
-Simulation results are automatically written to:
+Each experiment writes a new workbook directly to:
 
-```
-results/fixed_rate_results/<model>_results.xlsx
-```
-
----
-
-### 3) Analyze the saved run
-
-```bash
-python diagnostics/analyze_spatial_four_tier_run.py
-python diagnostics/plot_spatial_four_tier_run.py
+```text
+results/{model}_{run_id}_{experiment_tag}.xlsx
 ```
 
-The diagnostics reconstruct reliability independently and check the saved task
-outcomes. The plotting script writes three PNG figures to
-`diagnostics/results/spatial_four_tier_run/`.
+`run_id` is generated once at experiment startup as `YYYYMMDD_HHMMSS`.
+Set `EXPERIMENT_TAG = "baseline"` in `config/configuration.py` to label a run.
+For example: `results/ppo_20261001_140532_baseline.xlsx`. Existing experiment
+files cannot be overwritten: a filename collision raises `FileExistsError`.
 
-### 4) Summarize saved model results
+Each experiment workbook contains five sheets:
+
+- `Params`: the configuration snapshot plus `run_id` and `experiment_tag`.
+- `Tasks`: the full task profile snapshot used for this experiment.
+- `Servers`: the full server profile snapshot used for this experiment.
+- `Logs`: episode-level reward and mean task latency.
+- `TaskResults`: task-level outcomes in the existing 20-column schema.
+
+### 3) Summarize saved experiments
 
 ```bash
 python post_process.py
 ```
 
-This reads current-schema workbooks from `results/fixed_rate_results/*.xlsx`
-and writes a separate `results/Final_Result_All.xlsx`. Input workbooks are
-unchanged. The output contains:
+This scans `results/*.xlsx`, skipping Excel temporary files and
+`Final_Result_All.xlsx`. Model, run ID and experiment tag are read from each
+workbook's `Params` sheet. The output is `results/Final_Result_All.xlsx`:
 
-- `ModelSummary`: episode/task counts, mean episode reward, mean episode latency,
-  overall RSR, mean task latency and P95 task latency for each model.
-- `EpisodeMetrics`: episode reward, mean task latency, task count, RSR and P95
-  task latency, identified by model and source file.
-- `PairSelection`: counts and shares for all unordered server pairs across all
-  task outcomes, including pairs with zero selections.
+- `ModelSummary`: one row per experiment, with episode/outcome counts, mean
+  episode reward, overall RSR, mean task latency and P95 task latency.
+- `EpisodeMetrics`: per-run episode reward, mean latency, task count, RSR and
+  P95 task latency.
+- `PairSelection`: per-run counts and shares for every unordered server pair,
+  including zero-selection pairs.
 
-RSR is the mean of the saved `requirement_satisfied` boolean values; latency is
-measured in seconds. Multiple model workbooks are summarized in the same tables.
+All three tables include `Model`, `Run_ID`, `Experiment_Tag` and `Source_File`.
+RSR is the mean of the saved `requirement_satisfied` booleans; latency is in
+seconds. `Final_Result_All.xlsx` is a derived summary and may be overwritten
+when regenerated. Individual experiment workbooks are the original records
+and must be preserved. With no input experiment workbooks, post-processing
+raises `ValueError` without replacing the existing summary.
+
+The historical `results/fixed_rate_results/ppo_results.xlsx` remains unchanged.
+New runs do not write there, and post-processing does not scan that directory
+or infer metadata for the historical workbook.
 
 ---
 

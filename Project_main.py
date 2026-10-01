@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from io_utils.save_parameters_and_logs import save_params_and_logs
 from config.params import params
 from core.main_loop import MainLoop
@@ -74,12 +76,16 @@ def build_model():
 
 
 def run_simulation():
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     model = build_model()
 
     ml = MainLoop(model, params.total_episodes, params.taskno, params.num_states, params.num_actions)
     ml.EP()
 
-    save_params_and_logs(params, ml.log_data, ml.task_results)
+    save_params_and_logs(
+        params, ml.log_data, ml.task_results,
+        run_id=run_id, experiment_tag=params.EXPERIMENT_TAG,
+    )
 
 
 def main():

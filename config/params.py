@@ -7,6 +7,7 @@ class params:
     # Experiment
     model_summary = parameters.model_summary  # Options: "dqn", "ppo", "ddpg"
     total_episodes = parameters.total_episodes
+    EXPERIMENT_TAG = parameters.EXPERIMENT_TAG
 
     # Infrastructure
     NUM_SERVERS = parameters.NUM_SERVERS

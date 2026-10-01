@@ -5,6 +5,7 @@ class parameters:
     # Experiment
     model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg"
     total_episodes = 100
+    EXPERIMENT_TAG = "baseline"
 
     # Infrastructure
     NUM_SERVERS = 8

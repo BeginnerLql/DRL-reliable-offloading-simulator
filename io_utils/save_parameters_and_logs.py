@@ -8,15 +8,14 @@ from openpyxl.chart import LineChart, Reference
 from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
 
 
-def save_params_and_logs(params, log_data, task_results):
+def save_params_and_logs(params, log_data, task_results, run_id, experiment_tag):
     ensure_dirs()
 
     model_name = str(params.model_summary).strip().lower()
 
-    results_dir = os.path.join(RESULTS_DIR, "fixed_rate_results")
-    os.makedirs(results_dir, exist_ok=True)
-
-    filename = os.path.join(results_dir, f"{model_name}_results.xlsx")
+    filename = os.path.join(
+        RESULTS_DIR, f"{model_name}_{run_id}_{experiment_tag}.xlsx",
+    )
 
     servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
     server_info = pd.read_excel(servers_path)
@@ -25,6 +24,7 @@ def save_params_and_logs(params, log_data, task_results):
     task_df = pd.read_excel(task_path)
 
     params_data = {attr: [value] for attr, value in vars(params).items()}
+    params_data.update({"run_id": [run_id], "experiment_tag": [experiment_tag]})
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
 
@@ -65,12 +65,14 @@ def save_params_and_logs(params, log_data, task_results):
     ]
     df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
 
-    with pd.ExcelWriter(filename) as writer:
-        df_params.to_excel(writer, sheet_name="Params", index=False)
-        task_df.to_excel(writer, sheet_name="Tasks", index=False)
-        server_info.to_excel(writer, sheet_name="Servers", index=False)
-        df_logs.to_excel(writer, sheet_name="Logs", index=False)
-        df_task_results.to_excel(writer, sheet_name="TaskResults", index=False)
+    # Exclusive creation preserves every existing experiment workbook.
+    with open(filename, "xb") as output:
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df_params.to_excel(writer, sheet_name="Params", index=False)
+            task_df.to_excel(writer, sheet_name="Tasks", index=False)
+            server_info.to_excel(writer, sheet_name="Servers", index=False)
+            df_logs.to_excel(writer, sheet_name="Logs", index=False)
+            df_task_results.to_excel(writer, sheet_name="TaskResults", index=False)
 
     wb = load_workbook(filename)
 
