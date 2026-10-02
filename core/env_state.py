@@ -1,4 +1,4 @@
-"""Server CPU metadata, task objects and episode spatial context."""
+"""Server transmission/CPU metadata, task objects and episode spatial context."""
 
 import numpy as np
 from config.params import params
@@ -19,9 +19,38 @@ class EnvironmentState:
         server_id = server_object.server_id
         self.servers[server_id] = {
             'server_object': server_object,
+            'transmitting_replicas': [],
             'waiting_replicas': [],
             'running_replica': None
         }
+
+    def register_transmitting_replica(
+        self, server_id, task, replica_name, tx_finish_time, service_time
+    ):
+        self.servers[server_id]['transmitting_replicas'].append({
+            'task': task,
+            'replica': replica_name,
+            'tx_finish_time': float(tx_finish_time),
+            'service_time': float(service_time),
+        })
+
+    def finish_replica_transmission(self, server_id, task, replica_name):
+        transmitting = self.servers[server_id]['transmitting_replicas']
+        identity = (task.id, replica_name)
+        match = next(item for item in transmitting
+                     if (item['task'].id, item['replica']) == identity)
+        transmitting.remove(match)
+
+    def get_server_transmission_components(self, server_id, current_time):
+        """Return next CPU-queue arrival delay and future CPU work in seconds."""
+        transmitting = self.servers[server_id]['transmitting_replicas']
+        next_remaining = min(
+            (max(item['tx_finish_time'] - current_time, 0.0)
+             for item in transmitting),
+            default=0.0,
+        )
+        future_workload = sum(item['service_time'] for item in transmitting)
+        return float(next_remaining), float(future_workload)
 
     def register_waiting_replica(self, server_id, task, replica_name, service_time):
         """Register a replica waiting for CPU service on a server."""
@@ -146,6 +175,8 @@ class EnvironmentState:
         transmission_rates = []
         running_backlogs = []
         waiting_backlogs = []
+        next_transmission_times = []
+        future_cpu_workloads = []
 
         frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
         transmission_rate_min = min(params.SERVER_TRANSMISSION_RATES)
@@ -160,11 +191,16 @@ class EnvironmentState:
             running_backlog, waiting_backlog = self.get_server_backlog_components(
                 server_id, task.env.now
             )
+            next_transmission_time, future_cpu_workload = (
+                self.get_server_transmission_components(server_id, task.env.now)
+            )
             failure_rates.append(failure_rate)
             frequencies.append(frequency)
             transmission_rates.append(transmission_rate)
             running_backlogs.append(running_backlog)
             waiting_backlogs.append(waiting_backlog)
+            next_transmission_times.append(next_transmission_time)
+            future_cpu_workloads.append(future_cpu_workload)
 
         scale = params.BACKLOG_TIME_SCALE_SEC
         task_size = float(task.task_size)
@@ -196,6 +232,12 @@ class EnvironmentState:
         normalized_computation_demand = self.normalize(
             computation_demand, demand_min, demand_max
         )
+        normalized_next_transmission_times = np.asarray(next_transmission_times) / (
+            np.asarray(next_transmission_times) + scale
+        )
+        normalized_future_cpu_workloads = np.asarray(future_cpu_workloads) / (
+            np.asarray(future_cpu_workloads) + scale
+        )
 
         state = np.concatenate((
             np.asarray(failure_rates),
@@ -208,5 +250,7 @@ class EnvironmentState:
                 normalized_computation_demand,
                 normalized_reliability_requirement,
             ]),
+            normalized_next_transmission_times,
+            normalized_future_cpu_workloads,
         ))
         return state.astype(np.float32)

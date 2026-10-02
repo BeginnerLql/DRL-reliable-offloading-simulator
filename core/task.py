@@ -48,10 +48,15 @@ class Task:
     def _run_replica(self, server, replica_name, replica_info):
         transmission_rate = self.get_transmission_rate(server)
         transmission_time = self.task_size / transmission_rate
+        service_time = self.computation_demand / server.processing_frequency
+        tx_finish_time = self.env.now + transmission_time
+        self.env_state.register_transmitting_replica(
+            server.server_id, self, replica_name, tx_finish_time, service_time
+        )
         yield self.env.timeout(transmission_time)
 
+        self.env_state.finish_replica_transmission(server.server_id, self, replica_name)
         replica_info["queue_enter_time"] = float(self.env.now)
-        service_time = self.computation_demand / server.processing_frequency
         self.env_state.register_waiting_replica(
             server.server_id, self, replica_name, service_time
         )

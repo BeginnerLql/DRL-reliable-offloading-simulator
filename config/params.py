@@ -34,7 +34,7 @@ class params:
     EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
 
     # State/action dimensions for the current observation and unordered pairs.
-    num_states = 5 * NUM_SERVERS + 3
+    num_states = 7 * NUM_SERVERS + 3
     num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
 
     # DDPG
