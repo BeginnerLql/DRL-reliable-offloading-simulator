@@ -1,10 +1,12 @@
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import torch
 
 from io_utils.save_parameters_and_logs import save_params_and_logs
 from config.params import params
+from config.paths import RESULTS_DIR
 from core.main_loop import MainLoop
 
 
@@ -55,7 +57,7 @@ def build_model():
             num_states=params.num_states,
             num_actions=params.num_actions,
             hidden_layers=params.hidden_layers_ppo,
-            device="cpu",
+            device="cuda",
             gamma=params.gamma_ppo,
             actor_lr=params.actor_lr_ppo,
             critic_lr=params.critic_lr_ppo,
@@ -69,7 +71,7 @@ def build_model():
             max_grad_norm=params.max_grad_norm_ppo,
             activation=params.af_ppo,
         )
-        print("PPOAgent is set.")
+        print(f"PPOAgent is set. Device: {model.device}")
         return model
 
     raise ValueError(
@@ -91,6 +93,10 @@ def run_simulation():
         params, ml.log_data, ml.task_results,
         run_id=run_id,
     )
+    if str(params.model_summary).strip().lower() == "ppo":
+        checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
+        model.save_model(checkpoint_path)
+        print(f"Saved PPO checkpoint: {checkpoint_path}")
 
 
 def main():
