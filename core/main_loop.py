@@ -201,7 +201,9 @@ class MainLoop:
                     self.model.store_transition(
                         self.ppo_last_decision_state,
                         self.ppo_last_decision_action,
-                        self.ppo_interval_reward,
+                        self._get_ppo_interval_reward(
+                            self.ppo_last_decision_time, current_time
+                        ),
                         self.G_state,
                         delta_t=float(delta_t),
                         done=False,
@@ -270,7 +272,9 @@ class MainLoop:
                 self.model.store_transition(
                     self.ppo_last_decision_state,
                     self.ppo_last_decision_action,
-                    self.ppo_interval_reward,
+                    self._get_ppo_interval_reward(
+                        self.ppo_last_decision_time, terminal_time
+                    ),
                     terminal_next_state,
                     delta_t=float(delta_t),
                     done=True,
@@ -345,6 +349,24 @@ class MainLoop:
     def compute_reward(self, outcome_info):
         return -float(outcome_info["task_latency"])
 
+    def _compute_flow_interval_reward(self, interval_start, interval_end):
+        """Charge active-task time using only currently known completions."""
+        reward = 0.0
+        for task in self.env_state.tasks.values():
+            active_start = max(task.arrival_time, interval_start)
+            active_end = interval_end
+            if task.task_completion_time is not None:
+                active_end = min(task.task_completion_time, interval_end)
+            reward -= max(active_end - active_start, 0.0)
+        return reward
+
+    def _get_ppo_interval_reward(self, interval_start, interval_end):
+        if params.PPO_REWARD_MODE == "event":
+            return self.ppo_interval_reward
+        if params.PPO_REWARD_MODE == "flow":
+            return self._compute_flow_interval_reward(interval_start, interval_end)
+        raise ValueError(f"Unsupported PPO_REWARD_MODE: {params.PPO_REWARD_MODE!r}")
+
     def _get_ppo_terminal_time(self):
         """Use the latest actual outcome timestamp for PPO terminal timing."""
         decision_time = float(self.ppo_last_decision_time)
@@ -353,7 +375,7 @@ class MainLoop:
         return max(decision_time, float(self.ppo_last_resolved_outcome_time))
 
     def _collect_resolved_task_outcomes(self):
-        """Accumulate completed task rewards into the current PPO interval."""
+        """Finalize task accounting and accumulate Event-mode interval rewards."""
         for task_counter in list(self.pendingList):
             task = self.env_state.tasks[task_counter]
             if not task.task_completion_event.triggered:
@@ -361,7 +383,8 @@ class MainLoop:
 
             outcome_info = self.get_task_outcome_info(task)
             task_reward = self.compute_reward(outcome_info)
-            self.ppo_interval_reward += task_reward
+            if params.PPO_REWARD_MODE == "event":
+                self.ppo_interval_reward += task_reward
             task_outcome_time = task.task_completion_time
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time

@@ -4,6 +4,8 @@ import torch.optim as optim
 import numpy as np
 from torch.distributions import Categorical
 
+from config.params import params
+
 
 class PPOPolicyNetwork(nn.Module):
     def __init__(self, input_dim, output_dim, hidden_layers, activation="tanh"):
@@ -97,6 +99,12 @@ class PPOAgent:
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
         self.min_rollout = int(min_rollout)
+        self.critic_loss_mode = params.PPO_CRITIC_LOSS_MODE
+        self.critic_max_grad_norm = params.PPO_CRITIC_MAX_GRAD_NORM
+        if self.critic_loss_mode not in ("raw", "mean_centered"):
+            raise ValueError(f"Unsupported PPO_CRITIC_LOSS_MODE: {self.critic_loss_mode}")
+        if not np.isfinite(self.critic_max_grad_norm) or self.critic_max_grad_norm <= 0:
+            raise ValueError("PPO_CRITIC_MAX_GRAD_NORM must be finite and positive")
 
         # policy_old is frozen during rollout sampling and log-prob computation.
         self.policy_net = PPOPolicyNetwork(
@@ -219,6 +227,11 @@ class PPOAgent:
             else:
                 advantages = (advantages - adv_mean) / (adv_std + 1e-8)
 
+        if self.critic_loss_mode == "mean_centered":
+            # Fixed for this update; GAE and actor advantages retain raw values.
+            mu_y = returns.mean().detach()
+            mu_v_ref = values.mean().detach()
+
         batch_size = min(int(self.batch_size), N)
 
         for _ in range(int(self.k_epochs)):
@@ -253,6 +266,8 @@ class PPOAgent:
                 )
 
                 new_values = self.value_net(b_states)
+                if self.critic_loss_mode == "mean_centered":
+                    new_values = mu_y + (new_values - mu_v_ref)
                 value_loss = self.value_loss_coef * nn.MSELoss()(new_values, b_returns)
                 total_loss = policy_loss + value_loss
 
@@ -262,10 +277,22 @@ class PPOAgent:
                 self.optimizer_policy.zero_grad(set_to_none=True)
                 self.optimizer_value.zero_grad(set_to_none=True)
                 total_loss.backward()
-                nn.utils.clip_grad_norm_(
-                    list(self.policy_net.parameters()) + list(self.value_net.parameters()),
-                    self.max_grad_norm,
-                )
+                if params.PPO_GRAD_CLIP_MODE == "joint":
+                    nn.utils.clip_grad_norm_(
+                        list(self.policy_net.parameters()) + list(self.value_net.parameters()),
+                        self.max_grad_norm,
+                    )
+                elif params.PPO_GRAD_CLIP_MODE == "separate":
+                    nn.utils.clip_grad_norm_(
+                        self.policy_net.parameters(), self.max_grad_norm
+                    )
+                    nn.utils.clip_grad_norm_(
+                        self.value_net.parameters(), self.critic_max_grad_norm
+                    )
+                else:
+                    raise ValueError(
+                        f"Unsupported PPO_GRAD_CLIP_MODE: {params.PPO_GRAD_CLIP_MODE}"
+                    )
                 self.optimizer_policy.step()
                 self.optimizer_value.step()
 

@@ -58,6 +58,10 @@ class params:
     epsilon_end_dqn = parameters.epsilon_end_dqn
     epsilon_decay_dqn = parameters.epsilon_decay_dqn
     # PPO
+    PPO_REWARD_MODE = parameters.PPO_REWARD_MODE
+    PPO_GRAD_CLIP_MODE = parameters.PPO_GRAD_CLIP_MODE
+    PPO_CRITIC_LOSS_MODE = parameters.PPO_CRITIC_LOSS_MODE
+    PPO_CRITIC_MAX_GRAD_NORM = parameters.PPO_CRITIC_MAX_GRAD_NORM
     hidden_layers_ppo = parameters.hidden_layers_ppo
     af_ppo = parameters.af_ppo
     actor_lr_ppo = parameters.actor_lr_ppo

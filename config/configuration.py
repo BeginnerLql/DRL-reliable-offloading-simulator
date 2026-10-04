@@ -71,6 +71,10 @@ class parameters:
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
     # PPO
+    PPO_REWARD_MODE = "event"  # Options: "event", "flow"
+    PPO_GRAD_CLIP_MODE = "joint"  # Options: "joint", "separate"
+    PPO_CRITIC_LOSS_MODE = "raw"  # Options: "raw", "mean_centered"
+    PPO_CRITIC_MAX_GRAD_NORM = 0.5
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4
