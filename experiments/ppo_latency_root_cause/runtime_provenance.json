@@ -1,0 +1,142 @@
+{
+  "source_commit": "55743b565bba1f538a298edbb10b95d6b6928970",
+  "historical_head": "9ee3714c6cb2689f0f4b6907b6436d67cb80c9e9",
+  "scope": "Verified 6H-2 runtime configuration; this is a provenance/config file, not an executable or a verbatim copy of the original runner.",
+  "original_sources": {
+    "/tmp/6h2_runner.py": {
+      "sha256": "6226ce2e866245167a512181612b22cc6dfd98f4462877a1a39fcb9ec4f9041e"
+    },
+    "/tmp/6h1_smoke.py": {
+      "sha256": "e39db7bd60a28acf8c40bbdb079ac3752760d4928351c0660fa6d9fd28632ca6"
+    },
+    "/tmp/6h2_grid.py": {
+      "sha256": "fa7ec94532068e093891d82ea56e4ad41724fced658cd84a6ee9d79190c775f4"
+    }
+  },
+  "original_runner_dependency": "6h2_runner.py executes the prefix of /tmp/6h1_smoke.py before def collect_fixed(); that prefix also loads /tmp/6h1_ppo_agent.py. No diagnostic hooks or historical agent copy are archived here.",
+  "evidence": {
+    "summary_workbook": "results/6h2_2x2_10seed_summary.xlsx",
+    "summary_sha256": "56dc0b57d916eb937f7abe87ab7a71d2da7d111bab698efc13183571eb781e27",
+    "mapping_sheet": "run_mapping",
+    "parameters_sheet": "Params in each of the 40 mapped workbooks",
+    "checked_workbooks": 40,
+    "checked_parameter_values_excluding_run_id": 1520,
+    "temporary_run_records": "/tmp/6h2_train_{arm}_{seed}.json: arm, seed, checkpoint, workbook and 100 episode rows matched.",
+    "source_match": "All four production source SHA-256 values match /tmp/6h2_before.json.",
+    "regression": "A/2026 matched the historical Separate-g1 networks and optimizer state; gate passed with no parameter mismatch."
+  },
+  "training": {
+    "seed_range": {
+      "first": 2026,
+      "last": 2035
+    },
+    "runtime_parameters_common": {
+      "model_summary": "ppo",
+      "total_episodes": 100,
+      "NUM_SERVERS": 8,
+      "SERVER_TRANSMISSION_RATES": "(20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 45.0, 50.0)",
+      "TASK_SIZE_RANGE": "(10, 100)",
+      "TASK_RELIABILITY_REQUIREMENT_LEVELS": "(0.9, 0.99, 0.999, 0.9999)",
+      "Low_demand": 1,
+      "High_demand": 100,
+      "taskno": 200,
+      "TASK_ARRIVAL_RATE": 0.5,
+      "SERVER_PROCESSING_FREQ_RANGE": "(10, 15)",
+      "SERVER_FAILURE_RATE_RANGE": "(0.001, 0.005)",
+      "BACKLOG_TIME_SCALE_SEC": 4,
+      "SPATIAL_RISK_ENABLED": true,
+      "SPATIAL_CORRELATION_LENGTH_KM": 0.5,
+      "SPATIAL_RISK_BETA_P": 0.5,
+      "PROFILE_SEED": 2026,
+      "num_states": 59,
+      "num_actions": 28,
+      "PPO_REWARD_MODE": "event",
+      "PPO_GRAD_CLIP_MODE": "separate",
+      "hidden_layers_ppo": "[64, 32]",
+      "af_ppo": "tanh",
+      "actor_lr_ppo": 0.0001,
+      "critic_lr_ppo": 0.0005,
+      "gamma_ppo": 1,
+      "clip_eps_ppo": 0.2,
+      "k_epochs_ppo": 2,
+      "batch_size_ppo": 64,
+      "entropy_coef_ppo": 0.01,
+      "reward_scale_ppo": 1,
+      "gae_lambda_ppo": 0.95,
+      "value_loss_coef_ppo": 0.5,
+      "max_grad_norm_ppo": 0.5
+    },
+    "arms": {
+      "A": {
+        "PPO_CRITIC_LOSS_MODE": "raw",
+        "PPO_CRITIC_MAX_GRAD_NORM": 0.5,
+        "tag_suffix": "raw_c05"
+      },
+      "B": {
+        "PPO_CRITIC_LOSS_MODE": "raw",
+        "PPO_CRITIC_MAX_GRAD_NORM": 5,
+        "tag_suffix": "raw_c5"
+      },
+      "C": {
+        "PPO_CRITIC_LOSS_MODE": "mean_centered",
+        "PPO_CRITIC_MAX_GRAD_NORM": 0.5,
+        "tag_suffix": "center_c05"
+      },
+      "D": {
+        "PPO_CRITIC_LOSS_MODE": "mean_centered",
+        "PPO_CRITIC_MAX_GRAD_NORM": 5,
+        "tag_suffix": "center_c5"
+      }
+    },
+    "selection": {
+      "EXPERIMENT_SEED": "selected training seed",
+      "EXPERIMENT_TAG": "6h2_{arm}_{tag_suffix}_s{seed}",
+      "overrides": "Start with typed config.params.params from source_commit, then apply original_config_function(arm, seed) before constructing PPOAgent. runtime_parameters_common records the effective workbook values; tuple/list fields retain their workbook string representation and are not direct assignment values.",
+      "constructor": "PPOAgent with the PPO runtime parameters; MainLoop(model, 100, 200, 59, 28)."
+    },
+    "runtime_execution": {
+      "device": "cuda",
+      "torch_threads": 1,
+      "numpy_global_seed": "np.random.seed(params.EXPERIMENT_SEED) before network construction",
+      "torch_seed": "torch.manual_seed(params.EXPERIMENT_SEED) before network construction",
+      "arrival_seed": "params.EXPERIMENT_SEED",
+      "spatial_seed": "params.EXPERIMENT_SEED + 1",
+      "fresh_process_per_arm_and_seed": true,
+      "train_order": "A/2026 regression first; then seeds 2026..2035, arms A/B/C/D, skipping the completed A/2026.",
+      "historical_gpu": "NVIDIA GeForce RTX 5060"
+    },
+    "original_config_function": "def config(arm,seed):\n    mode,threshold,tag=ARM_CONFIG[arm]\n    params.EXPERIMENT_SEED=seed;params.PROFILE_SEED=2026\n    params.PPO_CRITIC_LOSS_MODE=mode;params.PPO_CRITIC_MAX_GRAD_NORM=threshold\n    params.PPO_GRAD_CLIP_MODE='separate';params.PPO_REWARD_MODE='event';params.gamma_ppo=1.\n    params.total_episodes=100;params.EXPERIMENT_TAG=f'6h2_{arm}_{tag}_s{seed}'"
+  },
+  "frozen_evaluation": {
+    "policies": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "Uniform Random"
+    ],
+    "episodes_per_policy_and_training_seed": 50,
+    "tasks_per_episode": 200,
+    "arrival_seed_range": {
+      "first": 3000,
+      "last": 3049
+    },
+    "spatial_seed_range": {
+      "first": 3001,
+      "last": 3050
+    },
+    "ppo_action_seed": "100000 + 1000*(training_seed-2026) + eval_episode_index",
+    "random_action_seed": "200000 + 1000*(training_seed-2026) + eval_episode_index",
+    "optimizer_updates": 0
+  },
+  "profile_sha256": {
+    "data/server_info.xlsx": "039073ccbfd1a146d6905f7b07f0f570c11dee8c3c58aae5c4261f89d8b6b512",
+    "data/task_parameters.xlsx": "124963a10bad3952acc031374017ae2471c4df428aa05afb9a9b43ea1b6bfed6"
+  },
+  "historical_5C_6B": {
+    "status": "Original formal 5C/6B /tmp runners are no longer present. They are not reconstructed or archived as original runners.",
+    "Separate_g1": "6H-2 A/2026 has a verified full regression against results/ppo_20261003_135634_txstate59_event_g1_sepclip.pt and its workbook.",
+    "Event_g1": "Not selectable as a historical 5C run from this 6H-2-only config.",
+    "Flow_g1": "Not selectable as a historical 5C run from this 6H-2-only config."
+  }
+}
