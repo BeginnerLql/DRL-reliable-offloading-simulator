@@ -12,26 +12,17 @@ class parameters:
 
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
-    TASK_SIZE_RANGE = (10, 100)  # MB
+    TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
     # Main-experiment task reliability requirement tiers.
     TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
-    Low_demand, High_demand = 1, 100  # MI
+    COMPUTATION_DEMAND_RANGE = (0.5e9, 3.0e9)  # CPU cycles, continuous uniform
     taskno = 200
 
-    SERVER_TRANSMISSION_RATES = (
-        20.0,
-        24.0,
-        28.0,
-        32.0,
-        36.0,
-        40.0,
-        45.0,
-        50.0,
-    )  # MB/s, indexed by Server_ID 1..8
+    SERVER_TRANSMISSION_RATE_RANGE = (10.0, 30.0)  # MB/s, frozen per server
 
     # Unified server parameters
     # TEMPORARY: value to be calibrated later.
-    SERVER_PROCESSING_FREQ_RANGE = (10, 15)  # MIPS
+    SERVER_PROCESSING_FREQ_RANGE = (1.0e9, 3.0e9)  # cycles/s (1-3 GHz)
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
     SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)
 
