@@ -4,7 +4,7 @@ from core.server import Server
 from core.task import Task
 from core.env_state import EnvironmentState
 from config.params import params
-from config.paths import DATA_DIR
+from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH
 from pathlib import Path
 from core.spatial_risk import (
     build_distance_matrix,
@@ -19,11 +19,15 @@ import pandas as pd
 
 
 class MainLoop:
-    def __init__(self, model, total_episodes, maxtaskno, num_states, num_actions):
+    def __init__(
+        self, model, total_episodes, maxtaskno, num_states, num_actions,
+        *, task_parameters_path=TRAIN_TASK_PATH,
+    ):
         self.model = model
         self.num_states = num_states
         self.num_actions = num_actions
         self.total_episodes = total_episodes
+        self.task_parameters_path = Path(task_parameters_path)
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
@@ -58,15 +62,13 @@ class MainLoop:
         self.ppo_last_resolved_outcome_time = None
 
     def _load_run_profiles(self):
-        """Load the immutable server/task profiles for this run."""
-        server_path = Path(DATA_DIR) / "server_info.xlsx"
-        task_path = Path(DATA_DIR) / "task_parameters.xlsx"
+        """Load fixed profiles once; every episode reuses their attributes/order."""
         server_df = pd.read_excel(
-            server_path,
+            SERVER_INFO_PATH,
             sheet_name="Servers",
             dtype={"Site_ID": "string"},
         )
-        task_df = pd.read_excel(task_path)
+        task_df = pd.read_excel(self.task_parameters_path)
         return (
             self._build_server_profiles(server_df),
             self._build_task_profiles(task_df),
@@ -94,7 +96,7 @@ class MainLoop:
         return {
             int(row["Task_ID"]): {
                 "Task_ID": int(row["Task_ID"]),
-                "Task_Size": int(row["Task_Size"]),
+                "Task_Size": float(row["Task_Size"]),
                 "Computation_Demand": float(row["Computation_Demand"]),
                 "Reliability_Requirement": float(row["Reliability_Requirement"]),
             }

@@ -148,8 +148,7 @@ class EnvironmentState:
         waiting_backlogs = []
 
         frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
-        transmission_rate_min = min(params.SERVER_TRANSMISSION_RATES)
-        transmission_rate_max = max(params.SERVER_TRANSMISSION_RATES)
+        transmission_rate_min, transmission_rate_max = params.SERVER_TRANSMISSION_RATE_RANGE
 
         for server_id in server_ids:
             server_info = self.servers[server_id]
@@ -170,7 +169,7 @@ class EnvironmentState:
         task_size = float(task.task_size)
         task_size_min, task_size_max = params.TASK_SIZE_RANGE
         computation_demand = float(task.computation_demand)
-        demand_min, demand_max = params.Low_demand, params.High_demand
+        demand_min, demand_max = params.TASK_DEMAND_RANGE
         reliability_requirement = float(task.reliability_requirement)
         normalized_reliability_requirement = self.normalize_reliability_requirement(
             reliability_requirement

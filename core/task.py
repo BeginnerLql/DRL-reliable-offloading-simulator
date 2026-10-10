@@ -1,4 +1,4 @@
-"""Runtime task initialized from a run-level task profile."""
+"""Runtime task initialized from a fixed profile: size in MB, demand in cycles."""
 
 
 class Task:
@@ -30,6 +30,7 @@ class Task:
         self.task_completion_event = self.env.event()
 
     def get_transmission_rate(self, server):
+        """Return the server's fixed upload rate in MB/s."""
         return server.transmission_rate
 
     def execute_task(self, server_A, server_B):
@@ -47,10 +48,11 @@ class Task:
 
     def _run_replica(self, server, replica_name, replica_info):
         transmission_rate = self.get_transmission_rate(server)
-        transmission_time = self.task_size / transmission_rate
+        transmission_time = self.task_size / transmission_rate  # MB / (MB/s) = s
         yield self.env.timeout(transmission_time)
 
         replica_info["queue_enter_time"] = float(self.env.now)
+        # CPU cycles / (cycles/s) = seconds.
         service_time = self.computation_demand / server.processing_frequency
         self.env_state.register_waiting_replica(
             server.server_id, self, replica_name, service_time

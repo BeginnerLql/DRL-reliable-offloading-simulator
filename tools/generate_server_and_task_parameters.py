@@ -1,20 +1,26 @@
 """Generate unified server and synthetic task parameter workbooks."""
 
-import random
 import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.stats import truncnorm
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from config.configuration import parameters
-from config.paths import DATA_DIR, ensure_dirs
+from config.paths import (
+    DATA_DIR,
+    EVALUATION_TASK_PATH,
+    SERVER_INFO_PATH,
+    TRAIN_TASK_PATH,
+    ensure_dirs,
+)
 
+# Workbook units: Processing_Frequency in cycles/s, Transmission_Rate in MB/s,
+# Base_Failure_Rate in s^-1; Task_Size in MB, Computation_Demand in CPU cycles.
 SERVER_INFO_COLUMNS = [
     "Server_ID",
     "Site_ID",
@@ -52,11 +58,21 @@ def load_eua_topology(
 
 
 def generate_processing_frequencies(number_of_servers: int) -> list[float]:
-    """Generate frequencies from the unified server configuration."""
-    return [
-        round(random.uniform(*parameters.SERVER_PROCESSING_FREQ_RANGE), 2)
-        for _ in range(number_of_servers)
-    ]
+    """Sample CPU capacity in cycles/s (the configured 1–3 GHz range)."""
+    return _profile_rng(0, 0).uniform(
+        *parameters.SERVER_PROCESSING_FREQ_RANGE, size=number_of_servers
+    ).tolist()
+
+
+def _profile_rng(profile_stream: int, parameter_stream: int) -> np.random.Generator:
+    """Stable SeedSequence keys: 0=servers, 1=train tasks, 2=evaluation tasks.
+
+    Each parameter has its own child stream, recreated on every generation call.
+    Global RNG calls and generation order therefore cannot alter these profiles.
+    """
+    return np.random.default_rng(np.random.SeedSequence(
+        parameters.PROFILE_SEED, spawn_key=(profile_stream, parameter_stream)
+    ))
 
 
 def generate_server_info(
@@ -66,71 +82,63 @@ def generate_server_info(
 ) -> pd.DataFrame:
     """Write unified server parameters with selected EUA locations."""
     count = parameters.NUM_SERVERS if num_servers is None else num_servers
-    transmission_rates = parameters.SERVER_TRANSMISSION_RATES
     topology_df = load_eua_topology(topology_path, count)
-    frequencies = generate_processing_frequencies(count)
-    failure_rates = [
-        random.uniform(*parameters.SERVER_FAILURE_RATE_RANGE)
-        for _ in range(count)
-    ]
-    server_info = topology_df.copy()
-    server_info["Processing_Frequency"] = frequencies
-    server_info["Base_Failure_Rate"] = failure_rates
-    transmission_rate_by_id = dict(enumerate(transmission_rates, start=1))
-    server_info["Transmission_Rate"] = server_info["Server_ID"].map(
-        transmission_rate_by_id
+    processing_frequencies_cycles_per_second = generate_processing_frequencies(count)
+    transmission_rates_mb_per_second = _profile_rng(0, 1).uniform(
+        *parameters.SERVER_TRANSMISSION_RATE_RANGE, size=count
     )
+    failure_rates_per_second = _profile_rng(0, 2).uniform(
+        *parameters.SERVER_FAILURE_RATE_RANGE, size=count
+    )
+    server_info = topology_df.copy()
+    server_info["Processing_Frequency"] = processing_frequencies_cycles_per_second
+    server_info["Base_Failure_Rate"] = failure_rates_per_second
+    server_info["Transmission_Rate"] = transmission_rates_mb_per_second
     server_info = server_info[SERVER_INFO_COLUMNS]
     server_info.to_excel(filename, sheet_name="Servers", index=False)
     return server_info
 
 
-def generate_task_params(filename: str | Path = "task_parameters.xlsx") -> pd.DataFrame:
-    """Write synthetic task parameters with reliability requirements."""
-    task_info = []
+def generate_task_params(
+    filename: str | Path | None = None,
+    *,
+    dataset: str = "train",
+) -> pd.DataFrame:
+    """Write one fixed task set; size, CPU cycles and tier order are independent."""
+    profile_stream = {"train": 1, "evaluation": 2}[dataset]
+    if filename is None:
+        filename = TRAIN_TASK_PATH if dataset == "train" else EVALUATION_TASK_PATH
     num_tasks = parameters.taskno
-    size_range = parameters.TASK_SIZE_RANGE
     reliability_levels = parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
     if num_tasks % len(reliability_levels):
         raise ValueError("taskno must be divisible by the number of reliability levels.")
-    reliability_requirements = np.random.permutation(
+    reliability_requirements = _profile_rng(profile_stream, 2).permutation(
         np.repeat(reliability_levels, num_tasks // len(reliability_levels))
     )
 
-    lower_demand, upper_demand = parameters.Low_demand, parameters.High_demand
-    mean = (lower_demand + upper_demand) / 2
-    standard_deviation = (upper_demand - lower_demand) / 6
-    lower_bound = (lower_demand - mean) / standard_deviation
-    upper_bound = (upper_demand - mean) / standard_deviation
-
-    for task_id, reliability_requirement in enumerate(reliability_requirements, start=1):
-        task_size = np.random.randint(size_range[0], size_range[1] + 1)
-        computation_demand = truncnorm.rvs(
-            lower_bound,
-            upper_bound,
-            loc=mean,
-            scale=standard_deviation,
-        )
-        task_info.append([
-            task_id,
-            task_size,
-            float(computation_demand),
-            float(reliability_requirement),
-        ])
-
-    task_df = pd.DataFrame(task_info, columns=TASK_INFO_COLUMNS)
+    task_sizes_mb = _profile_rng(profile_stream, 0).uniform(
+        *parameters.TASK_SIZE_RANGE, size=num_tasks
+    )
+    computation_demands_cycles = _profile_rng(profile_stream, 1).uniform(
+        *parameters.TASK_DEMAND_RANGE, size=num_tasks
+    )
+    task_df = pd.DataFrame({
+        "Task_ID": np.arange(1, num_tasks + 1),
+        "Task_Size": task_sizes_mb,
+        "Computation_Demand": computation_demands_cycles,
+        "Reliability_Requirement": reliability_requirements,
+    }, columns=TASK_INFO_COLUMNS)
     task_df.to_excel(filename, index=False)
     return task_df
 
 
 def main() -> None:
-    """Write server and task parameter files into the data directory."""
-    random.seed(parameters.PROFILE_SEED)
-    np.random.seed(parameters.PROFILE_SEED)
+    """Write server, training-task and evaluation-task workbooks."""
     ensure_dirs()
-    generate_server_info(Path(DATA_DIR) / "server_info.xlsx")
-    generate_task_params(Path(DATA_DIR) / "task_parameters.xlsx")
-    print("Parameters defined in Excel files!")
+    generate_server_info(SERVER_INFO_PATH)
+    generate_task_params(dataset="train")
+    generate_task_params(dataset="evaluation")
+    print("Server, training-task and evaluation-task parameters saved to data/.")
 
 if __name__ == "__main__":
     main()

@@ -77,7 +77,35 @@ python pre_process.py
 ```
 
 This script generates all required Excel files into the `data/` directory.
-`PROFILE_SEED` controls server/task profile generation.
+`PROFILE_SEED = 2026` controls server/task profile generation. NumPy
+`SeedSequence` uses fixed stream keys: 0 for servers, 1 for training tasks,
+and 2 for evaluation tasks. Within each profile, CPU/rate/failure parameters
+or size/demand/reliability-order parameters have separate child streams.
+Regeneration preserves the same values and row order independently of global
+RNG calls or the order in which profiles are generated. No additional master
+seed setting is needed.
+
+The generated workbooks retain their existing column names:
+
+| File | Profile and units |
+| --- | --- |
+| `data/server_info.xlsx` | Eight servers: `Processing_Frequency` in cycles/s, `Transmission_Rate` in MB/s, `Base_Failure_Rate` in s^-1; existing EUA locations and Server_ID/Site_ID mapping |
+| `data/task_parameters.xlsx` | Fixed training set: 200 tasks, `Task_Size` in MB, `Computation_Demand` in CPU cycles |
+| `data/task_parameters_evaluation.xlsx` | Independently generated fixed evaluation set with the same schema and distributions |
+
+Task size is continuous uniform on 5–10 MB; computation demand is independently
+continuous uniform on 0.5e9–3e9 CPU cycles. Each set has exactly 50 tasks at each
+reliability level, with a reproducibly shuffled tier order. There are exactly four
+task columns: `Task_ID`, `Task_Size`, `Computation_Demand`, and
+`Reliability_Requirement`.
+
+`MainLoop` loads the training file by default and reuses the same attributes and
+Task_ID order in every episode. To load evaluation data, pass
+`task_parameters_path=EVALUATION_TASK_PATH` (from `config.paths`) to its
+constructor. Pass the same path to `save_params_and_logs` when saving that run's
+task snapshot. This selects data only; an evaluation execution mode is a later
+stage. Future Uniform Random load scans should use the training file; algorithms
+being evaluated should share the evaluation file.
 
 `EXPERIMENT_SEED` controls PPO initialization, action sampling and minibatch
 shuffling, plus the environment arrival and spatial fields. Arrival and spatial
@@ -159,8 +187,11 @@ Key parameters include:
 - `TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)`;
   the generated 200-task profile contains 50 tasks at each level.
 
-Input profiles are loaded once per run. Servers have fixed processing frequencies,
-base failure rates and transmission rates (20/24/28/32/36/40/45/50 MB/s).
+Input profiles are loaded once per run. Servers independently sample CPU capacity
+uniformly on 1e9–3e9 cycles/s (1–3 GHz), upload rate on 10–30 MB/s, and base failure
+rate on 0.001–0.005 s^-1; these values remain fixed after generation. CPU and upload
+rate are not coupled. Transmission time is `Task_Size / Transmission_Rate` and
+execution time is `Computation_Demand / Processing_Frequency`, both in seconds.
 The profile builders sort records, convert field types and build dictionaries;
 Python and the underlying libraries report malformed inputs directly.
 

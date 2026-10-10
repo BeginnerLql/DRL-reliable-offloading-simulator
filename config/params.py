@@ -11,19 +11,19 @@ class params:
 
     # Infrastructure
     NUM_SERVERS = parameters.NUM_SERVERS
-    SERVER_TRANSMISSION_RATES = parameters.SERVER_TRANSMISSION_RATES
 
     # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
     TASK_RELIABILITY_REQUIREMENT_LEVELS = (
         parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
     )
-    Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
+    TASK_DEMAND_RANGE = parameters.TASK_DEMAND_RANGE
     taskno = parameters.taskno
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
 
     # Unified server parameters
     SERVER_PROCESSING_FREQ_RANGE = parameters.SERVER_PROCESSING_FREQ_RANGE
+    SERVER_TRANSMISSION_RATE_RANGE = parameters.SERVER_TRANSMISSION_RATE_RANGE
     SERVER_FAILURE_RATE_RANGE = parameters.SERVER_FAILURE_RATE_RANGE
 
     BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC

@@ -2,6 +2,8 @@ import simpy
 
 
 class Server:
+    """Fixed server profile: CPU cycles/s, upload MB/s, base failure rate s^-1."""
+
     def __init__(
         self,
         env,

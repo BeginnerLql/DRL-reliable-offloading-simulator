@@ -5,10 +5,12 @@ import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.chart import LineChart, Reference
 
-from config.paths import DATA_DIR, RESULTS_DIR, ensure_dirs
+from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH, RESULTS_DIR, ensure_dirs
 
 
-def save_params_and_logs(params, log_data, task_results, run_id):
+def save_params_and_logs(
+    params, log_data, task_results, run_id, *, task_parameters_path=TRAIN_TASK_PATH,
+):
     ensure_dirs()
 
     model_name = str(params.model_summary).strip().lower()
@@ -17,11 +19,9 @@ def save_params_and_logs(params, log_data, task_results, run_id):
         RESULTS_DIR, f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.xlsx",
     )
 
-    servers_path = os.path.join(DATA_DIR, "server_info.xlsx")
-    server_info = pd.read_excel(servers_path)
+    server_info = pd.read_excel(SERVER_INFO_PATH)
 
-    task_path = os.path.join(DATA_DIR, "task_parameters.xlsx")
-    task_df = pd.read_excel(task_path)
+    task_df = pd.read_excel(task_parameters_path)
 
     other_model_suffixes = tuple(
         f"_{name}" for name in ("ppo", "dqn", "ddpg") if name != model_name
