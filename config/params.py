@@ -11,14 +11,14 @@ class params:
 
     # Infrastructure
     NUM_SERVERS = parameters.NUM_SERVERS
-    SERVER_TRANSMISSION_RATES = parameters.SERVER_TRANSMISSION_RATES
+    SERVER_TRANSMISSION_RATE_RANGE = parameters.SERVER_TRANSMISSION_RATE_RANGE
 
     # Workload
     TASK_SIZE_RANGE = parameters.TASK_SIZE_RANGE
     TASK_RELIABILITY_REQUIREMENT_LEVELS = (
         parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
     )
-    Low_demand, High_demand = parameters.Low_demand, parameters.High_demand
+    COMPUTATION_DEMAND_RANGE = parameters.COMPUTATION_DEMAND_RANGE
     taskno = parameters.taskno
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
 
