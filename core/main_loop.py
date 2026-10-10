@@ -94,7 +94,7 @@ class MainLoop:
         return {
             int(row["Task_ID"]): {
                 "Task_ID": int(row["Task_ID"]),
-                "Task_Size": int(row["Task_Size"]),
+                "Task_Size": float(row["Task_Size"]),
                 "Computation_Demand": float(row["Computation_Demand"]),
                 "Reliability_Requirement": float(row["Reliability_Requirement"]),
             }
