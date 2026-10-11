@@ -197,16 +197,34 @@ Python and the underlying libraries report malformed inputs directly.
 
 ## PPO/SMDP state representation
 
-Each server contributes its effective failure intensity, normalized processing
-frequency, normalized transmission rate, normalized remaining CPU service time,
-and normalized queued CPU service time. Running and waiting backlogs are each
-normalized as `B / (B + BACKLOG_TIME_SCALE_SEC)` with scale 4.0 seconds.
+The state contains `5N + 1 = 41` features, in this exact group order, with each
+server group sorted by Server_ID:
 
-The task contributes normalized size, normalized computation demand and its
-reliability tier encoded as 0, 1/3, 2/3 or 1. The state is ordered as
-`[failure_rates, frequencies, transmission_rates, running_backlogs,
-waiting_backlogs, task_size, demand, reliability_tier]`: `5N + 3 = 43` features.
-CPU backlogs exclude transmission time.
+```text
+[lambda_active / c_lambda, (L_i / r_n) / c_tx, (C_i / f_n) / c_exe,
+ W_run / c_run, W_wait / c_wait, R_i_req]
+```
+
+Active failure intensity is read through `get_active_failure_rate`, and each
+task-specific upload time uses `Task.get_transmission_rate`. Times are in seconds.
+Running work is the remaining CPU service time at the decision's SimPy `env.now`.
+Waiting work sums CPU service times of replicas whose uploads have finished and
+which have not started CPU execution. Running, uploading and completed replicas
+are excluded from waiting work. The current task is observed before its replicas
+are launched.
+
+Initial fixed scales are `STATE_FAILURE_RATE_SCALE = 0.005` s^-1,
+`STATE_TRANSMISSION_TIME_SCALE_SEC = 1.0` s, and
+`STATE_EXECUTION_TIME_SCALE_SEC = 3.0` s. Both CPU work groups share
+`BACKLOG_TIME_SCALE_SEC = 4.0` s. Each group is divided directly by its scale;
+values may exceed one and are not clipped. The reliability requirement retains
+its raw value, such as 0.999, without tier encoding. These initial scales are not
+performance-tuned at this stage.
+
+Uploading replicas are not included in the state, so it may not fully describe
+future CPU queue changes. This partial observability is accepted at this stage.
+Historical 43-feature PPO checkpoints are incompatible with the new input size
+and remain preserved; no automatic checkpoint migration is provided.
 
 ## Task arrival process
 

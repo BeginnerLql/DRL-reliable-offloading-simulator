@@ -131,81 +131,33 @@ class EnvironmentState:
         self.spatial_risk_field = None
         self.effective_failure_rates = None
 
-    def normalize(self, val, min_val, max_val):
-        return (val - min_val) / (max_val - min_val)
-
-    def normalize_reliability_requirement(self, reliability_requirement):
-        levels = params.TASK_RELIABILITY_REQUIREMENT_LEVELS
-        return levels.index(reliability_requirement) / (len(levels) - 1)
-
     def get_state(self, task):
+        """Observe current CPU work and task-specific times in Server_ID order."""
         server_ids = sorted(self.servers)
 
         failure_rates = []
-        frequencies = []
-        transmission_rates = []
+        transmission_times = []
+        execution_times = []
         running_backlogs = []
         waiting_backlogs = []
 
-        frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
-        transmission_rate_min, transmission_rate_max = params.SERVER_TRANSMISSION_RATE_RANGE
-
         for server_id in server_ids:
-            server_info = self.servers[server_id]
-            server_object = server_info['server_object']
-            failure_rate = float(self.get_active_failure_rate(server_id))
-            frequency = float(server_object.processing_frequency)
-            transmission_rate = float(server_object.transmission_rate)
+            server = self.get_server_by_id(server_id)
             running_backlog, waiting_backlog = self.get_server_backlog_components(
                 server_id, task.env.now
             )
-            failure_rates.append(failure_rate)
-            frequencies.append(frequency)
-            transmission_rates.append(transmission_rate)
+            failure_rates.append(self.get_active_failure_rate(server_id))
+            transmission_times.append(task.task_size / task.get_transmission_rate(server))
+            execution_times.append(task.computation_demand / server.processing_frequency)
             running_backlogs.append(running_backlog)
             waiting_backlogs.append(waiting_backlog)
 
-        scale = params.BACKLOG_TIME_SCALE_SEC
-        task_size = float(task.task_size)
-        task_size_min, task_size_max = params.TASK_SIZE_RANGE
-        computation_demand = float(task.computation_demand)
-        demand_min, demand_max = params.TASK_DEMAND_RANGE
-        reliability_requirement = float(task.reliability_requirement)
-        normalized_reliability_requirement = self.normalize_reliability_requirement(
-            reliability_requirement
-        )
-
-        normalized_frequencies = self.normalize(
-            np.asarray(frequencies), frequency_min, frequency_max
-        )
-        normalized_transmission_rates = self.normalize(
-            np.asarray(transmission_rates),
-            transmission_rate_min,
-            transmission_rate_max,
-        )
-        normalized_running_backlogs = np.asarray(running_backlogs) / (
-            np.asarray(running_backlogs) + scale
-        )
-        normalized_waiting_backlogs = np.asarray(waiting_backlogs) / (
-            np.asarray(waiting_backlogs) + scale
-        )
-        normalized_task_size = self.normalize(
-            task_size, task_size_min, task_size_max
-        )
-        normalized_computation_demand = self.normalize(
-            computation_demand, demand_min, demand_max
-        )
-
         state = np.concatenate((
-            np.asarray(failure_rates),
-            np.asarray(normalized_frequencies),
-            np.asarray(normalized_transmission_rates),
-            normalized_running_backlogs,
-            normalized_waiting_backlogs,
-            np.asarray([
-                normalized_task_size,
-                normalized_computation_demand,
-                normalized_reliability_requirement,
-            ]),
+            np.asarray(failure_rates) / params.STATE_FAILURE_RATE_SCALE,
+            np.asarray(transmission_times) / params.STATE_TRANSMISSION_TIME_SCALE_SEC,
+            np.asarray(execution_times) / params.STATE_EXECUTION_TIME_SCALE_SEC,
+            np.asarray(running_backlogs) / params.BACKLOG_TIME_SCALE_SEC,
+            np.asarray(waiting_backlogs) / params.BACKLOG_TIME_SCALE_SEC,
+            np.asarray([task.reliability_requirement]),
         ))
         return state.astype(np.float32)

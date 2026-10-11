@@ -24,8 +24,11 @@ class parameters:
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
     SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)
 
-    # Retained for backlog normalization; the value remains provisional.
-    BACKLOG_TIME_SCALE_SEC = 4.0
+    # Initial fixed state scales; no clipping or performance tuning at this stage.
+    STATE_FAILURE_RATE_SCALE = 0.005  # s^-1
+    STATE_TRANSMISSION_TIME_SCALE_SEC = 1.0  # s
+    STATE_EXECUTION_TIME_SCALE_SEC = 3.0  # s
+    BACKLOG_TIME_SCALE_SEC = 4.0  # s, shared by running and waiting CPU work
 
     # One quasi-static spatial-risk field is sampled per episode when enabled.
     SPATIAL_RISK_ENABLED = True
