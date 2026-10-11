@@ -22,13 +22,14 @@ import pandas as pd
 class MainLoop:
     def __init__(
         self, model, total_episodes, maxtaskno, num_states, num_actions,
-        *, task_parameters_path=TRAIN_TASK_PATH,
+        *, task_parameters_path=TRAIN_TASK_PATH, episode_callback=None,
     ):
         self.model = model
         self.num_states = num_states
         self.num_actions = num_actions
         self.total_episodes = total_episodes
         self.task_parameters_path = Path(task_parameters_path)
+        self.episode_callback = episode_callback
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
@@ -128,6 +129,8 @@ class MainLoop:
             self.env.run()
             for task in sorted(self.env_state.tasks.values(), key=lambda item: item.id):
                 self.task_results.append(self.get_task_outcome_info(task))
+            if self.episode_callback is not None:
+                self.episode_callback(self)
 
     def _initialize_episode_spatial_risk(self):
         """Sample and store one quasi-static spatial risk field for this episode."""

@@ -85,12 +85,13 @@ def window_statistics(records, horizon):
     return busy, waiting_area, maximum, last_queue
 
 
-def run_episode(arrival_rate, episode_id, basis, server_profiles, task_profiles, pairs, distances, correlation):
+def run_episode(arrival_rate, episode_id, basis, server_profiles, task_profiles, pairs, distances, correlation, *, action_selector=None):
     env, state = make_environment(server_profiles)
     state.set_episode_spatial_risk_context(
         list(server_profiles), distances, correlation, basis["risk"], basis["effective_rates"]
     )
     tasks = []
+    actions = []
 
     def arrivals():
         for index, (task_id, profile) in enumerate(task_profiles.items()):
@@ -98,7 +99,9 @@ def run_episode(arrival_rate, episode_id, basis, server_profiles, task_profiles,
             task = Task(env, state, task_id, profile)
             tasks.append(task)
             state.add_task(task)
-            a_id, b_id = pairs[basis["actions"][index]]
+            action = basis["actions"][index] if action_selector is None else action_selector(state.get_state(task))
+            actions.append(action)
+            a_id, b_id = pairs[action]
             a, b = state.get_server_by_id(a_id), state.get_server_by_id(b_id)
             task.replica_A_reliability = state.compute_replica_reliability(task, a)
             task.replica_B_reliability = state.compute_replica_reliability(task, b)
@@ -109,12 +112,19 @@ def run_episode(arrival_rate, episode_id, basis, server_profiles, task_profiles,
     env.run()  # Drain every replica, including losers after first task completion.
     assert len(tasks) == len(task_profiles) == 200
     np.testing.assert_allclose([t.arrival_time for t in tasks], np.cumsum(basis["arrival_base"] / arrival_rate), rtol=0, atol=1e-10)
-    arrival_window, episode_end = tasks[-1].arrival_time, env.now
-    records = {server_id: [] for server_id in server_profiles}
-    assigned_work = dict.fromkeys(server_profiles, 0.)
-    latency_parts = []
     for index, task in enumerate(tasks):
-        assert (task.replica_A["server_id"], task.replica_B["server_id"]) == pairs[basis["actions"][index]]
+        assert (task.replica_A["server_id"], task.replica_B["server_id"]) == pairs[actions[index]]
+    return collect_episode_metrics(arrival_rate, episode_id, tasks, state, env.now)
+
+
+def collect_episode_metrics(arrival_rate, episode_id, tasks, state, episode_end):
+    """Shared post-drain metrics for the existing training and evaluation loops."""
+    assert len(tasks) == 200
+    arrival_window = tasks[-1].arrival_time
+    records = {server_id: [] for server_id in state.servers}
+    assigned_work = dict.fromkeys(state.servers, 0.)
+    latency_parts = []
+    for task in tasks:
         winner = min([task.replica_A, task.replica_B], key=lambda replica: replica["finish_time"])
         delay = task.task_completion_time - task.arrival_time
         parts = [
