@@ -29,7 +29,7 @@ class parameters:
 
     # One quasi-static spatial-risk field is sampled per episode when enabled.
     SPATIAL_RISK_ENABLED = True
-    SPATIAL_CORRELATION_LENGTH_KM = 0.5
+    # Baseline correlation length = median server-pair distance / ln(2).
     # TEMPORARY exploratory calibration value.
     # Not yet a literature-calibrated final experiment parameter.
     SPATIAL_RISK_BETA_P = 0.5

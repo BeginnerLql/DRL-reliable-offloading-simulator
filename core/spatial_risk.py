@@ -87,9 +87,22 @@ def build_spatial_correlation_matrix(
     return np.exp(-matrix / correlation_length)
 
 
+def compute_baseline_correlation_length_km(distance_matrix: object) -> float:
+    """Return median distinct-pair distance / ln(2), in kilometres.
+
+    Only the strict upper triangle is used, so diagonal zeros and duplicate
+    symmetric entries do not contribute. Correlation at this median is 0.5.
+    """
+    matrix = np.asarray(distance_matrix, dtype=float)
+    pair_distances = matrix[np.triu_indices(matrix.shape[0], k=1)]
+    return float(np.median(pair_distances) / np.log(2.0))
+
+
 def sample_spatial_risk_field(
     correlation_matrix: object,
-    rng: np.random.Generator,
+    rng: np.random.Generator | None = None,
+    *,
+    standard_normal: object | None = None,
 ) -> np.ndarray:
     """Sample one latent standardized physical environmental risk field.
 
@@ -97,14 +110,20 @@ def sample_spatial_risk_field(
     value zero and variance one, and the component correlation is ``R``.  The
     field is a latent physical environmental risk field, not a failure field
     and not a failure-event or failure-probability sample.
+
+    Supply an RNG or an explicit standard-normal vector epsilon. The result is
+    L @ epsilon, where L is the lower Cholesky factor of the correlation matrix.
+    Reusing epsilon with the identity matrix gives the paired independent field.
+    When epsilon is supplied, the RNG is not consumed.
     """
     matrix = np.asarray(correlation_matrix, dtype=float)
-    dimension = matrix.shape[0]
-    return rng.multivariate_normal(
-        mean=np.zeros(dimension, dtype=float),
-        cov=matrix,
-        check_valid="raise",
+    factor = np.linalg.cholesky(matrix)
+    epsilon = (
+        rng.standard_normal(matrix.shape[0])
+        if standard_normal is None
+        else np.asarray(standard_normal, dtype=float)
     )
+    return factor @ epsilon
 
 
 def map_spatial_risk_to_effective_failure_rates(

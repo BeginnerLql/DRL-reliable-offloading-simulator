@@ -9,6 +9,7 @@ from pathlib import Path
 from core.spatial_risk import (
     build_distance_matrix,
     build_spatial_correlation_matrix,
+    compute_baseline_correlation_length_km,
     map_spatial_risk_to_effective_failure_rates,
     sample_spatial_risk_field,
 )
@@ -137,9 +138,10 @@ class MainLoop:
             for server_info in self.env_state.servers.values()
         ]
         server_ids, distance_matrix = build_distance_matrix(server_objects)
+        correlation_length_km = compute_baseline_correlation_length_km(distance_matrix)
         correlation_matrix = build_spatial_correlation_matrix(
             distance_matrix,
-            params.SPATIAL_CORRELATION_LENGTH_KM,
+            correlation_length_km,
         )
         spatial_risk_field = sample_spatial_risk_field(
             correlation_matrix,

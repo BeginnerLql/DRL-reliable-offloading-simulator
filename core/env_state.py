@@ -96,13 +96,13 @@ class EnvironmentState:
         return self.effective_failure_rates[server_id]
 
     def compute_replica_reliability(self, task, server):
-        """Compute decision-time reliability over CPU execution only."""
+        """Return exp(-lambda_active * C/f); C/f is CPU execution seconds."""
         failure_rate = self.get_active_failure_rate(server.server_id)
         execution_time = task.computation_demand / server.processing_frequency
         return float(np.exp(-failure_rate * execution_time))
 
     def compute_pair_reliability(self, task, server_A, server_B):
-        """Compute pair reliability under independent replica failures."""
+        """Assume independent replica failures conditional on the episode field."""
         reliability_A = self.compute_replica_reliability(task, server_A)
         reliability_B = self.compute_replica_reliability(task, server_B)
         return float(

@@ -256,13 +256,32 @@ existing transition and discount behavior.
 
 ## Analytical reliability and task completion
 
-Spatial risk samples one Gaussian field per episode with physical correlation
-length 0.5 km and beta 0.5. Effective failure intensity is
+Spatial risk uses the Server_ID-sorted Haversine distance matrix in km. The
+baseline correlation length is computed from the strict upper-triangle distances:
+`ell_0 = median({d_nm: n < m}) / ln(2)`. For eight servers this uses 28 pairs,
+and the correlation at the median distance is exactly 0.5. The length is derived
+from the current server locations each episode, so topology changes require no
+manual length update. The correlation matrix is `Sigma_nm = exp(-d_nm / ell_0)`
+with diagonal entries equal to one.
+
+One Gaussian field is sampled per episode and remains fixed until the episode
+ends; the next episode draws a new field. Sampling uses `Z = L @ epsilon`, where
+`L @ L.T = Sigma` and `epsilon` is standard normal. The existing RNG call remains
+supported; `sample_spatial_risk_field(Sigma, standard_normal=epsilon)` also accepts
+an explicit vector without consuming RNG state. The same vector with the identity
+matrix produces the paired independent field for future comparisons. This change
+to the sampling method changes risk traces relative to older runs, while keeping
+fixed-seed reproducibility within the new version.
+
+With beta 0.5, effective failure intensity is
 `lambda_eff = lambda_0 * exp(beta * Z_phy - beta**2 / 2)`.
-With spatial risk disabled, the base failure intensity is used directly.
+The correction term preserves `E[lambda_eff] = lambda_0` over Gaussian risk
+realizations. Base failure rates are not overwritten. With spatial risk disabled,
+the base failure intensity is used directly; beta zero also recovers base rates.
 
 Decision-time replica reliability is `exp(-lambda_eff * C / f)`. Pair reliability
-is `1 - (1 - R_A) * (1 - R_B)`, and requirement satisfaction compares this snapshot
+is `1 - (1 - R_A) * (1 - R_B)` under conditionally independent failures given
+the current episode field, and requirement satisfaction compares this snapshot
 against the task's raw requirement. Reliability does not mask actions or affect
 physical completion: both replicas transmit and queue independently; the first
 CPU finish completes the task, and the losing replica continues to completion.
