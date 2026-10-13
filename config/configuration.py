@@ -15,20 +15,16 @@ class parameters:
     TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
     # Main-experiment task reliability requirement tiers.
     TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
-    TASK_DEMAND_RANGE = (0.5e9, 3.0e9)  # CPU cycles, continuous uniform
+    TASK_DEMAND_RANGE = (2.0e9, 4.0e9)  # CPU cycles, continuous uniform
     taskno = 200
 
     # Unified server parameters
-    SERVER_PROCESSING_FREQ_RANGE = (1.0e9, 3.0e9)  # cycles/s; equivalent to 1–3 GHz
-    SERVER_TRANSMISSION_RATE_RANGE = (10.0, 30.0)  # MB/s, continuous uniform
+    SERVER_PROCESSING_FREQ_RANGE = (1.0e9, 4.0e9)  # cycles/s; equivalent to 1–4 GHz
+    SERVER_TRANSMISSION_RATE_RANGE = (5.0, 20.0)  # MB/s, continuous uniform
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
-    SERVER_FAILURE_RATE_RANGE = (0.001, 0.005)
+    SERVER_FAILURE_RATE_RANGE = (0.1, 0.5)
 
-    # Initial fixed state scales; no clipping or performance tuning at this stage.
-    STATE_FAILURE_RATE_SCALE = 0.005  # s^-1
-    STATE_TRANSMISSION_TIME_SCALE_SEC = 1.0  # s
-    STATE_EXECUTION_TIME_SCALE_SEC = 3.0  # s
-    BACKLOG_TIME_SCALE_SEC = 4.0  # s, shared by running and waiting CPU work
+    STATE_FAILURE_RATE_SCALE = 0.5  # s^-1; scales with the base failure-rate range.
 
     # One quasi-static spatial-risk field is sampled per episode when enabled.
     SPATIAL_RISK_ENABLED = True
@@ -70,7 +66,7 @@ class parameters:
     critic_lr_ppo = 5e-4
     # Per-second discount base for event-driven PPO/SMDP.
     # Transition-specific discount: gamma_k = gamma_ppo ** delta_t_seconds.
-    gamma_ppo = 0.90
+    gamma_ppo = 0.8
     clip_eps_ppo = 0.2
     k_epochs_ppo = 2
     batch_size_ppo = 64

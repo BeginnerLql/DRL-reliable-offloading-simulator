@@ -58,7 +58,7 @@ def load_eua_topology(
 
 
 def generate_processing_frequencies(number_of_servers: int) -> list[float]:
-    """Sample CPU capacity in cycles/s (the configured 1–3 GHz range)."""
+    """Sample CPU capacity in cycles/s from the configured range."""
     return _profile_rng(0, 0).uniform(
         *parameters.SERVER_PROCESSING_FREQ_RANGE, size=number_of_servers
     ).tolist()

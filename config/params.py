@@ -27,16 +27,13 @@ class params:
     SERVER_FAILURE_RATE_RANGE = parameters.SERVER_FAILURE_RATE_RANGE
 
     STATE_FAILURE_RATE_SCALE = parameters.STATE_FAILURE_RATE_SCALE
-    STATE_TRANSMISSION_TIME_SCALE_SEC = parameters.STATE_TRANSMISSION_TIME_SCALE_SEC
-    STATE_EXECUTION_TIME_SCALE_SEC = parameters.STATE_EXECUTION_TIME_SCALE_SEC
-    BACKLOG_TIME_SCALE_SEC = parameters.BACKLOG_TIME_SCALE_SEC
     SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
     PROFILE_SEED = parameters.PROFILE_SEED
     EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
 
     # State/action dimensions for the current observation and unordered pairs.
-    num_states = 5 * NUM_SERVERS + 1
+    num_states = 5 * NUM_SERVERS + 2
     num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
 
     # DDPG

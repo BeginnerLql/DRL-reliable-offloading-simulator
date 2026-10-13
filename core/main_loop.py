@@ -22,14 +22,13 @@ import pandas as pd
 class MainLoop:
     def __init__(
         self, model, total_episodes, maxtaskno, num_states, num_actions,
-        *, task_parameters_path=TRAIN_TASK_PATH, episode_callback=None,
+        *, task_parameters_path=TRAIN_TASK_PATH,
     ):
         self.model = model
         self.num_states = num_states
         self.num_actions = num_actions
         self.total_episodes = total_episodes
         self.task_parameters_path = Path(task_parameters_path)
-        self.episode_callback = episode_callback
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
@@ -57,7 +56,6 @@ class MainLoop:
         self.task_results = []
 
         # PPO-only arrival-driven SMDP bookkeeping.
-        self.ppo_interval_reward = 0.0
         self.ppo_last_decision_state = None
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
@@ -113,7 +111,6 @@ class MainLoop:
             self.tempbuffer = {}
             self.taskCounter = 1
             self.pendingList = []
-            self.ppo_interval_reward = 0.0
             self.ppo_last_decision_state = None
             self.ppo_last_decision_action = None
             self.ppo_last_decision_time = None
@@ -121,7 +118,6 @@ class MainLoop:
 
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
-            self.env_state.reset()
 
             self.setServers()
             self._initialize_episode_spatial_risk()
@@ -129,8 +125,6 @@ class MainLoop:
             self.env.run()
             for task in sorted(self.env_state.tasks.values(), key=lambda item: item.id):
                 self.task_results.append(self.get_task_outcome_info(task))
-            if self.episode_callback is not None:
-                self.episode_callback(self)
 
     def _initialize_episode_spatial_risk(self):
         """Sample and store one quasi-static spatial risk field for this episode."""
@@ -208,12 +202,11 @@ class MainLoop:
                     self.model.store_transition(
                         self.ppo_last_decision_state,
                         self.ppo_last_decision_action,
-                        self.ppo_interval_reward,
+                        0.0,  # Filled with the task outcome before updating.
                         self.G_state,
                         delta_t=float(delta_t),
                         done=False,
                     )
-                    self.ppo_interval_reward = 0.0
             elif self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
                 # resolved DQN/DDPG task transitions.
@@ -277,12 +270,16 @@ class MainLoop:
                 self.model.store_transition(
                     self.ppo_last_decision_state,
                     self.ppo_last_decision_action,
-                    self.ppo_interval_reward,
+                    0.0,  # Filled with the task outcome before updating.
                     terminal_next_state,
                     delta_t=float(delta_t),
                     done=True,
                 )
-                self.ppo_interval_reward = 0.0
+            # Each arrival-ordered decision receives its own task outcome.
+            self.model.rewards[:] = [
+                self.compute_reward(self.get_task_outcome_info(task))
+                for task in self.env_state.tasks.values()
+            ]
             # PPO remains on-policy and updates once after the episode.
             self.model.train_step()
 
@@ -360,7 +357,7 @@ class MainLoop:
         return max(decision_time, float(self.ppo_last_resolved_outcome_time))
 
     def _collect_resolved_task_outcomes(self):
-        """Accumulate completed task rewards into the current PPO interval."""
+        """Record completed task outcomes and the latest completion timestamp."""
         for task_counter in list(self.pendingList):
             task = self.env_state.tasks[task_counter]
             if not task.task_completion_event.triggered:
@@ -368,7 +365,6 @@ class MainLoop:
 
             outcome_info = self.get_task_outcome_info(task)
             task_reward = self.compute_reward(outcome_info)
-            self.ppo_interval_reward += task_reward
             task_outcome_time = task.task_completion_time
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time
@@ -381,10 +377,6 @@ class MainLoop:
             )
 
     def add_train(self):
-        if self.model_name == "ppo":
-            self._collect_resolved_task_outcomes()
-            return
-
         for task_counter in list(self.pendingList):
             task = self.env_state.tasks[task_counter]
             if not task.task_completion_event.triggered:

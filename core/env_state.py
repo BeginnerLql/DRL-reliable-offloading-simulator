@@ -121,43 +121,31 @@ class EnvironmentState:
         task_id = task_object.id
         self.tasks[task_id] = task_object
 
-    def reset(self):
-        """Reset the environment state."""
-        self.servers = {}
-        self.tasks = {}
-        self.spatial_risk_server_ids = None
-        self.spatial_distance_matrix = None
-        self.spatial_correlation_matrix = None
-        self.spatial_risk_field = None
-        self.effective_failure_rates = None
-
     def get_state(self, task):
-        """Observe current CPU work and task-specific times in Server_ID order."""
+        """Observe server parameters, separate CPU work and current task attributes."""
         server_ids = sorted(self.servers)
-
-        failure_rates = []
-        transmission_times = []
-        execution_times = []
-        running_backlogs = []
-        waiting_backlogs = []
-
+        failure_rates, frequencies, transmission_rates = [], [], []
+        running_backlogs, waiting_backlogs = [], []
         for server_id in server_ids:
             server = self.get_server_by_id(server_id)
-            running_backlog, waiting_backlog = self.get_server_backlog_components(
-                server_id, task.env.now
-            )
+            running, waiting = self.get_server_backlog_components(server_id, task.env.now)
             failure_rates.append(self.get_active_failure_rate(server_id))
-            transmission_times.append(task.task_size / task.get_transmission_rate(server))
-            execution_times.append(task.computation_demand / server.processing_frequency)
-            running_backlogs.append(running_backlog)
-            waiting_backlogs.append(waiting_backlog)
+            frequencies.append(server.processing_frequency)
+            transmission_rates.append(server.transmission_rate)
+            running_backlogs.append(running)
+            waiting_backlogs.append(waiting)
 
+        frequency_min, frequency_max = params.SERVER_PROCESSING_FREQ_RANGE
+        rate_min, rate_max = params.SERVER_TRANSMISSION_RATE_RANGE
+        size_min, size_max = params.TASK_SIZE_RANGE
+        demand_min, demand_max = params.TASK_DEMAND_RANGE
         state = np.concatenate((
             np.asarray(failure_rates) / params.STATE_FAILURE_RATE_SCALE,
-            np.asarray(transmission_times) / params.STATE_TRANSMISSION_TIME_SCALE_SEC,
-            np.asarray(execution_times) / params.STATE_EXECUTION_TIME_SCALE_SEC,
-            np.asarray(running_backlogs) / params.BACKLOG_TIME_SCALE_SEC,
-            np.asarray(waiting_backlogs) / params.BACKLOG_TIME_SCALE_SEC,
-            np.asarray([task.reliability_requirement]),
+            (np.asarray(frequencies) - frequency_min) / (frequency_max - frequency_min),
+            (np.asarray(transmission_rates) - rate_min) / (rate_max - rate_min),
+            np.asarray(running_backlogs),  # Raw remaining CPU time in seconds.
+            np.asarray(waiting_backlogs),  # Raw queued CPU work in seconds.
+            [(task.task_size - size_min) / (size_max - size_min),
+             (task.computation_demand - demand_min) / (demand_max - demand_min)],
         ))
         return state.astype(np.float32)
