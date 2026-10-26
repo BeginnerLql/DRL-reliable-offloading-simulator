@@ -11,6 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from config.configuration import parameters
+from core.task import compute_task_deadlines
 from config.paths import (
     DATA_DIR,
     EVALUATION_TASK_PATH,
@@ -20,7 +21,8 @@ from config.paths import (
 )
 
 # Workbook units: Processing_Frequency in cycles/s, Transmission_Rate in MB/s,
-# Base_Failure_Rate in s^-1; Task_Size in MB, Computation_Demand in CPU cycles.
+# Base_Failure_Rate in s^-1; Task_Size in MB, Computation_Demand in CPU cycles,
+# Deadline in seconds relative to task arrival.
 SERVER_INFO_COLUMNS = [
     "Server_ID",
     "Site_ID",
@@ -35,6 +37,7 @@ TASK_INFO_COLUMNS = [
     "Task_Size",
     "Computation_Demand",
     "Reliability_Requirement",
+    "Deadline",
 ]
 
 
@@ -122,11 +125,18 @@ def generate_task_params(
     computation_demands_cycles = _profile_rng(profile_stream, 1).uniform(
         *parameters.TASK_DEMAND_RANGE, size=num_tasks
     )
+    servers = pd.read_excel(SERVER_INFO_PATH, sheet_name="Servers")
+    _, deadlines = compute_task_deadlines(
+        task_sizes_mb, computation_demands_cycles,
+        servers.Processing_Frequency.to_numpy(), servers.Transmission_Rate.to_numpy(),
+        kappa=parameters.TASK_DEADLINE_SCALE,
+    )
     task_df = pd.DataFrame({
         "Task_ID": np.arange(1, num_tasks + 1),
         "Task_Size": task_sizes_mb,
         "Computation_Demand": computation_demands_cycles,
         "Reliability_Requirement": reliability_requirements,
+        "Deadline": deadlines,
     }, columns=TASK_INFO_COLUMNS)
     task_df.to_excel(filename, index=False)
     return task_df

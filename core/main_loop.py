@@ -1,18 +1,11 @@
 from itertools import combinations
 
 from core.server import Server
-from core.task import Task
-from core.env_state import EnvironmentState
+from core.task import Task, compute_task_qos, compute_task_utility
+from core.env_state import EnvironmentState, select_latency_greedy_action
 from config.params import params
 from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH
 from pathlib import Path
-from core.spatial_risk import (
-    build_distance_matrix,
-    build_spatial_correlation_matrix,
-    compute_baseline_correlation_length_km,
-    map_spatial_risk_to_effective_failure_rates,
-    sample_spatial_risk_field,
-)
 
 import simpy
 import numpy as np
@@ -23,12 +16,16 @@ class MainLoop:
     def __init__(
         self, model, total_episodes, maxtaskno, num_states, num_actions,
         *, task_parameters_path=TRAIN_TASK_PATH,
+        use_safety_mask=True, failure_rate_scale=1.0, reliability_model="correlated",
     ):
         self.model = model
         self.num_states = num_states
         self.num_actions = num_actions
         self.total_episodes = total_episodes
         self.task_parameters_path = Path(task_parameters_path)
+        self.use_safety_mask = bool(use_safety_mask)
+        self.failure_rate_scale = float(failure_rate_scale)
+        self.reliability_model = reliability_model
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
@@ -51,15 +48,40 @@ class MainLoop:
         self.env = None
         self.env_state = None
         self.arrival_rng = np.random.default_rng(params.EXPERIMENT_SEED)
-        self.spatial_risk_rng = np.random.default_rng(params.EXPERIMENT_SEED + 1)
         self.log_data = []
         self.task_results = []
 
-        # PPO-only arrival-driven SMDP bookkeeping.
+        # PPO-only SMDP intervals span valid policy decisions, including intervening fallback.
         self.ppo_last_decision_state = None
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
         self.ppo_last_resolved_outcome_time = None
+        self.ppo_last_decision_mask = None
+        self.ppo_decision_task_ids = []
+        self.ppo_interval_reward = 0.0
+
+    def reliability_feasibility(self):
+        """Inspect fixed profiles without advancing the workload RNG or changing caches."""
+        env = simpy.Environment()
+        state = EnvironmentState(failure_rate_scale=self.failure_rate_scale,
+                                 reliability_model=self.reliability_model)
+        for sid, profile in self.server_profiles.items():
+            state.add_server_and_init_environment(Server(
+                env, sid, profile["Site_ID"], profile["Processing_Frequency"],
+                profile["Base_Failure_Rate"], profile["Transmission_Rate"],
+                profile["Latitude"], profile["Longitude"],
+            ))
+        counts = []
+        for tid in range(1, self.maxTask + 1):
+            profile = {key: value for key, value in self.task_profiles[tid].items()
+                       if key not in ("safe_mask", "reliability_snapshot")}
+            task = Task(env, state, tid, profile)
+            counts.append(int(state.get_safe_action_mask(task).sum()))
+        counts = np.asarray(counts)
+        return dict(task_count=len(counts), no_safe_action_count=int((counts == 0).sum()),
+                    single_safe_action_count=int((counts == 1).sum()),
+                    multi_safe_action_count=int((counts > 1).sum()),
+                    mean_safe_pair_count=float(counts.mean()))
 
     def _load_run_profiles(self):
         """Load fixed profiles once; every episode reuses their attributes/order."""
@@ -69,6 +91,8 @@ class MainLoop:
             dtype={"Site_ID": "string"},
         )
         task_df = pd.read_excel(self.task_parameters_path)
+        if "Deadline" not in task_df:
+            raise ValueError("QoS reward requires a Deadline column in the task workbook")
         return (
             self._build_server_profiles(server_df),
             self._build_task_profiles(task_df),
@@ -93,12 +117,17 @@ class MainLoop:
     @staticmethod
     def _build_task_profiles(task_df):
         frame = task_df.sort_values("Task_ID").reset_index(drop=True)
+        if "Deadline" in frame:
+            deadlines = frame.Deadline.to_numpy(dtype=float)
+            if not np.isfinite(deadlines).all() or np.any(deadlines <= 0):
+                raise ValueError("Task deadlines must be positive finite seconds")
         return {
             int(row["Task_ID"]): {
                 "Task_ID": int(row["Task_ID"]),
                 "Task_Size": float(row["Task_Size"]),
                 "Computation_Demand": float(row["Computation_Demand"]),
                 "Reliability_Requirement": float(row["Reliability_Requirement"]),
+                **({"Deadline": float(row["Deadline"])} if "Deadline" in frame else {}),
             }
             for _, row in frame.iterrows()
         }
@@ -115,9 +144,13 @@ class MainLoop:
             self.ppo_last_decision_action = None
             self.ppo_last_decision_time = None
             self.ppo_last_resolved_outcome_time = None
+            self.ppo_last_decision_mask = None
+            self.ppo_decision_task_ids = []
+            self.ppo_interval_reward = 0.0
 
             self.env = simpy.Environment()
-            self.env_state = EnvironmentState()
+            self.env_state = EnvironmentState(failure_rate_scale=self.failure_rate_scale,
+                                              reliability_model=self.reliability_model)
 
             self.setServers()
             self._initialize_episode_spatial_risk()
@@ -127,39 +160,25 @@ class MainLoop:
                 self.task_results.append(self.get_task_outcome_info(task))
 
     def _initialize_episode_spatial_risk(self):
-        """Sample and store one quasi-static spatial risk field for this episode."""
-        if not params.SPATIAL_RISK_ENABLED:
+        """Initialize unknown-field GH reliability without an observed risk sample."""
+        self.env_state.initialize_spatial_reliability()
+
+    def _store_ppo_interval(self, next_state, next_mask, next_task_id=None, *, done=False):
+        """Close an interval only at another PPO decision or the terminal drain."""
+        if self.ppo_last_decision_state is None:
             return
-        server_objects = [
-            server_info["server_object"]
-            for server_info in self.env_state.servers.values()
-        ]
-        server_ids, distance_matrix = build_distance_matrix(server_objects)
-        correlation_length_km = compute_baseline_correlation_length_km(distance_matrix)
-        correlation_matrix = build_spatial_correlation_matrix(
-            distance_matrix,
-            correlation_length_km,
+        task_id = self.ppo_decision_task_ids[-1]
+        task = self.env_state.tasks[task_id]
+        end_time = self._get_ppo_terminal_time() if done else float(self.env.now)
+        task.ppo_delta_t = end_time - self.ppo_last_decision_time
+        task.ppo_next_task_id = next_task_id
+        task.ppo_interval_reward = self.ppo_interval_reward
+        self.model.store_transition(
+            self.ppo_last_decision_state, self.ppo_last_decision_action, self.ppo_interval_reward,
+            next_state, delta_t=task.ppo_delta_t, done=done,
+            action_mask=self.ppo_last_decision_mask, next_action_mask=next_mask, task_id=task_id,
         )
-        spatial_risk_field = sample_spatial_risk_field(
-            correlation_matrix,
-            rng=self.spatial_risk_rng,
-        )
-        base_failure_rates = np.array([
-            self.env_state.get_server_by_id(server_id).base_failure_rate
-            for server_id in server_ids
-        ], dtype=float)
-        effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
-            base_failure_rates,
-            spatial_risk_field,
-            params.SPATIAL_RISK_BETA_P,
-        )
-        self.env_state.set_episode_spatial_risk_context(
-            server_ids,
-            distance_matrix,
-            correlation_matrix,
-            spatial_risk_field,
-            effective_failure_rates,
-        )
+        self.ppo_interval_reward = 0.0
 
     def _sample_interarrival_time(self):
         """Sample one inter-arrival time for the common Poisson workload."""
@@ -184,9 +203,7 @@ class MainLoop:
             yield self.env.timeout(self._sample_interarrival_time())
             current_time = float(self.env.now)
 
-            # PPO closes the previous arrival-to-arrival interval before
-            # observing the new task. DQN/DDPG use
-            # task-centric bookkeeping below.
+            # Collect all task outcomes, including deterministic fallback tasks.
             if self.model_name == "ppo":
                 self._collect_resolved_task_outcomes()
 
@@ -196,18 +213,8 @@ class MainLoop:
             self.env_state.add_task(task)
             self.G_state = self.env_state.get_state(task)
 
-            if self.model_name == "ppo":
-                if self.ppo_last_decision_state is not None:
-                    delta_t = current_time - self.ppo_last_decision_time
-                    self.model.store_transition(
-                        self.ppo_last_decision_state,
-                        self.ppo_last_decision_action,
-                        0.0,  # Filled with the task outcome before updating.
-                        self.G_state,
-                        delta_t=float(delta_t),
-                        done=False,
-                    )
-            elif self.taskCounter > 1:
+            task.safe_mask = self.env_state.get_safe_action_mask(task)
+            if self.model_name != "ppo" and self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
                 # resolved DQN/DDPG task transitions.
                 prev = list(self.tempbuffer[self.taskCounter - 1])
@@ -215,7 +222,24 @@ class MainLoop:
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
                 self.add_train()
 
-            if self.model_name == "ddpg":
+            if self.model_name == "ppo":
+                task.is_fallback = not bool(task.safe_mask.any())
+                if task.is_fallback:
+                    self.G_action = select_latency_greedy_action(self.G_state, self.index_of_actions)
+                else:
+                    mask = task.safe_mask if self.use_safety_mask else np.ones(self.num_actions, dtype=bool)
+                    self._store_ppo_interval(self.G_state, mask, task.id)
+                    self.G_action = self.model.select_action(self.G_state, 0.0, action_mask=mask)
+                    task.ppo_decision = True
+                    task.ppo_action_mask = np.array(mask, dtype=bool, copy=True)
+                    task.ppo_transition_index = len(self.ppo_decision_task_ids)
+                    self.ppo_decision_task_ids.append(task.id)
+                    self.ppo_last_decision_state = self.G_state
+                    self.ppo_last_decision_action = self.G_action
+                    self.ppo_last_decision_time = current_time
+                    self.ppo_last_decision_mask = np.array(mask, copy=True)
+                server_A, server_B = self.extract_parameters_from_index(self.G_action)
+            elif self.model_name == "ddpg":
                 action_scores = self.model.policy(self.G_state)
                 self.G_action = action_scores.numpy().tolist()
                 self.G_action = self.model.addNoise(
@@ -227,6 +251,7 @@ class MainLoop:
                 action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
+            task.action_index = int(self.G_action) if self.model_name != "ddpg" else None
 
             # Freeze the decision-time reliability snapshot before execution.
             task.replica_A_reliability = (
@@ -239,11 +264,7 @@ class MainLoop:
                 self.env_state.compute_pair_reliability(task, server_A, server_B)
             )
 
-            if self.model_name == "ppo":
-                self.ppo_last_decision_state = self.G_state
-                self.ppo_last_decision_action = self.G_action
-                self.ppo_last_decision_time = current_time
-            else:
+            if self.model_name != "ppo":
                 # Store the DQN/DDPG task transition.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
@@ -263,25 +284,17 @@ class MainLoop:
 
         if self.model_name == "ppo":
             # Close the final arrival-to-terminal interval explicitly.
-            if self.ppo_last_decision_state is not None:
-                terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
-                terminal_time = self._get_ppo_terminal_time()
-                delta_t = terminal_time - self.ppo_last_decision_time
-                self.model.store_transition(
-                    self.ppo_last_decision_state,
-                    self.ppo_last_decision_action,
-                    0.0,  # Filled with the task outcome before updating.
-                    terminal_next_state,
-                    delta_t=float(delta_t),
-                    done=True,
+            if self.ppo_decision_task_ids:
+                self._store_ppo_interval(
+                    np.zeros_like(self.ppo_last_decision_state),
+                    np.zeros(self.num_actions, dtype=bool), done=True,
                 )
-            # Each arrival-ordered decision receives its own task outcome.
-            self.model.rewards[:] = [
-                self.compute_reward(self.get_task_outcome_info(task))
-                for task in self.env_state.tasks.values()
-            ]
+            # Rewards were collected at completion and assigned to decision intervals.
+            if not np.isclose(sum(self.model.rewards), self.episodic_reward, rtol=0, atol=1e-9):
+                raise RuntimeError("PPO interval rewards must equal total effective task QoS")
             # PPO remains on-policy and updates once after the episode.
-            self.model.train_step()
+            if self.ppo_decision_task_ids:
+                self.model.train_step()
 
         task_avg_delay = self.episodic_delay / self.maxTask
         self.log_data.append((
@@ -321,13 +334,28 @@ class MainLoop:
 
     def get_task_outcome_info(self, task):
         """Build task-level outcome data from its lifecycle and saved snapshot."""
-        return {
+        outcome = {
             "episode": self.this_episode,
             "task_id": task.id,
             "task_size": task.task_size,
             "computation_demand": task.computation_demand,
             "reliability_requirement": task.reliability_requirement,
             "arrival_time": task.arrival_time,
+            "deadline_s": task.deadline,
+            "absolute_deadline_s": task.absolute_deadline,
+            "action_index": task.action_index,
+            "ppo_action": task.action_index if task.ppo_decision else None,
+            "safe_mask": "".join("1" if flag else "0" for flag in task.safe_mask),
+            "action_mask": ("".join("1" if flag else "0" for flag in task.ppo_action_mask)
+                            if task.ppo_decision else None),
+            "is_fallback": task.is_fallback,
+            "ppo_decision": task.ppo_decision,
+            "ppo_transition_index": task.ppo_transition_index,
+            "ppo_delta_t": task.ppo_delta_t,
+            "ppo_next_task_id": task.ppo_next_task_id,
+            "ppo_reward_owner_task_id": task.ppo_reward_owner_task_id,
+            "ppo_interval_reward": task.ppo_interval_reward,
+            "safe_pair_count": int(np.count_nonzero(task.safe_mask)),
             "server_A_id": task.replica_A["server_id"],
             "server_B_id": task.replica_B["server_id"],
             "replica_A_queue_enter_time": task.replica_A["queue_enter_time"],
@@ -345,9 +373,56 @@ class MainLoop:
                 task.pair_reliability >= task.reliability_requirement
             ),
         }
+        outcome["task_qos"] = compute_task_qos(
+            outcome["task_latency"], outcome["deadline_s"],
+            grace_multiplier=params.QOS_GRACE_MULTIPLIER)
+        outcome["task_utility"] = MainLoop.compute_reward(outcome)
+        if hasattr(task, "rasoul_decision"):
+            decision = task.rasoul_decision
+            outcome.update(
+                selection_reliability_model="marginal",
+                selection_reliability=task.replica_A_reliability,
+                selection_requirement_satisfied=outcome["requirement_satisfied"],
+                predicted_qos=decision.predicted_qos,
+                predicted_latency_s=decision.predicted_latency_s,
+                fallback_reason=decision.fallback_reason,
+                safe_node_mask="".join("1" if flag else "0" for flag in decision.safe_node_mask),
+                safe_node_count=sum(decision.safe_node_mask),
+                admitted_node_mask="".join("1" if flag else "0" for flag in decision.admitted_node_mask),
+                admitted_node_count=sum(decision.admitted_node_mask),
+                rasoul_score=decision.selection_score,
+                rasoul_cold_start=decision.feedback_count == 0,
+                rasoul_history_mean_error=decision.history_mean_error,
+                rasoul_confidence_bonus=decision.confidence_bonus,
+                rasoul_feedback_count_before=decision.feedback_count,
+                rasoul_decision_count=decision.decision_count,
+                rasoul_selected_load=decision.selected_load,
+                rasoul_selected_load_after_admission=decision.selected_load_after_admission,
+            )
+            outcome.update({f"rasoul_{key}": value for key, value in getattr(task, "rasoul_feedback", {}).items()})
+        if hasattr(task, "tore_decision"):
+            decision = task.tore_decision
+            outcome.update(
+                selection_reliability_model="independent",
+                selection_reliability=decision.independent_reliability,
+                selection_requirement_satisfied=bool(
+                    decision.independent_reliability >= task.reliability_requirement),
+                predicted_qos=decision.predicted_qos,
+                predicted_latency_s=decision.predicted_latency_s,
+                greedy_server_ids=decision.greedy_server_ids,
+                greedy_reliability=decision.greedy_reliability,
+                fallback_reason="replica_limit" if decision.is_fallback else None,
+                independent_feasible_pair_exists=bool(task.safe_mask.any()),
+                greedy_missed_feasible_pair=bool(decision.is_fallback and task.safe_mask.any()),
+            )
+        return outcome
 
-    def compute_reward(self, outcome_info):
-        return -float(outcome_info["task_latency"])
+    @staticmethod
+    def compute_reward(outcome_info):
+        """Per-task objective contribution; PPO sums these over completion intervals."""
+        qos = compute_task_qos(outcome_info["task_latency"], outcome_info["deadline_s"],
+                               grace_multiplier=params.QOS_GRACE_MULTIPLIER)
+        return compute_task_utility(qos, outcome_info["requirement_satisfied"])
 
     def _get_ppo_terminal_time(self):
         """Use the latest actual outcome timestamp for PPO terminal timing."""
@@ -365,6 +440,9 @@ class MainLoop:
 
             outcome_info = self.get_task_outcome_info(task)
             task_reward = self.compute_reward(outcome_info)
+            if self.ppo_last_decision_state is not None:
+                task.ppo_reward_owner_task_id = self.ppo_decision_task_ids[-1]
+                self.ppo_interval_reward += task_reward
             task_outcome_time = task.task_completion_time
             if self.ppo_last_resolved_outcome_time is None:
                 self.ppo_last_resolved_outcome_time = task_outcome_time

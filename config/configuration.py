@@ -16,6 +16,8 @@ class parameters:
     # Main-experiment task reliability requirement tiers.
     TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
     TASK_DEMAND_RANGE = (2.0e9, 4.0e9)  # CPU cycles, continuous uniform
+    TASK_DEADLINE_SCALE = 1.5  # Relative deadline / fastest unloaded completion time.
+    QOS_GRACE_MULTIPLIER = 2.0  # QoS reaches zero at b * relative deadline.
     taskno = 200
 
     # Unified server parameters
@@ -26,7 +28,9 @@ class parameters:
 
     STATE_FAILURE_RATE_SCALE = 0.5  # s^-1; scales with the base failure-rate range.
 
-    # One quasi-static spatial-risk field is sampled per episode when enabled.
+    # Marginalize the unknown spatial-risk field when enabled (no field sampling).
+    # False uses base failure rates without latent risk: effective beta = 0.
+    # Set before starting a run and building reliability caches.
     SPATIAL_RISK_ENABLED = True
     # Baseline correlation length = median server-pair distance / ln(2).
     # TEMPORARY exploratory calibration value.
@@ -64,9 +68,9 @@ class parameters:
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4
     critic_lr_ppo = 5e-4
-    # Per-second discount base for event-driven PPO/SMDP.
-    # Transition-specific discount: gamma_k = gamma_ppo ** delta_t_seconds.
-    gamma_ppo = 0.8
+    # Undiscounted finite episode: sum of completion utilities / N is the reported objective.
+    # The SMDP still records elapsed seconds; gamma_k = gamma_ppo ** delta_t_seconds.
+    gamma_ppo = 1.0
     clip_eps_ppo = 0.2
     k_epochs_ppo = 2
     batch_size_ppo = 64

@@ -1,0 +1,248 @@
+﻿Zotero键,标题,范围,可靠性方面,证据层级,PDF状态,说明
+8DE59KN9,MEC-Enabled Task Replication With Resource Allocation for Reliability-Sensitive Services in 5G mMTC Networks,核心,通信可靠性；排队与时限,本地PDF系统模型,可读,不是CPU硬件指数故障；Service IoT与MEC不是同一种队列模型。
+XVKWEK76,TORE-NET: A Task Replication and Offloading Strategy in Reliable and Energy-Efficient Mobile Edge Computing Networks,核心,CPU执行可靠性；可用性,本地PDF系统模型,可读,可用性、CPU无故障概率与按期完成率必须分开；不能直接声称处理相关故障。
+ETI9KJD8,RASOUL: A Reliability-Aware Task Allocation Strategy to Improve Success Rate and Energy Saving in Mobile-Edge Computing,核心,CPU执行可靠性；可用性,本地PDF系统模型,可读,全文已补齐；能量主要为终端传输/预处理，不等于TORE-NET的ES执行能量。
+UN5YWMYX,Bayesian spatial reliability model for power transmission network lines,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8JXYRVHM,Hazard Resistance-Based Spatiotemporal Risk Analysis for Distribution Network Outages During Hurricanes,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+M2STJ77U,Real-Time Service Restoration of Coupled Power-Water Systems Considering the Spatio-Temporal Cascading Failure,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+F6XZFBUH,Event-Driven Computation Offloading in IoT With Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+MHCGMJF9,Task-Driven Priority-Aware Computation Offloading Using Deep Reinforcement Learning,边界,一般QoS/优先级,本地PDF系统模型,可读,相关工作提及故障不构成本论文故障模型，不列为核心故障卸载文献。
+ZH4XFDGC,Spatially dependent sampling of component failures for power system preventive control against hurricanes,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PA4NK8Y5,Modeling and Measuring Common Cause Failures in Measurement of Reliability of Nuclear Power Plant Systems,未纳入本次相关集,,仅元数据/摘要筛查,无PDF附件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+3BQ2K8HY,Optimization of system reliability in the presence of common cause failures,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+66JYL6SF,Fed-TSN: Joint Failure Probability-Based Federated Learning for Fault-Tolerant Time-Sensitive Networks,支撑,联合失效；网络路径可靠性,本地PDF系统模型,可读,网络流冗余路由，不是CPU任务复制。
+MKXLV53D,,支撑,共因故障；网络冗余,本地PDF系统模型,可读,原记录标题为空；由PDF首页识别标题，未修改Zotero。
+FNWIA3Q9,Common Cause Failures Dominate and Defeat Redundancy,支撑,共因故障；冗余失效,本地PDF系统模型,可读,背景论证，不是任务卸载算法。
+8LMUD5BW,Cost-Driven Prunings for Iterative Solving of Constrained Routing Problem With SRLG-Disjoint Protection,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+GCIBD7EC,Design and Reliability Performance of Wireless Backhaul Networks Under Weather-Induced Correlated Failures,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+E72Y7NAY,RIoTstore: Resilient Data Storage for Spatial IoT Applications,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+22N55ZYR,A Framework for Disaster-Tolerant Slice Placement in Future Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+V7LXE87U,Topology-Aware Virtual Machine Placement Through the Buffer Migration Mechanism,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+TRC42RBI,Distributed Convex Relaxation for Heterogeneous Task Replication in Mobile Edge Computing,核心,期限内完成可靠性,本地PDF系统模型,可读,不是CPU执行硬件无故障概率；作业与单任务的成功事件不同。
+6J648F9U,Security-Sensitive Task Offloading in Integrated Satellite-Terrestrial Networks,核心,通信可靠性；安全性另列,本地PDF系统模型,可读,可靠性主要指链路传输；抗攻击强度不能代替CPU可靠性。
+LAGQBNIC,ReToCue: Reliability-aware task offloading and caching in UAV-assisted LEO satellite edge computing,核心,尾时延可靠性,本地PDF系统模型,可读,旧笔记中能量与切换风险不应替代正文的时延违约可靠性定义。
+M4SYZZES,CVaR-constrained reinforcement learning for ultra-reliable task offloading in LEO satellite edge computing,核心,尾风险；期限违约；链路丢弃,本地PDF系统模型,可读,CVaR是损失尾部风险，不能等同单任务无故障概率。
+GG339X3N,PRITO: Performance-reputation integrated task offloading for reliable vehicular edge computing,核心,可信结果；通信连续性；准时性,本地PDF系统模型,可读,声誉是估计服务可信度，不是指数CPU失效率。
+VEKJKF7D,On the marshall–olkin copula model for network reliability under dependent failures,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+XPM57MLT,Reliability-aware optimization of task offloading for UAV-assisted edge computing,核心,CPU/节点故障；通信可靠性,本地PDF系统模型,可读,同时包含传输与计算故障，不能简化成单一链路超期模型。
+HY4YPKGL,LLM-enhanced deep reinforcement learning for task offloading in collaborative edge computing,核心,CPU/软件故障；硬件故障；通信故障,本地PDF系统模型,可读,是多类失效联合模型；与单一CPU可靠性门槛需做机制对齐。
+J8GUFM2K,Optimal task partition and distribution in grid service system with common cause failures,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+UG9Z7TRF,FailLite: Failure-resilient model serving for resource-constrained edge environments,支撑,服务可用性与恢复,本地PDF系统模型,可读,复制模型服务部署，不是对每个到达任务选两个执行节点。
+SIK5DA7T,ESFMTO: A reliable task offloading strategy based on edge server failure model in IIoT,核心,硬件/容器失效恢复；尾时延,本地PDF系统模型,可读,必须区分故障过程本身与CVaR时延目标，不能仅用静态λ替代。
+3EE7NX8V,Learning spatiotemporal failure dependencies for resilient edge computing services,支撑,时空相关节点故障；链路可用性,本地PDF系统模型,可读,持续服务部署；是联合故障建模参考，不是独立任务CPU复制的直接同模型基线。
+WPUZMFAG,Robust dynamic edge service placement under spatio-temporal correlated demand uncertainty,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+45GCAMCK,PR-fog: An efficient task priority-based reliable provisioning of resources in fog-enabled IoT networks,核心,节点失效恢复；阻塞和按期完成,本地PDF系统模型,可读,满意率属于按时完成，不能单独解释为硬件无故障概率。
+LLDP28PA,Resilient edge service placement under demand and node failure uncertainties,支撑,节点故障不确定性,本地PDF系统模型,可读,决策是服务部署与负载再分配，不是在线单任务复制。
+LYH9UR7W,Reliability-aware proactive placement of microservices-based IoT applications in fog computing environments,支撑,独立与共因故障；服务吞吐可用性,本地PDF系统模型,可读,研究服务副本放置；故障组依赖不是仅用节点距离建立的风险核。
+FFUIT44G,KPath: Dependent and redundant task execution path planning in edge service networks,核心,路径冗余与故障隔离,本地PDF系统模型,可读,不是每个节点都给出exp(-λt)门槛；副本是完整依赖执行路径。
+6GVHFETT,Decentralized task offloading in collaborative edge computing: A digital twin assisted multi-agent reinforcement learning approach,核心,节点执行失败；子任务冗余,本地PDF系统模型,可读,旧笔记未充分记录其复制模型；本次核对模型第4页确认存在冗余子任务。
+DZ68WBXY,A fault-tolerant task offloading framework via large-scale multi-objective evolutionary optimization and game-based decision mechanism,核心,节点/执行路径故障风险,本地PDF系统模型,可读,优化多目标分数不能当作单一CPU可靠性门槛。
+QIXLEZBS,Reinforcement learning for strategy-proof reliability-aware redundancy task offloading in UAV-enabled mobile edge computing network,核心,硬件执行可靠性,本地PDF系统模型,可读,原模型用节点硬件失败概率，不应自行换成频率相关λ后称完整复现。
+F3SFVRZ6,Goal-driven trusted collaborator selection and task offloading in dynamic collaborative systems,核心,协作者可信性；接触连续性,本地PDF系统模型,可读,信任评分不是联合硬件故障概率；结果正确性的验证范围须单独检查。
+L928YI99,Trustworthy multi-hop cooperative task offloading in device-edge-cloud computing,核心,安全可信性/虚假服务,本地PDF系统模型,可读,属于对抗行为可信性，不是随机硬件失效模型。
+D8F72THP,Task offloading scheduling for mobile edge computing networks with incomplete edge information,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+NLDHZBHF,Mobility-aware joint task offloading and resource allocation in SDN-enabled MEC networks via hierarchical deep reinforcement learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+ZFHZACNA,Availability analysis of redundant and replicated cloud services with bayesian networks,支撑,服务可用性；共因故障,本地PDF系统模型,可读,服务可用性和任务期限内无故障执行是不同事件。
+RBWXBHN8,Algorithms for optimal replica placement under correlated failure in hierarchical failure domains,支撑,相关故障域；数据可用性,本地PDF系统模型,可读,复制的是数据，不执行同一CPU任务。
+9M5ZCA4V,DieHard: Reliable scheduling to survive correlated failures in cloud data centers,支撑,相关故障；服务容量存活,本地PDF系统模型,可读,K-of-N服务容量条件，不是单任务首副本完成；不能套独立乘积。
+AZA8N8RU,A simplified reliability analysis method for cloud computing systems considering common-cause failures,未纳入本次相关集,,仅元数据/摘要筛查,无PDF附件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+9S8UVTQ4,Reliability evaluation for cloud computing system considering common cause failure,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+7WKEJWDQ,Safety analysis of rail transit redundant structure in cloud computing environment based on graph and bayesian theory,支撑,安全运行；冗余结构可用性,本地PDF系统模型,可读,领域安全结构分析，不是移动计算任务卸载。
+GS2KT4XV,Reliability of a k-out-of-n system with common-cause failures using multivariate exponential distribution,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+ZB2BYGHC,Reliability-aware task replication for mobile edge computing,核心,期限内完成可靠性,本地PDF系统模型,可读,不是下方Fog-IoV同名RATE；原伪代码初始化存在与最少副本目标不一致处。
+N7VAN3PG,Joint UAV placement and dependent task offloading in multi-UAV MEC networks: A graph attention enhanced DRL approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KQ4FD48B,Quality of experience and reliability-aware task offloading and scheduling for multi-user mobile-edge computing systems,核心,CPU软错误；链路传输错误,本地PDF系统模型,可读,链路错误参数的单位需核对；不能把所有失败简化为超期。
+SL933D4R,Reliable routing and scheduling in time sensitive networks based on reinforcement learning,支撑,网络传输可靠性；按期到达,本地PDF系统模型,可读,对象是周期网络流。
+48ENLURA,High reliability scheduling for DAG based service function chains,支撑,服务链可靠性；截止期,本地PDF系统模型,可读,VNF服务链和独立任务副本不同。
+WV7TGTXZ,Hybrid redundancy for reliable task offloading in collaborative edge computing,核心,执行故障；主动复制与重试,本地PDF系统模型,可读,在选中集群内部确定副本数；首成功后可取消其他副本，与继续执行规则不同。
+SXUYQPZC,Efficient resource allocation in computing power networks considering similar task merging: A lyapunov optimization-based DRL approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+D7XC4RGX,Context-aware fault classification for multi-access edge computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+6DLXVCXI,Prioritized fault recovery strategies for multi-access edge computing using probabilistic model checking,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+ETJ63HTZ,Resilience and failure analysis in next-generation communication networks: A contemporary survey,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8QVF796E,Decentralized task offloading in edge computing: An offline-to-online reinforcement learning approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+FJBEC772,Fault-tolerant mobile service offloading in mobile edge computing,核心,节点故障；恢复连续性,本地PDF系统模型,可读,是有恢复状态的过程，不能直接等价于两个独立一次性副本。
+XIG385ZI,Workload-aware approximate backup to reduce fault-tolerant overhead for stream processing applications,支撑,流处理恢复；结果精度,本地PDF系统模型,可读,近似备份不保证与主任务完全相同的结果。
+K5BF47KD,Governing resource failures through reinforcement learning scheduling in fog/edge computing: A review,支撑,资源故障；容错调度综述,本地PDF综述,可读,综述，不虚构单一原创系统模型。
+U9FRARMH,DeepWFFS: Enhancing fog computing efficiency through multiqueue architecture and intelligent controller for task prioritization,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PKCQSAWB,Intelligent cross-domain data orchestration in computing power networks: An attention-enhanced multi-agent reinforcement learning approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+AMNKJN8D,A balanced and reliable data replica placement scheme based on reinforcement learning in edge–cloud environments,支撑,数据副本可用性,本地PDF系统模型,可读,复制的是数据，不是执行任务。
+DIISZ8X6,Proactive spatio-temporal request prediction for replica placement in edge-cloud computing,支撑,请求覆盖；服务副本部署,本地PDF系统模型,可读,请求时空相关性不是故障时空相关性。
+BQVHSWSJ,DIST: Distributed learning-based energy-efficient and reliable task scheduling and resource allocation in fog computing,核心,执行可靠性；实时调度,本地PDF系统模型,可读,工作流/DVFS模型不同于固定频率独立任务；不把可靠性与节能混为一类。
+KITIKZMY,Dynamic task replication with imperfect fault detection in multicore cyber-physical systems,支撑,执行故障；非完美故障检测,本地PDF系统模型,可读,是多核处理器，不是网络边缘节点卸载。
+6TTIDW6D,DReaM: Deep reinforcement learning for joint reliability and power management in multicore IoT devices,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+B76XMRDS,Fault-tolerant resource allocation and task offloading scheme for UAV NOMA-MEC networks,核心,MEC节点硬件故障,本地PDF系统模型,可读,需要NOMA/UAV资源模型，不只是普通静态CPU选择。
+YNX4H396,ReLIEF: A reinforcement-learning-based real-time task assignment strategy in emerging fault-tolerant fog computing,核心,执行/链路故障；主备恢复,本地PDF系统模型,可读,备用不是同时执行；不能直接当作无序双节点FR。
+UVQQX5G3,Computation offloading and resource allocation in failure-aware vehicular edge computing,核心,期限违约与重传,本地PDF系统模型,可读,这里failure主要是时限失败，不是硬件随机宕机。
+RFIIHJYC,A novel multi-path routing optimization scheme for deterministic computing power network in industrial internet of things,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+TT4AX79G,An event-driven and hybrid collaboration based simulation method for computing power network,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+EJMBLZL3,Delay-prioritized and reliable task scheduling with long-term load balancing in computing power networks,核心,期限违约；拥塞丢弃,本地PDF系统模型,可读,没有据此确认CPU软错误模型；可靠性主要来自完成与不丢弃。
+57CLCT2G,DPU-enhanced multi-agent actor-critic algorithm for cross-domain resource scheduling in computing power network,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+B3LIAWIG,"DNN partitioning, task offloading, and resource allocation in dynamic vehicular networks: A lyapunov-guided diffusion-based reinforcement learning approach",未纳入本次相关集,,仅元数据/摘要筛查,无PDF附件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+R6FZV5QA,QERLO: An intelligent quantum-enhanced reinforcement learning framework for task offloading in IoT networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+JQ3BLNE3,Large language model-based task offloading and resource allocation for digital twin edge computing networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+RQ9KM5ZT,Joint latency and charge cost minimization for reliable task offloading in dispersed computing: A multi-objective optimization approach,核心,设备执行正确性/故障,本地PDF系统模型,可读,设备计算结果可被验证；不是单纯首返回即可信。
+2BWERK7I,URLLC-awared resource allocation for heterogeneous vehicular edge computing,核心,队列稳定性/URLLC,本地PDF系统模型,可读,强稳定性不自动等于指定极小期限违约概率，不是硬件可靠性。
+58SXU5G5,Distributed dependency-aware task offloading and service caching in cloudlet-based edge computing networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+XHCYK9SA,Energy-efficient task offloading in the industrial internet of things: A lyapunov-guided multi-agent deep reinforcement learning approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8RHSY9N9,Distributed task offloading in edge computing: A multi-objective adaptive deep reinforcement learning algorithm,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KVZXU9ZL,Reliability-aware task processing and offloading for data-intensive applications in edge computing,核心,失效恢复；期限内处理,本地PDF系统模型,可读,原文可靠性依赖失败恢复过程，不能仅取一次执行exp(-λt)。
+RT5Y72GB,"Edge computing for industry 5.0: Fundamental, applications, and research challenges",未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+THKZ36FA,"Joint optimization of trajectory control, resource allocation, and task offloading for multi-UAV-assisted IoV",未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8BD9QWLD,Secure task offloading and resource allocation design for multi-layer non-terrestrial networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+QFHN2YB7,QAROO: AI-driven online task offloading for energy-efficient and sustainable MEC networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KLMZVNSR,Multi-objective deep reinforcement learning for mobile edge computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+AWTEAT8Y,QECO: A QoE-oriented computation offloading algorithm based on deep reinforcement learning for mobile edge computing,边界,一般QoE/时延,本地PDF系统模型,可读,可作排队感知算法背景，不列为核心故障卸载证据。
+T9GL79MQ,"Joint trajectory, resource, and access optimization in multi-UAV collaborative mobile edge computing networks for low-altitude economy",未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+RQ8SJK4H,Distributed optimization of task offloading and resource allocation for mobile edge computing with multifactorial uncertainty,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+4ZKNBXCU,"A survey on computing power networks: Architecture, resource allocation, and AI services enablement",未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+CV228UBB,AI-native predictive scheduling for computing power networks: A multi-scale learning framework for ultra-low latency 6G applications,支撑,低时延QoS；预测调度,本地PDF系统模型,可读,支撑背景；未据此确认随机节点故障约束。
+8XL6F363,Intelligent delay-aware partial computing task offloading for multiuser industrial internet of things through edge computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+5S4AQXMU,Event-driven preemptive priority scheduling via causal topology-task context fusion in computing power networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+Q6VDTV9C,TTACO: Trusted Time-Aware Computing Offloading in Air-Ground Integrated Networks,核心,可信协作,摘要级,缺失文件,仅摘要，不能推断CPU故障过程或副本可靠性公式。
+ITZ2WSIC,Joint Optimization of Completion Ratio and Latency of Offloaded Tasks With Multiple Priority Levels in 5G Edge,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+N4NWFQZ9,Blockchain-Based Trusted Traffic Offloading in Space-Air-Ground Integrated Networks (SAGIN): A Federated Reinforcement Learning Approach,支撑,对抗节点可信性,摘要级,缺失文件,卸载对象是流量，不是CPU计算任务；摘要证据。
+DY7IND98,Deadline-Aware Joint Task Scheduling and Offloading in Mobile-Edge Computing Systems,核心,按期完成/超期调度,网页全文系统模型,缺失文件,网页预印本系统模型；无硬件故障可靠性门槛。
+HMEBHKAZ,Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information,核心,通信中断；供能可用性；超期,网页全文系统模型,缺失文件,供电不足导致本地计算失败，不是ES指数瞬态故障；网页全文模型第III节。
+NBH42EKR,Joint Power Allocation and Task Offloading for Reliability-Aware Services in NOMA-Enabled MEC,核心,传输错误；排队尾时延,摘要级,缺失文件,摘要确认；未核验模型方程与端到端约束组合形式。
+K5DD96JM,基于强化学习的算力网络管理和调度,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+4PFKQZXL,Delay-Sensitive Dependent Tasks Offloading and Resource Allocation in VEC: A Deep-Reinforcement Learning Approach,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+59XAE276,Resource Optimization for Semantic-Aware Networks With Task Offloading,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+BFMWUF7E,QoE-Driven Multi-Task Offloading for Semantic-Aware Edge Computing Systems,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PLW4GAKC,Deep Reinforcement Learning for Energy-Efficient Computation Offloading in Mobile-Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+B3N4YJ9J,Deadline-aware task offloading in vehicular networks using deep reinforcement learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+RLJPEYVV,Latency and Reliability-Aware Task Offloading and Resource Allocation for Mobile Edge Computing,核心,尾队列风险,本地PDF系统模型,可读,队列长度作为时延代理，不是CPU无故障概率。
+7FXYV9QS,Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game,核心,攻击风险；对抗可靠性,摘要级,缺失文件,仅摘要；不能确认节点复制数量及具体故障概率公式。
+U36XDGYE,To Risk or Not to Risk: Learning with Risk Quantification for IoT Task Offloading in UAVs,核心,任务后果风险；能量/时限,网页全文系统模型,缺失文件,CVaR针对损害代价，不直接等同CPU失败概率或纯尾时延。
+FF7XKHVD,Risk-Aware Data Offloading in Multi-Server Multi-Access Edge Computing Environment,核心,资源竞争风险；前景理论效用,网页全文系统模型,缺失文件,Section II–IV；分割数据而非完整副本，效用损失不等于硬件故障概率。
+R4RFPPLE,Deep-Reinforcement-Learning-Based Task Offloading and Resource Allocation in Mobile Edge Computing Network With Heterogeneous Tasks,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+MD5KUZXP,Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing,核心,尾队列风险/URLLC,网页全文系统模型,缺失文件,网页作者预印本模型；与会议版RLJPEYVV属同一研究线，非同一DOI重复项。
+3EH686AT,Towards Risk-Averse Edge Computing With Deep Reinforcement Learning,核心,时延波动风险；风险厌恶,网页全文系统模型,缺失文件,Section 3.2–5；PPO-MV/PPO-DSR控制均值方差/Sharpe风险；跨任务分散不等于同任务复制。
+FV4M7K6L,Reliability and Latency Aware Code-Partitioning Offloading in Mobile Edge Computing,核心,卸载失败与时限,摘要级,缺失文件,仅摘要；不能确认失败由硬件、链路还是超时具体组合导致。
+7LYY7D66,RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments,核心,历史服务可信度；协作连续性,网页全文系统模型,缺失文件,网页系统模型；与ZB2BYGHC期限概率RATE是不同论文，评分非概率。
+AYHWYXYM,Age-of-Information Minimization in Multi-Server Edge Computing Networks for URLLC Services,核心,有限块长通信；计算尾队列,摘要级,缺失文件,仅摘要；信息新鲜度目标不等于任务执行无故障概率。
+H6ZFNW6K,Task-Specific Trust Prediction with GNN for Minimized Risk of Task Completion in Dynamic Collaborative Systems,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+YYEJMBAZ,Multi-Objective Reinforcement Learning-Based Dependent Task Scheduling With Service Caching in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+7AELAYCV,Dependency-Aware Task Offloading Strategy via Heterogeneous Graph Neural Network and Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+3IRPRCM2,Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+TMZEIHYV,Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing,核心,移动链路/结果返回可靠性,摘要级,缺失文件,仅摘要，未核对CPU故障或联合概率约束。
+TPXBG6X5,Dependent Task Offloading in Edge Computing Using GNN and Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+63PE7ZRN,Task Offloading in Internet of Vehicles: A DRL-Based Approach With Representation Learning for DAG Scheduling,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+BR29Y6R8,Multi-Agent Deep Reinforcement Learning Based Multi-Task Partial Computation Offloading in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+YUFUQ9MF,Risk-Aware DRL-Based Computation Offloading for Edge-Enabled Smart Ports,核心,灾害/负载风险,摘要级,缺失文件,仅摘要，无法确认风险权重是否对应真实节点失效事件。
+2YFEHPHE,Joint Optimization of Task Offloading and Resource Allocation in Smart Factories via Cascaded Dual-Branch Network-Based Deep Reinforcement Learning Approach,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+EULCLEHC,Dependency-Aware Task Offloading in Edge Computing: A Bi-Level Optimization Integrating Reinforcement Learning and Heuristics,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KB8RWT83,Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+AJ445TKE,Resource-Aware Secure Computation Offloading,支撑,信息论隐私；安全计算,同DOI另一条目PDF系统模型,缺失文件,与5XLJSENQ同DOI，使用另一条目的可读PDF；不计作两种算法。
+GYKZNERD,DTA-RL: Dynamic Topology Adaptive Reinforcement Learning Approach for Task Offloading in Mobile Edge Computing,边界,拓扑适应与卸载失败率,摘要级,缺失文件,不能仅凭失败率字样推断硬件故障或超期模型；暂列边界待核。
+KX9FH3L7,Fault-Tolerant Aware Task Offloading Based on Reinforcement Learning in Mobile Edge Computing,核心,节点/中继故障；故障域隔离,本地PDF系统模型,可读,主任务失败后启动备份，与同时执行FR不同。
+LLBC7NK2,A Survey of Computation Offloading With Task Types,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+SBK48KGI,Privacy-Preserving Task Offloading in Vehicular Edge Computing Using Federated Multi-Agent Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+7Z36KI4F,DAG Scheduling in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+NPTRF8MG,SecDS: A security-aware DAG task scheduling strategy for edge computing,核心,攻击导致的执行失败；可信性,本地PDF系统模型,可读,SecDS安全调度；不是随机CPU硬件失效率模型。
+SGIKVN6T,FEAT: Towards Fast Environment-Adaptive Task Offloading and Power Allocation in MEC,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+QEMFHEUZ,Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+JMH8VJRX,Dependent Task Offloading for Edge Computing based on Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+EPR2ZZ4C,Interactive Fast Computation Offloading and Resource Allocation: A Joint Optimization Approach for Metaverse Applications,边界,通信QoS/可靠性宣称,摘要级,缺失文件,仅摘要，不能确认独立可靠性模型，暂列边界。
+LPSHDQDN,Generalizable Pareto-Optimal Offloading With Reinforcement Learning in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+N82GCYV3,Mobility-Aware Deep Reinforcement Learning With Seq2seq Mobility Prediction for Offloading and Allocation in Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PE23628M,Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks,支撑,节点故障预测与主动迁移,摘要级,缺失文件,仅摘要，迁移对象和故障过程细节未核验。
+3MNQIJXL,GCNCO: Graph Attention-Driven Offloading and Orchestration via Computing and Networking Coordination for Holographic Services,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+82KEMIVY,,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+G5P6NJLS,Mobility-Aware Cooperative Caching in Vehicular Edge Computing Based on Asynchronous Federated and Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+2J3YGRQC,Privacy-preserving offloading scheme in multi-access mobile edge computing based on MADRL,支撑,隐私泄漏风险,本地PDF系统模型,可读,隐私约束不是无故障执行概率；列支撑。
+GXJWVCJ9,Time-Dependent Path Selection and Online Learning for Efficient DAG Task Offloading in In-network Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+G57PP8M3,Reliability-Aware Proactive Offloading in Mobile Edge Computing Using Stackelberg Game Approach,核心,拥塞/等待时间可靠性,摘要级,缺失文件,仅摘要；不能说是CPU硬件故障门槛。
+ER9V72FJ,A Deep Reinforcement Learning With Transformer Integration for Directed Acyclic Graph Scheduling in Edge Networks,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+XHY5LCBA,Dependent Task Scheduling and Offloading for Minimizing Deadline Violation Ratio in Mobile Edge Computing Networks,核心,工作流期限违约,摘要级,缺失文件,仅摘要；没有依据确认节点随机失效。
+VJAI2MHD,Adaptive Fault-Tolerant Strategy for Latency-Aware IoT Application Executing in Edge Computing Environment,核心,节点失败与检查点恢复,摘要级,缺失文件,仅摘要；不是同一任务始终双节点并行执行。
+T9MISUM7,Fault tolerant & priority basis task offloading and scheduling model for IoT logistics,核心,调度失败；资源失效恢复,摘要＋网页模型片段,缺失文件,摘要与可见模型检索片段，未完整核验节点故障分布；不虚构解析可靠性公式。
+E7JE764L,User mobility aware task assignment for Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+V63BNLU9,Reliability-Enhanced Task Offloading in Mobile Edge Computing Environments,核心,容器/VM失效恢复；完成时间,本地PDF系统模型,可读,不是单次CPU执行的孤立指数存活概率。
+EDLQXM7J,Mobility-Aware Collaborative Task Offloading for Parallel Tasks in Vehicular Edge Computing,支撑,移动接触稳定性；并行任务时限,本地PDF系统模型,可读,任务拆分并行不等于同任务冗余复制。
+ZCQ23XJC,Fault-Tolerant Scheduling Mechanism for Dynamic Edge Computing Scenarios Based on Graph Reinforcement Learning,核心,执行失败；处理时间不确定性,本地PDF系统模型,可读,模型包含失败和超时，不能只按一般时延优化归类。
+M2JJSGHY,"Joint UAV Trajectory Planning, DAG Task Scheduling, and Service Function Deployment Based on DRL in UAV-Empowered Edge Computing",未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+SLEETCX2,INVAR: Inversion Aware Resource Provisioning and Workload Scheduling for Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+T2PLIRSB,GEES: Enabling Location Privacy-Preserving Energy Saving in Multi-Access Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+RHZA2GXE,ReflexPilot: Startup-Aware Dependent Task Scheduling Based on Deep Reinforcement Learning for Edge-Cloud Collaborative Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+F6ZST2N5,CoCaR: Enabling Efficient Dynamic DNN-Based Model Caching and Request Routing in MEC,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+WYZAHAF6,Attention-Enhanced Transferable Task Offloading via Auxiliary Learning in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+YPD2CZEK,Decentralized Task Offloading in Edge Computing: An Offline-to-Online Reinforcement Learning Approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+UR4YVHED,Dynamic Task Offloading and Resource Allocation for Vehicular Edge Computing Networks Based on Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+S3R4ZGMY,A deep-reinforcement-learning-based strategy selection approach for fault-tolerant offloading of delay-sensitive tasks in vehicular edge-cloud computing,核心,CPU执行失败；超时恢复,本地PDF系统模型,可读,没有R≥Rreq硬约束；旧笔记误写DQN，本次纠正为DDPG。
+97ARFIYJ,Impact of User Privacy and Mobility on Edge Offloading,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+QAV7EFR7,Virne: A Comprehensive Benchmark for RL-based Network Resource Allocation in NFV,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+NU3S9YIY,Cooperative Edge Caching Based on Elastic Federated and Multi-Agent Deep Reinforcement Learning in Next-Generation Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+3A9QWLFA,Trusted Routing for Blockchain-Empowered UAV Networks via Multi-Agent Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+CNEQB5B5,Jointly Optimizing Task Offloading and Resource Allocation in MEC with Secure Data Transmission: A Multi-DNNs Approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+HS67PNZ3,Deep reinforcement learning based latency-energy minimization in smart healthcare network,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+TQQSLLMM,A Deep Reinforcement Learning Approach for Dependent Task Offloading in Multi-Access Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PRFWHJPC,Error Correction Aware Dependent Task Offloading in Satellite Edge Computing,核心,链路误码与纠错可靠性,本地PDF系统模型,可读,主要是通信可靠性，不能视为节点硬件故障复制。
+TRHSF6BQ,Deep Reinforcement Learning for Online Computation Offloading in Wireless Powered Mobile-Edge Computing Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+5XLJSENQ,Resource-Aware Secure Computation Offloading,支撑,信息论隐私；安全计算,本地PDF系统模型,可读,与AJ445TKE同DOI；安全隐私而非自然故障。
+45RUYH4Q,Dependency-Aware Dynamic Priority Scheduling for Online Multi-DAG Task Offloading in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+WSX7XW3L,Dynamic Caching Dependency-Aware Task Offloading in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+996LWWCX,Distributed Dependency-aware Task Offloading and Service Caching in Cloudlet-based Edge Computing Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+5HVHNVH6,DAG-Fluid: A Real-Time Scheduling Algorithm for DAGs,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+G685HIEX,Quantized Graph-Based Personalized DRL for Dependency-Aware Task Offloading in Heterogeneous Edge Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+YRPF2A9I,Multihop Offloading of Multiple DAG Tasks in Collaborative Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+JDSD3XFM,Combining Lyapunov Optimization With Actor–Critic Networks for Privacy-Aware IIoT Computation Offloading,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+66ZG95AE,Priority and Dependency-Based DAG Tasks Offloading in Fog/Edge Collaborative Environment,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+LX4HKW8X,SC-DRL: A Status Correction-Empowered Deep Reinforcement Learning Algorithm for Dependency-Aware Application Offloading,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+Y8ERB9IR,Energy-Aware Dependent Task Offloading and Resource Allocation for Industrial IoT With Computing and Network Convergence,边界,一般期限约束,本地PDF系统模型,可读,暂列时限QoS扩展，不作为硬件可靠性卸载核心文献。
+MR9SDUSN,TLCO: Topological Link-Aware Task Co-Offloading Method for Joint V2V and V2I System,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+WHZFBKJ3,Multi-Agent Reinforcement Learning for Task Offloading in Crowd-Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+LDMYQ8E7,DRL-based federated self-supervised learning for task offloading and resource allocation in ISAC-enabled vehicle edge computing,支撑,通信感知QoS；联邦学习,本地PDF系统模型,可读,学习/通信性能支撑，不能直接作为CPU可靠性机制。
+63T4WV2G,Graph Neural Networks and Deep Reinforcement Learning-Based Resource Allocation for V2X Communications,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+4K8YGB8J,Online Partial Computation Offloading Optimization in Wireless Powered Mobile Edge Computing Network,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+9M6Z26KY,Asynchronous DRL-Based Multi-Hop Task Offloading in RSU-Assisted IoV Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+UCGA53LP,Deep Reinforcement Learning for Delay-Optimized Task Offloading in Vehicular Fog Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+85EU4ADW,Edge Computing and Caching Optimization Based on PPO for Task Offloading in RSU-Assisted IoV,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+XW254S6S,Dependency-Aware Dynamic Task Offloading Based on Deep Reinforcement Learning in Mobile-Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+BD4GF5DI,Exploring Deep-Reinforcement-Learning-Assisted Federated Learning for Online Resource Allocation in Privacy-Preserving EdgeIoT,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+N7DVJ36F,Dependency-Aware Task Offloading for Satellite Mobile-Edge Computing: A Deep Reinforcement Learning Scheme,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+AKBE7CYK,Dynamic SFC Deployment for SDN/NFV-Based Satellite–Terrestrial Integrated Vehicular Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8ZJYRGT9,Graph-Deep-Reinforcement-Learning-Based Joint Computation Offloading and SFC Deployment in UAV-Assisted Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+AQIR49WI,Robust SFC Placement In Next Generation Multi-domain IoT Networks Under Resource Demand Uncertainty,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+4ND27ZU7,Cost-Aware SFC Collaborative Scaling Based on Multiagent RL With Stackelberg Game,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+8I2QGXAR,Security-Driven SFC Deployment and Migration in Dynamic SAGIN Using Deception and Moving Target Defense,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+49UG3JYI,TBTOA: A DAG-Based Task Offloading Scheme for Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KNFDPP5H,DRL Connects Lyapunov in Delay and Stability Optimization for Offloading Proactive Sensing Tasks of RSUs,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+9EDZYXK3,CacheMoE: Task-Aware Expert Model Caching for Multitask Inference in Distributed Edge IoT Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+FJ8RZ2ND,Task Offloading With Differential Privacy in Multi-Access Edge Computing: An A3C-Based Approach,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+FJPGTT4B,Dynamic Service Caching Aided Computation Offloading Optimization Algorithm for Mobile-Edge Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+JEH663WY,Dependent Task Offloading of Cross-Applications and Service Caching for End–Edge–Cloud Computing in Consumer Electronics,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+LQS7CL5L,LLM-Based Task Offloading and Resource Allocation in Satellite Edge Computing Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+KLGGUXZX,A Socially-Aware Dependent Tasks Offloading Strategy in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+P8YPTPL9,Delay-Sensitive Task Offloading in Vehicular Fog Computing-Assisted Platoons,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+WVC9L2HP,Lyapunov-Guided Deep Reinforcement Learning for Stable Online Computation Offloading in Mobile-Edge Computing Networks,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+V37KGJDT,Task Offloading and Resource Optimization Based on Dependency-Aware Graph and Collaborative Deep Reinforcement Learning in Mobile Edge Computing,边界,一般期限违约指标,本地PDF系统模型,可读,有超期指标但非独立故障可靠性模型；作为QoS扩展单列。
+XHH83YP3,Real-time and dynamic fault-tolerant scheduling for scientific workflows in clouds,支撑,主机永久/瞬态故障；VM瞬态故障,网页全文系统模型,缺失文件,作者版Section 3，PDF第5–7页；ReadyFS组合延迟复制RDE、延迟检查点CDE、重调度ReSC与资源调整；主副本完成可回收备份。
+NNBT76HF,A Method for Selecting Computing Power Nodes in a Computing Power Network Scenario,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+Z3VPK6IE,Cost-Efficient and Secure Federated Learning for Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+27F3A8R6,Security-Aware Resource Allocation Scheme Based on DRL in Cloud–Edge–Terminal Cooperative Vehicular Network,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+LYFABHH7,DRL-SFCP: Adaptive Service Function Chains Placement with Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+C29DCZQW,Adaptive Federated Learning in Resource Constrained Edge Computing Systems,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+TUFI9N4H,Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+L789NHIU,Task Offloading in Edge Computing Considering the Dynamics of Tasks and Networks Based on Grey Numbers,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+JCFBFJRP,Energy-Efficient Task Scheduling in Collaborative Edge Computing for Internet of Things,未纳入本次相关集,,仅元数据/摘要筛查,可读,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+GL2Z45WN,Geometrized Task Scheduling and Adaptive Resource Allocation for Large-Scale Edge Computing in Smart Cities,边界,一般时限服务质量,本地PDF系统模型,可读,空间分布不等于空间相关故障；不作为相关故障证据。
+RGZK7ICH,SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+PSZNCDSZ,Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+I2DXEUAC,Adaptive Federated Learning in Resource Constrained Edge Computing Systems,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+QSJ2J5ZM,DRL-SFCP: Adaptive Service Function Chains Placement with Deep Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+3XBX6G9W,Dependency-Aware Computation Offloading for Mobile Edge Computing With Edge-Cloud Cooperation,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+W72PA7L4,Computing Power Networking Meets Blockchain: A Reputation-Enhanced Trading Framework for Decentralized IoT Cloud Services,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+H6SPPX6D,Dynamic Topology and Resource Allocation for Distributed Training in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+EAAV8HTE,Security-Aware Virtual Network Embedding Algorithm Based on Reinforcement Learning,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+9S7IWB66,Failure Aware Semi-Centralized Virtual Network Embedding in Cloud Computing Fat-Tree Data Center Networks,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+WUVH6FVA,AI-Empowered Virtual Network Embedding: A Comprehensive Survey,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+INLCXIPK,Repeatable Multi-Dimensional Virtual Network Embedding in Cloud Service Platform,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+NLXUEQJ7,Location Privacy-Aware Task Offloading in Mobile Edge Computing,未纳入本次相关集,,仅元数据/摘要筛查,缺失文件,按题名、摘要与既有笔记筛查，未确认属于任务可靠性卸载或其直接建模支撑；不表示逐篇全文复核。
+THK4KB7C,"Security, Reliability, Cost, and Energy-Aware Scheduling of Real-Time Workflows in Compute-Continuum Environments",支撑,执行可靠性；安全约束,摘要＋网页模型片段,缺失文件,网页仅读到模型检索片段，不能称完整全文复现；安全与执行可靠性分开。
+FSE5WTD8,Reliability-Aware and Energy-Efficient Workflow Scheduling in IaaS Clouds,支撑,工作流执行可靠性；能耗约束,摘要级,缺失文件,仅摘要；REWS，无法据摘要确认是否完全无复制及具体故障分布。
+IQTQ4B6E,Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems,支撑,工作流执行失效；多云成本,摘要级,缺失文件,摘要与已有笔记；Weibull危险率细节未取得本次可读原始模型佐证，不作为确定公式。
+E5L8CEZR,Reliability-Ensured Efficient Scheduling With Replication in Cloud Environment,支撑,机器执行失败；任务复制,摘要级,缺失文件,仅摘要；复制已确认，具体概率分布、队列和副本取消规则未核验。
+D487IH3U,Failure-Aware Elastic Cloud Workflow Scheduling,支撑,主机与网络设备故障；主备容错,摘要级,缺失文件,摘要级；不得补写独立CPU指数失效公式。
+U2DXBW7N,Fault-Tolerant Cost-Efficient Scheduling for Energy and Deadline-Constrained IoT Workflows in Edge-Cloud Continuum,支撑,瞬态/永久故障；动态副本,摘要级,缺失文件,只有作者机构摘要；虽有全文链接，本次链接未能读取，细节不作模型级结论。
+LRSJN8WM,Secure Task Offloading in Blockchain-Enabled Mobile Edge Computing With Deep Reinforcement Learning,支撑,篡改/隐私攻击；完整性,摘要级,缺失文件,作者机构摘要；对抗安全不是随机硬件可靠性。
+W4HA9JMY,Secure Video Offloading in MEC-Enabled IIoT Networks: A Multicell Federated Deep Reinforcement Learning Approach,支撑,视频保密；物理层安全,摘要级,缺失文件,摘要级；未核验保密率和误码/成功率的联合约束。

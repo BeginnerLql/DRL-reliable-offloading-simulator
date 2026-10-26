@@ -1,0 +1,1881 @@
+{
+  "date": "2026-10-19",
+  "batches": [
+    {
+      "batch": 0,
+      "queries": [
+        {
+          "key": "Q6VDTV9C",
+          "title": "TTACO: Trusted Time-Aware Computing Offloading in Air-Ground Integrated Networks",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://doi.org/10.1109/TMC.2026.3696251"
+        },
+        {
+          "key": "N4NWFQZ9",
+          "title": "Blockchain-Based Trusted Traffic Offloading in Space-Air-Ground Integrated Networks (SAGIN): A Federated Reinforcement Learning Approach",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/JSAC.2022.3213317"
+        },
+        {
+          "key": "HMEBHKAZ",
+          "title": "Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information",
+          "prior": "B 单节点但可靠性语义不同",
+          "source": "https://www.cs.newpaltz.edu/~lik/publications/Peng-Peng-IEEE-TNSM-2024"
+        },
+        {
+          "key": "NBH42EKR",
+          "title": "Joint Power Allocation and Task Offloading for Reliability-Aware Services in NOMA-Enabled MEC",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://doi.org/10.1109/TWC.2023.3342434"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information | Request PDF",
+          "url": "https://www.researchgate.net/publication/383903758_Reliable_Task_Offloading_in_Sustainable_Edge_Computing_with_Imperfect_Channel_State_Information"
+        },
+        {
+          "title": "Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information",
+          "url": "https://www.cs.newpaltz.edu/~lik/publications/Peng-Peng-IEEE-TNSM-2024"
+        },
+        {
+          "title": "Blockchain-Based Trusted Traffic Offloading in Space-Air-Ground Integrated Networks (SAGIN): A Federated Reinforcement Learning Approach — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/work/blockchain-based-trusted-traffic-offloading-in-space-air-ground-integrated/wrk_d3ee122211f39abe11ea0fdb043490b5"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2023-01/Publications_Contents_Digest_2022_Dec.pdf"
+        },
+        {
+          "title": "Joint Power Allocation and Task Offloading for Reliability-Aware Services in NOMA-Enabled MEC",
+          "url": "https://ieeexplore.ieee.org/document/10367826/"
+        },
+        {
+          "title": "dblp: Joint Power Allocation and Task Offloading for Reliability-Aware Services in NOMA-Enabled MEC.",
+          "url": "https://dblp.org/rec/journals/twc/DongTZWC24.html"
+        },
+        {
+          "title": "Quantum Federated Reinforcement Learning‐Based Traffic Offloading and Resource Allocation for RSMA‐Enabled Space–Air–Ground Integrated Networks - Budhiraja - 2026 - Transactions on Emerging Telecommunications Technologies - Wiley Online Library",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/ett.70482"
+        },
+        {
+          "title": "International Journal of",
+          "url": "https://ijisae.org/index.php/IJISAE/article/download/7634/6652/13010"
+        },
+        {
+          "title": "Joint Power Allocation and Task Offloading for Reliability-Aware Services in NOMA-Enabled MEC | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/detail?JGLOBAL_ID=202402252819598862"
+        },
+        {
+          "title": "Integration of Sensing, Communication, and Computing for Metaverse: A Survey",
+          "url": "https://www.researchgate.net/profile/Zhaolong-Ning/publication/383414028_Integration_of_Sensing_Communication_and_Computing_for_Metaverse_A_Survey/links/66cc20ad97265406eaad1363/Integration-of-Sensing-Communication-and-Computing-for-Metaverse-A-Survey.pdf"
+        },
+        {
+          "title": "Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information",
+          "url": "https://cs.newpaltz.edu/~lik/publications/Peng-Peng-IEEE-TNSM-2024"
+        },
+        {
+          "title": "International Transactions on Electrical Engineering and Computer Science",
+          "url": "https://iteecs.com/index.php/iteecs/article/download/83/101/367"
+        },
+        {
+          "title": "RIS-assisted NOMA for space-air-ground integrated networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S1874490725003118"
+        },
+        {
+          "title": "A Survey on Off-chain Networks: Frameworks, Technologies, Solutions and Challenges | ACM Computing Surveys",
+          "url": "https://doi.org/10.1145/3735124"
+        },
+        {
+          "title": "Peng Peng – Others / Others | AD Scientific Index",
+          "url": "https://adscientificindex.com/scientist/peng-peng/5869301/"
+        },
+        {
+          "title": "Resilient Massive Access for SAGIN: A Deep Reinforcement Learning Approach",
+          "url": "https://eurekamag.com/research/096/139/096139824.php"
+        },
+        {
+          "title": "TCO-SGCPN: A Trustworthy Computing Offloading Scheme for Space-Ground Computing Power Network, consisting of cloud, satellites, and terminals - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S1569190X26000377"
+        },
+        {
+          "title": "Linfeng Luo — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/author/linfeng-luo/aut_6c584dcd93314b3dabaa2f216d36f0a5"
+        }
+      ],
+      "excerpt": "Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information | Request PDF (https://www.researchgate.net/publication/383903758_Reliable_Task_Offloading_in_Sustainable_Edge_Computing_with_Imperfect_Channel_State_Information)\nciteturn83search0 [wordlim: 200] Crawled: 2 months ago; # Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information ... However, these new techniques inevitably introduce reliability risks to the edge system generally because of i) imperfect Channel State Information (CSI), which can misguide offloading decisions and cause transmission outages, and ii) unstable renewable energy supply, which complicates device availability.\n\n# Reliable Task Offloading in Sustainable Edge Computing with Imperfect Channel State Information\n\n  * December 2024\n  * IEEE Transactions on Network and Service Management 21(6):6423-6436\n\nDOI:10.1109/TNSM.2024.3456568\n\nAuthors:\n\nPeng Peng\n\nPeng Peng\n\n  * This person is not on ResearchGate, or hasn't claimed this research yet.\n\nWentai Wu\n\n  * Jinan University\n\nWeiwei Lin\n\n  * South China University of Technology\n\nFan Zhang\n\nFan Zhang\n\n  * This person is not on ResearchGate, or hasn't claimed this research yet.\n\nShow all 6 authors Hide\n\n## Abstract\n\nAs a promising paradigm, edge computing enhances service provisioning by offloading tasks to powerful servers at the network edge. Meanwhile, Non-Orthogonal Multiple Access (NOMA) and renewable energy sources are increasingly adopted for spectral efficiency and carbon footprint reduction. However, these new techniques inevitably introduce reliability risks to the edge system generally because of i) imperfect Channel State Information (CSI), which can misguide offloading decisions and cause transmission outages, and ii) unstable renewable energy supply, which complicates device availability. To tackle these issues, we first establish a system model that measures service reliability based on probabilistic principles for the NOMA-based edge system. As a solution, a Reliable Offloading method with Multi-Agent deep reinforcement learning (ROMA) is proposed. In ROMA, we first reformulate the reliability-crit"
+    },
+    {
+      "batch": 1,
+      "queries": [
+        {
+          "key": "7FXYV9QS",
+          "title": "Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://scholarship.miami.edu/esploro/outputs/journalArticle/Risk-Aware-Edge-Computation-Offloading-Using-Bayesian/991031577546902976"
+        },
+        {
+          "key": "U36XDGYE",
+          "title": "To Risk or Not to Risk: Learning with Risk Quantification for IoT Task Offloading in UAVs",
+          "prior": "B 单节点但可靠性语义不同",
+          "source": "https://arxiv.org/html/2302.07399v1"
+        },
+        {
+          "key": "FF7XKHVD",
+          "title": "Risk-Aware Data Offloading in Multi-Server Multi-Access Edge Computing Environment",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/TNET.2020.2983119"
+        },
+        {
+          "key": "MD5KUZXP",
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing",
+          "prior": "B 单节点但可靠性语义不同",
+          "source": "https://arxiv.org/html/1812.08076"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game - University of Miami",
+          "url": "https://scholarship.miami.edu/esploro/outputs/journalArticle/Risk-Aware-Edge-Computation-Offloading-Using-Bayesian/991031577546902976"
+        },
+        {
+          "title": "(PDF) Risk-Aware Data Offloading in Multi-Server Multi-Access Edge Computing Environment",
+          "url": "https://www.researchgate.net/publication/340877583_Risk-Aware_Data_Offloading_in_Multi-Server_Multi-Access_Edge_Computing_Environment"
+        },
+        {
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing",
+          "url": "https://arxiv.org/abs/1812.08076"
+        },
+        {
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing - Princeton University",
+          "url": "https://collaborate.princeton.edu/en/publications/dynamic-task-offloading-and-resource-allocation-for-ultra-reliabl/"
+        },
+        {
+          "title": "To Risk or Not to Risk: Learning with Risk Quantification for IoT Task Offloading in UAVs",
+          "url": "https://arxiv.org/abs/2302.07399"
+        },
+        {
+          "title": "Risk-Aware Data Offloading in Multi-Server Multi-Access Edge Computing Environment",
+          "url": "https://eurekamag.com/research/087/298/087298037.php"
+        },
+        {
+          "title": "Towards efficient program execution on edge-cloud computing platforms - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0743731525001029"
+        },
+        {
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing",
+          "url": "https://eurekamag.com/research/083/272/083272231.php"
+        },
+        {
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/work/dynamic-task-offloading-and-resource-allocation-for-ultra-reliable-low-latency/wrk_c3e4e14727361b9d0b823e94c4971fdb"
+        },
+        {
+          "title": "Jie Xu - Publications",
+          "url": "https://sites.google.com/site/jiexuhomepage/publications"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2020-06/Publications_Contents_Digest_2020_Jun_0.pdf"
+        },
+        {
+          "title": "Dynamic Task Offloading and Resource Allocation for Ultra-Reliable Low-Latency Edge Computing",
+          "url": "https://oulurepo.oulu.fi/bitstream/10024/24528/1/nbnfi-fe2019121046448.pdf"
+        },
+        {
+          "title": "ICC 2023 - IEEE International Conference on Communications (Table of Contents)",
+          "url": "https://www.proceedings.com/content/070/070908webtoc.pdf"
+        },
+        {
+          "title": "Risk-Aware Distributionally Robust Optimization for Mobile Edge Computation Task Offloading in the Space–Air–Ground Integrated Network",
+          "url": "https://www.mdpi.com/1424-8220/23/12/5729"
+        },
+        {
+          "title": "Computation offloading in the edge-to-cloud compute continuum: a survey of federated architectural solutions | Cluster Computing | Springer Nature Link",
+          "url": "https://link.springer.com/article/10.1007/s10586-025-05577-6"
+        },
+        {
+          "title": "2020-12-22_qq_19132935-CSDN学习社区",
+          "url": "https://geek.csdn.net/65e5959b9a0b6f536f0c0d70.html"
+        },
+        {
+          "title": "Reliability‐Constrained Task Scheduling for DAG Applications in Mobile Edge Computing - Zhu - 2024 - Wireless Communications and Mobile Computing - Wiley Online Library",
+          "url": "https://doi.org/10.1155/2024/6980514"
+        },
+        {
+          "title": "Bridging Incentives and Dependencies: An Iterative Combinatorial Auction Approach to Dependency-Aware Offloading in Mobile Edge Computing",
+          "url": "https://faculty.washington.edu/weicaics/paper/papers/HongKLFC2024.pdf"
+        }
+      ],
+      "excerpt": "Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game - University of Miami (https://scholarship.miami.edu/esploro/outputs/journalArticle/Risk-Aware-Edge-Computation-Offloading-Using-Bayesian/991031577546902976)\nciteturn82search0 [wordlim: 200] Published: 6.4 years ago; Crawled: 4 weeks ago; Image: Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game ... # Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game\n\nImage: Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game\n\nJournal article   Peer reviewed\n\n# Risk-Aware Edge Computation Offloading Using Bayesian Stackelberg Game\n\nYang Bai, Lixing Chen, Linqi Song and Jie Xu Show details for 4 authors\n\nIEEE eTransactions on network and service management, Vol.17(2), pp.1000-1012\n\n2020-06\n\nDOI: https://doi.org/10.1109/TNSM.2020.2985080\n\n## Abstract\n\nCloud computing Games game theory Bayes methods Servers Security computation offloading Task analysis Edge computing\n\nMobile Edge Computing (MEC) is delivering a rich portfolio of computation services to enable ultra-low latency and location-awareness for emerging mobile applications. However, the vulnerability of this new paradigm to potential security and privacy issues prevents mobile users from fully embracing its advantage. While various defensive strategies have been proposed to secure the connection between the end devices and edge servers, an equally important issue, the server-side risk is still under-investigated for most edge computing systems. To handle these server-side risks, a Risk-aware Computation Offloading (RCO) policy is proposed to distribute computation tasks safely among geographically distributed edge sites under server-side attacks. RCO takes into account the strategic behaviors of the potential attackers in the edge system and finds an appropriate balance between risk management and service delay reduction. The Bayesian Stackelberg game is employed to formulate the RCO problem, which describes an appropriate relation between the edge system (as a defender) and the attacker. In particular, the Bayesian Stackelberg game captures the uncertainty of attacker's behavior and enables"
+    },
+    {
+      "batch": 2,
+      "queries": [
+        {
+          "key": "3EH686AT",
+          "title": "Towards Risk-Averse Edge Computing With Deep Reinforcement Learning",
+          "prior": "B 单节点但可靠性语义不同",
+          "source": "https://www.researchgate.net/publication/375203513_Towards_Risk-Averse_Edge_Computing_With_Deep_Reinforcement_Learning"
+        },
+        {
+          "key": "FV4M7K6L",
+          "title": "Reliability and Latency Aware Code-Partitioning Offloading in Mobile Edge Computing",
+          "prior": "X 排除：拆分任务",
+          "source": "https://doi.org/10.1109/WCNC.2019.8885778"
+        },
+        {
+          "key": "7LYY7D66",
+          "title": "RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments",
+          "prior": "B 单节点但可靠性语义不同",
+          "source": "https://www.researchgate.net/publication/378896769_RATE_Reliability-Aware_Task_Service_in_Fog-Enabled_IoV_Environments"
+        },
+        {
+          "key": "AYHWYXYM",
+          "title": "Age-of-Information Minimization in Multi-Server Edge Computing Networks for URLLC Services",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://doi.org/10.1109/TVT.2025.3566137"
+        }
+      ],
+      "sources": [
+        {
+          "title": "ORBilu: RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments - 2024",
+          "url": "https://orbilu.uni.lu/handle/10993/61198"
+        },
+        {
+          "title": "Age-of-Information Minimization in Multi-Server Edge Computing Networks for URLLC Services | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/document/10981682/"
+        },
+        {
+          "title": "Towards Risk-Averse Edge Computing With Deep Reinforcement Learning - University of Helsinki Research Portal",
+          "url": "https://researchportal.helsinki.fi/en/publications/towards-risk-averse-edge-computing-with-deep-reinforcement-learni/"
+        },
+        {
+          "title": "Knowledge-based optimization and reasoning for intelligent task offloading in dynamic vehicular fog networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0950705126002492"
+        },
+        {
+          "title": "(PDF) RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments",
+          "url": "https://www.researchgate.net/publication/378896769_RATE_Reliability-Aware_Task_Service_in_Fog-Enabled_IoV_Environments"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2024-08/Publications_Contents_Digest_2024_Aug.pdf"
+        },
+        {
+          "title": "dblp: Towards Risk-Averse Edge Computing With Deep Reinforcement Learning.",
+          "url": "https://dblp.org/rec/journals/tmc/XuSWTH24.html"
+        },
+        {
+          "title": "dblp: IEEE Transactions on Cognitive Communications and Networking, Volume 10",
+          "url": "https://dblp.org/db/journals/tccn/tccn10.html"
+        },
+        {
+          "title": "Αποτελέσματα αναζήτησης - \"Resources utilizations\" :: Library Catalog",
+          "url": "https://vufind2.lib.aegean.gr/EDS/Search?lookfor=%22Resources+utilizations%22&type=SU"
+        },
+        {
+          "title": "Reliability and Latency Aware Code-Partitioning Offloading in Mobile Edge Computing (2019) | Jianhui Liu | 21 Citations",
+          "url": "https://scispace.com/papers/reliability-and-latency-aware-code-partitioning-offloading-12h5r6wmwa"
+        },
+        {
+          "title": "Reliability and Latency Aware Code-Partitioning Offloading in Mobile Edge Computing",
+          "url": "https://ieeexplore.ieee.org/document/8885778/"
+        },
+        {
+          "title": "URLLCサービスのためのマルチサーバエッジコンピューティングネットワークにおける情報の年齢最小化〖JST機械翻訳〗 | 文献情報 | J-GLOBAL 科学技術総合リンクセンター",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202502219008943423"
+        },
+        {
+          "title": "Dianlei Xu",
+          "url": "https://www.csauthors.net/dianlei-xu/"
+        },
+        {
+          "title": "2019 IEEE Wireless",
+          "url": "https://www.proceedings.com/content/051/051036webtoc.pdf"
+        },
+        {
+          "title": "S. A. U. Haq et al.: SDN-Based Edge Computing in VCN: A Survey of Existing Approaches",
+          "url": "https://doras.dcu.ie/31037/1/SDN-Based_Edge_Computing_in_Vehicular_Communication_Networks_A_Survey_of_Existing_Approaches.pdf"
+        },
+        {
+          "title": "Resource Scheduling in Edge Computing: A Survey",
+          "url": "https://ssndt.github.io/papers/Resource_Scheduling_in_Edge_Computing_A_Survey.pdf"
+        },
+        {
+          "title": "Energy-Efficient Real-Time Job Mapping and",
+          "url": "https://gaochuanchao.github.io/papers/Energy-Efficient%20Real-Time%20Job%20Mapping%20and%20Resource%20Management%20in%20Mobile-Edge%20Computing.pdf"
+        },
+        {
+          "title": "[107] Z. Yu, Y. Gong, S. Gong, and Y. Guo, “Joint task offloading and resource allocation in uav-enabled mobile edge computing,” *IEEE Internet of Things Journal*, vol. 7, no. 4, pp. 3147–3159, 2020.",
+          "url": "https://weisongshi.org/papers/luohu21-SchedulingSurvey.pdf"
+        }
+      ],
+      "excerpt": "ORBilu: RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments - 2024 (https://orbilu.uni.lu/handle/10993/61198)\nciteturn84search0 [wordlim: 200] Published: 2.6 years ago; Crawled: 2.1 years ago; RATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments ... [en] In this work, we introduce a reliability-aware task service framework, named RATE, designed for fog-enabled Internet of Vehicle (IoV) environments.\n\nRATE: Reliability-Aware Task Service in Fog-Enabled IoV Environments\n\nTiwari, Minu; MAITY, Ilora; Misra, Sudip\n\n2024 • In IEEE Transactions on Cognitive Communications and Networking, p. 1-1\n\nDOI\n10.1109/TCCN.2024.3375524\n\n \n\n#### Files\n\n* * *\n\n##### Full Text\n\nRATE_Reliability-Aware_Task_Service_in_Fog-Enabled_IoV_Environments.pdf\n\nPublisher postprint (791.47 kB)\n\nRequest a copy\n\n\nKeywords :\n\nCollaboration; Computer architecture; Decision-making; Delays; Internet of Vehicles; Q-learning; Quality of service; Reliability; Resource management; Resource-utilization; Simulated Annealing; Task analysis; Task service; Decisions makings; Delay; Internet of vehicle; Quality-of-service; Resources utilizations; Hardware and Architecture; Computer Networks and Communications; Artificial Intelligence\n\nAbstract :\n\n[en] In this work, we introduce a reliability-aware task service framework, named RATE, designed for fog-enabled Internet of Vehicle (IoV) environments. In RATE, each fog entity makes an efficient decision for task service while considering the task requirements and availability of the resources. Existing works focus mainly on delay and energy as the main factor of decision-making. However, in a mobile IoV environment, it is vital to consider the reliability of entities serving the task. The factor of reliability affects the quality of service (QoS) offered by the task service while having an impact on the resource utilization of the nodes. To offer a reliable service while fulfilling the task demands on the fly, we propose a Q-learning-based algorithm for selecting a candidate for handling the offloaded task. On the contrary, it is important to consider the aspect of the entity offering the offloaded service. Thus, RATE uses a simul"
+    },
+    {
+      "batch": 3,
+      "queries": [
+        {
+          "key": "TMZEIHYV",
+          "title": "Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing",
+          "prior": "X 排除：拆分任务",
+          "source": "https://doi.org/10.1109/TCE.2023.3280484"
+        },
+        {
+          "key": "YUFUQ9MF",
+          "title": "Risk-Aware DRL-Based Computation Offloading for Edge-Enabled Smart Ports",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://doi.org/10.1109/CloudCom67567.2025.11331479"
+        },
+        {
+          "key": "AJ445TKE",
+          "title": "Resource-Aware Secure Computation Offloading",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/ICC52391.2025.11161789"
+        },
+        {
+          "key": "EPR2ZZ4C",
+          "title": "Interactive Fast Computation Offloading and Resource Allocation: A Joint Optimization Approach for Metaverse Applications",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/TSC.2026.3674125"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing",
+          "url": "https://doi.org/10.1109/TCE.2023.3280484"
+        },
+        {
+          "title": "Risk-Aware DRL-Based Computation Offloading for Edge-Enabled Smart Ports",
+          "url": "https://eurekamag.com/research/105/316/105316363.php"
+        },
+        {
+          "title": "Interactive Fast Computation Offloading and Resource Allocation: A Joint Optimization Approach for Metaverse Applications",
+          "url": "https://eurekamag.com/research/104/590/104590173.php"
+        },
+        {
+          "title": "Bohai Zhao",
+          "url": "https://www.csauthors.net/bohai-zhao/"
+        },
+        {
+          "title": "dblp: Resource-Aware Secure Multi-Party Edge Computation Offloading.",
+          "url": "https://dblp.dagstuhl.de/rec/journals/tcom/YanCSG26.html"
+        },
+        {
+          "title": "dblp: Basak Guler",
+          "url": "https://dblp.dagstuhl.de/pid/39/10799.html"
+        },
+        {
+          "title": "dblp: Bohai Zhao",
+          "url": "https://dblp.org/pid/260/1537.html"
+        },
+        {
+          "title": "82287 papers v01.pdf",
+          "url": "https://www.proceedings.com/content/082/082287webtoc.pdf"
+        },
+        {
+          "title": "Basak Guler",
+          "url": "https://basakguler.github.io/publications.html"
+        },
+        {
+          "title": "Secure computation offloading for data leakage prevention in digital twin edge networks | Cluster Computing | Springer Nature Link",
+          "url": "https://link.springer.com/article/10.1007/s10586-026-05950-z"
+        },
+        {
+          "title": "CloudCom2025-Program-V4.xlsx",
+          "url": "https://www.cloudcom2025.org/downloads/Cloudcom2025-MainTrack.pdf"
+        },
+        {
+          "title": "MSCO: Mobility-aware Secure Computation Offloading in blockchain-enabled Fog computing environments | Journal of Cloud Computing | Springer Nature Link",
+          "url": "https://link.springer.com/article/10.1186/s13677-024-00599-8"
+        },
+        {
+          "title": "A dynamic pricing scheme for secure offloading and resource allocation based on the internet of vehicles - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1570870524001562"
+        },
+        {
+          "title": "Advances in Partitioning",
+          "url": "https://s3-euw1-ap-pe-df-pch-content-store-p.s3.eu-west-1.amazonaws.com/9781003471905/89869096-3a0d-48d3-91d8-79b839b07d51/preview.pdf?AWSAccessKeyId=ASIAQFVOSJ57WKNBPREX&Expires=1773996571&Signature=ClUSFS4Psos2RfYFNbxdRa%2BxR1s%3D&response-content-disposition=attachment%3B+filename%3D%2210.1201_9781003471905_previewpdf.pdf%22&x-amz-security-token=IQoJb3JpZ2luX2VjEGQaCXVzLWVhc3QtMSJHMEUCID85Kv30AnkUv5vUszj%2F0BXULAnAaoKcz2MTnlsJaBH5AiEA9N30G1V903%2F600IOZlaXasNiXBTaUj5FToxviw%2BGo%2F0qjQQILBAEGgwwMTIxNzcyNjQ1MTEiDHjZPODN3JJirIQ6CirqA9o3Ek2apOBsVdbtv%2FhNyk%2BsS9imYrLcezXXOsU%2BsCvDyYPDX2jGg37kQGmV%2B1H8D4uq8QakwcxzjEPKjR9FKlFvK%2FYT%2B8A38DxvdFORV3mgqiSquUAvvosrkUUQX4z32iZXSPGS6gYg5mmXe%2FK9o3k7EcvOE85RM5bW%2Bu3UgXzVuJ0rT1aWd%2BatBag73aJxGxnFQ18cLgbBsQmPK1UhTygKwosbftAEOv%2FQyA%2BoUEuzsNUSPCHSleizZfm%2BVcNKmQHodUTB9VfyE3UakD15Sxtth0RbomBhnkTn0FbBU8g8z5rcK1ytn3wwRTlEGoymQKhs0yMCWmFaGbEA973xwEp3yHrst0WkHkWdXWRgP1kpTY7EaopJHdBBYVfdCmlFi0VlmlUaNpp06rEveSeFNtR94Yt%2BzeLbylhVHMSwHydULyDulBwcKpqxJTjLBU1FFVL2KZ1ld9ObjiBpjYxwd3kMz4Pv8gdRQFaUdVjBQeMq5NhuEgwMKMRUAr9COZFVNQZuN%2BAHwoioilPk2M%2FOg7CKIiea%2BN9ujBdva%2BL2oPbXmv%2BuPm0sSJpcZepU5KFsioMZaGcYzYqhw%2Ff0eqfjCiE%2BRF9SjFRmNM0evC%2F0gJNI1ARdtWCofsi5hEaIk%2FHlxA2%2Fk0Ba0y%2BmuNMw1%2FPyzQY6pQHWtH2jnLMqmWbJ8t3PK1t7YfPcLieIhzrINCcpoiUZaksG53YzOsMPLDkrKReomhnTxXtELrOue7U9uPVBXw%2FYQZj4Xe0qHQrdpwEC73IGj%2FDg5CFYrb6iCR%2B%2FqE%2BbaTUjkbis4uMHxuraTAmBc3FjG3Y8nHlUQdHxxNNwvngGQg7DUdvYJ%2FlvLC2hfOq3IYQrYLqYeFBE1%2BpRcgUSrsUz%2BXDOHMU%3D"
+        },
+        {
+          "title": "Publications - Liu Chunhui’s Homepage",
+          "url": "https://chhliu0302.github.io/lch_publications/"
+        },
+        {
+          "title": "Multiscale knowledge distillation with attention based fusion for robust human activity recognition",
+          "url": "https://www.nature.com/articles/s41598-024-63195-5.pdf"
+        },
+        {
+          "title": "IEEE TRANSACTIONS ON SERVICES COMPUTING",
+          "url": "https://www.netidee.at/sites/default/files/2025-04/_IEEE_TSC__FRESCO%20%284%29.pdf"
+        },
+        {
+          "title": "Reliability of Edge Offloading",
+          "url": "https://www.netidee.at/sites/default/files/2025-04/Thesis_Template___TU_Wien___Faculty_of_Informatics__vutinfth_%20%281%29.pdf"
+        }
+      ],
+      "excerpt": "Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing (https://doi.org/10.1109/TCE.2023.3280484)\nciteturn81search0 [wordlim: 200] Published: 3.4 years ago; Crawled: last month; # Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing ... In view of this, this paper makes the first exploration of accelerating the processing of DNN-based tasks while maintaining decent system reliability in vehicular edge computing (VEC) via task partitioning and offloading.\n\n# Toward Reliable DNN-Based Task Partitioning and Offloading in Vehicular Edge Computing\n\nPublisher: IEEE\n\n[Button: Cite This]\n\nAbstract\n\n## Document Sections\n\n  * I.\n\nIntroduction\n\n  * II.\n\nRelated Work\n\n  * III.\n\nScenario and Workflow\n\n  * IV.\n\nPartitioning and Offloading Problem\n\n  * V.\n\nProposed Solution\n\nShow Full Outline\n\n## Abstract:\n\nModern vehicles have become typical consumer electronics with the development of sensing, transmission, and computation technologies. The emerging intelligent transportat...Show More\n\n## Metadata\n\n## Abstract:\n\nModern vehicles have become typical consumer electronics with the development of sensing, transmission, and computation technologies. The emerging intelligent transportation systems (ITSs) yield lots of deep neural network (DNN) based tasks, requiring intensive computation. In view of this, this paper makes the first exploration of accelerating the processing of DNN-based tasks while maintaining decent system reliability in vehicular edge computing (VEC) via task partitioning and offloading. Specifically, we present a specific scenario, where vehicles partition and offload their tasks to nearby vehicles and roadside infrastructures, while they may fail to receive results due to unstable vehicular communications. Then, we model the task delay by considering task properties and node capacities. On this basis, the Partitioning and Offloading Problem (POP) is formulated as a bi-objective optimization problem, to maximize both the acceleration ratio and service ratio of DNN-based tasks in VEC. Further, we propose a Distributed Partitioning and Offloading Solution (DPOS), where a delay-priority-oriented o"
+    },
+    {
+      "batch": 4,
+      "queries": [
+        {
+          "key": "G57PP8M3",
+          "title": "Reliability-Aware Proactive Offloading in Mobile Edge Computing Using Stackelberg Game Approach",
+          "prior": "E 摘要候选：单副本待证实",
+          "source": "https://www.researchgate.net/publication/377453672_Reliability-Aware_Proactive_Offloading_in_Mobile_Edge_Computing_Using_Stackelberg_Game_Approach"
+        },
+        {
+          "key": "XHY5LCBA",
+          "title": "Dependent Task Scheduling and Offloading for Minimizing Deadline Violation Ratio in Mobile Edge Computing Networks",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/JSAC.2022.3233532"
+        },
+        {
+          "key": "T9MISUM7",
+          "title": "Fault tolerant & priority basis task offloading and scheduling model for IoT logistics",
+          "prior": "C 单点放置但有恢复（摘要）",
+          "source": "https://doi.org/10.1016/j.aej.2024.10.018"
+        },
+        {
+          "key": "XHH83YP3",
+          "title": "Real-time and dynamic fault-tolerant scheduling for scientific workflows in clouds",
+          "prior": "E 摘要候选：工作流容错",
+          "source": "https://doi.org/10.1016/j.ins.2021.03.003"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Fault tolerant & priority basis task offloading and scheduling model for IoT logistics - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1110016824011712"
+        },
+        {
+          "title": "Real-time and dynamic fault-tolerant scheduling for scientific workflows in clouds - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0020025521002401"
+        },
+        {
+          "title": "Reliability-Aware Proactive Offloading in Mobile Edge Computing Using Stackelberg Game Approach | Request PDF",
+          "url": "https://www.researchgate.net/publication/377453672_Reliability-Aware_Proactive_Offloading_in_Mobile_Edge_Computing_Using_Stackelberg_Game_Approach"
+        },
+        {
+          "title": "Fault tolerant & priority basis task offloading and scheduling model for IoT logistics - ScienceDirect",
+          "url": "https://doi.org/10.1016/j.aej.2024.10.018"
+        },
+        {
+          "title": "Dependent Task Scheduling and Offloading for Minimizing Deadline Violation Ratio in Mobile Edge Computing Networks - University of the Sunshine Coast, Queensland",
+          "url": "https://research.usc.edu.au/esploro/outputs/journalArticle/Dependent-Task-Scheduling-and-Offloading-for/991198947702621"
+        },
+        {
+          "title": "dblp: Reliability-Aware Proactive Offloading in Mobile Edge Computing Using Stackelberg Game Approach.",
+          "url": "https://dblp.dagstuhl.de/rec/journals/iotj/PengYWXL24.html"
+        },
+        {
+          "title": "<t",
+          "url": "https://lms.hu.edu.pk/department/faculty/resume/3437"
+        },
+        {
+          "title": "Fault tolerant and mobility-aware task offloading and scheduling model for IoT logistics | Connected Papers",
+          "url": "https://www.connectedpapers.com/main/aa5a799d1fd403bc00e067207ab337088ecbfb9b/Fault-tolerant-and-mobility%20aware-task-offloading-and-scheduling-model-for-IoT-logistics/graph"
+        },
+        {
+          "title": "Multi-Objective Task-Aware Offloading and Scheduling Framework for Internet of Things Logistics",
+          "url": "https://www.mdpi.com/1424-8220/24/8/2381"
+        },
+        {
+          "title": "(PDF) Fault tolerant & priority basis task offloading and scheduling model for IoT logistics",
+          "url": "https://www.researchgate.net/publication/387613759_Fault_tolerant_priority_basis_task_offloading_and_scheduling_model_for_IoT_logistics"
+        },
+        {
+          "title": "Rankless | Amal Abdullah Bukhari",
+          "url": "https://www.rankless.org/authors/amal-abdullah-bukhari"
+        },
+        {
+          "title": "Real-Time and Dynamic Fault-Tolerant Scheduling for Scientific Workflows in Clouds",
+          "url": "https://publications.aston.ac.uk/id/eprint/43878/1/Zhongjin_INS_R3_01_final.pdf"
+        },
+        {
+          "title": "Cost-Effective Scheduling for Dependent Tasks With Tight Deadline Constraints in Mobile Edge Computing",
+          "url": "https://profile.eurekamag.com/research/096/214/096214085.php"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2023-03/Publications_Contents_Digest_2023_Feb.pdf"
+        },
+        {
+          "title": "华侨大学 彭凯--中文主页--首页",
+          "url": "https://faculty.hqu.edu.cn/kaipeng/zh_CN/index.htm"
+        },
+        {
+          "title": "A Dynamic Priority-Aware Task Offloading and Resource Allocation Strategy Assisted by RSU-Relay in Vehicular Edge Computing",
+          "url": "https://centaur.reading.ac.uk/128035/1/A_Dynamic_Priority-Aware_Task_Offloading_and_Resource_Allocation_Strategy_Assisted_by_RSU-Relay_in_Vehicular_Edge_Computing.pdf"
+        },
+        {
+          "title": "The Journal of Supercomputing         (2025) 81:1203",
+          "url": "https://cdn5.f-cdn.com/files/download/276828071/s11227-025-07627-7.pdf"
+        }
+      ],
+      "excerpt": "Fault tolerant & priority basis task offloading and scheduling model for IoT logistics - ScienceDirect (https://www.sciencedirect.com/science/article/pii/S1110016824011712)\nciteturn87search0 [wordlim: 200] Published: 1.8 years ago; Crawled: last month; # Fault tolerant & priority basis task offloading and scheduling model for IoT logistics\n\n## Alexandria Engineering Journal\n\nVolume 110, January 2025, Pages 400-419\n\n# Fault tolerant & priority basis task offloading and scheduling model for IoT logistics\n\nhttps://doi.org/10.1016/j.aej.2024.10.018Get rights and content\n\nUnder a Creative Commons license\n\nOpen access\n\n## Abstract\n\nThe Internet of Things (IoT) has connected millions of devices to the internet for communication and computation purposes. Due to constraints such as limited battery power, processing capabilities, and storage capacity, IoT devices often rely on remote fog nodes for task execution, a practice known as task offloading. The NP-hard nature of offloading and scheduling IoT tasks onto fog nodes poses significant challenges. Current IoT task offloading often relies on single parameters like device MIPS, RAM, or battery power. Similarly, task allocation on fog nodes frequently prioritizes VM MIPS. To address energy consumption and task failures in IoT systems, robust fault tolerance, efficient task offloading, and effective scheduling are crucial. This paper introduces a novel Fault-Tolerant, Priority-Based Task Offloading and Scheduling Model (FP-TOSM) for IoT logistics. Utilizing the Analytic Hierarchy Process (AHP) for multi-criteria decision-making, IoT tasks are prioritized. Tasks below a specified threshold are executed locally, while those within a defined range are offloaded to a fog node. Tasks exceeding this range are delegated to the cloud. The Euclidean formula is used to determine the proximity between the IoT logistics vehicle and fog nodes for offloading decisions. Dynamic re-clustering fault tolerance mechanisms are utilized to manage task failures after offloading. Successful offloaded tasks are allocated to suitable VMs in the cloud and fog nodes. The proposed strategy selects the most suitable VM for offloaded tasks using a m"
+    },
+    {
+      "batch": 5,
+      "queries": [
+        {
+          "key": "THK4KB7C",
+          "title": "Security, Reliability, Cost, and Energy-Aware Scheduling of Real-Time Workflows in Compute-Continuum Environments",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/TCC.2024.3426282"
+        },
+        {
+          "key": "FSE5WTD8",
+          "title": "Reliability-Aware and Energy-Efficient Workflow Scheduling in IaaS Clouds",
+          "prior": "E 摘要候选：工作流而非独立任务",
+          "source": "https://doi.org/10.1109/TASE.2022.3195958"
+        },
+        {
+          "key": "IQTQ4B6E",
+          "title": "Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems",
+          "prior": "X 排除：主备或复制",
+          "source": "https://doi.org/10.1109/TCC.2021.3057422"
+        },
+        {
+          "key": "E5L8CEZR",
+          "title": "Reliability-Ensured Efficient Scheduling With Replication in Cloud Environment",
+          "prior": "X 排除：主备或复制",
+          "source": "https://doi.org/10.1109/JSYST.2021.3112098"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Reliability-driven scheduling of time/cost-constrained grid workflows - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0167739X1500237X"
+        },
+        {
+          "title": "Security, reliability, cost, and energy-aware scheduling of real-time",
+          "url": "https://pure.qub.ac.uk/files/616788380/Ahmad_Taghinezhad_Paper_4.pdf"
+        },
+        {
+          "title": "Security, reliability, cost, and energy-aware scheduling of real-time workflows in compute-continuum environments - Queen's University Belfast",
+          "url": "https://pure.qub.ac.uk/en/publications/security-reliability-cost-and-energy-aware-scheduling-of-real-tim/"
+        },
+        {
+          "title": "Reliability-Aware and Energy-Efficient Workflow Scheduling in IaaS Clouds (2023) | 14 Citations",
+          "url": "https://scispace.com/papers/reliability-aware-and-energy-efficient-workflow-scheduling-3qk5gz4q"
+        },
+        {
+          "title": "Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems",
+          "url": "https://ieeexplore.ieee.org/document/9349203"
+        },
+        {
+          "title": "計算連続環境における実時間ワークフローのセキュリティ,信頼性,コスト,エネルギーを意識したスケジューリング〖JST機械翻訳〗 | 文献情報 | J-GLOBAL 科学技術総合リンクセンター",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202402276662227730"
+        },
+        {
+          "title": "Security, reliability, cost, and energy-aware scheduling of real-time",
+          "url": "https://pureadmin.qub.ac.uk/ws/portalfiles/portal/616788380/Ahmad_Taghinezhad_Paper_4.pdf"
+        },
+        {
+          "title": "作者姓名  | 论文题目  | 期刊名称  | 论文等级",
+          "url": "https://www.csust.edu.cn/__local/1/C5/01/BA106EE42A674A72704AAA3EA4B_0E0158A3_3FA16.pdf"
+        },
+        {
+          "title": "Cost and Reliability Aware Scheduling of Workflows Across Multiple Clouds with Security Constraints by Suman Banerjee, Atherve Tekawade :: SSRN",
+          "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4469649"
+        },
+        {
+          "title": "Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy On Multi-Cloud Systems | PDF | Cloud Computing | Workflow",
+          "url": "https://www.scribd.com/document/1058490922/Reliability-Aware-Cost-efficient-Scientific-Workflows-Scheduling-Strategy-on-Multi-cloud-Systems"
+        },
+        {
+          "title": "Cost and Reliability Aware Scheduling of Workflows Across Multiple Clouds with Security Constraints",
+          "url": "https://ouci.dntb.gov.ua/en/works/lmkLmP57/"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2023-01/Publications_Contents_Digest_2022_Dec.pdf"
+        },
+        {
+          "title": "Reliable cloud workflow scheduling with uncertain task execution time | Journal of King Saud University Computer and Information Sciences | Springer Nature Link",
+          "url": "https://doi.org/10.1007/s44443-026-00585-x"
+        },
+        {
+          "title": "Energy and performance-aware workflow scheduler using dynamic virtual network resource optimization under edge-cloud platform - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S004579062500028X"
+        },
+        {
+          "title": "Reliable budget aware workflow scheduling strategy on multi-cloud environment",
+          "url": "https://ouci.dntb.gov.ua/en/works/4O1JkY29/"
+        },
+        {
+          "title": "IAES International Journal of Artificial Intelligence (IJ-AI)",
+          "url": "https://ijai.iaescore.com/index.php/IJAI/article/viewFile/24879/14197"
+        },
+        {
+          "title": "Uncertainty‐aware scheduling of real‐time workflows under deadline constraints on multi‐cloud systems",
+          "url": "https://ouci.dntb.gov.ua/en/works/lx88X28l/"
+        }
+      ],
+      "excerpt": "Reliability-driven scheduling of time/cost-constrained grid workflows - ScienceDirect (https://www.sciencedirect.com/science/article/abs/pii/S0167739X1500237X)\nciteturn85search0 [wordlim: 200] Published: 10.7 years ago; Crawled: 2 months ago; In this paper, a multi-objective scheduling (MOS) algorithm for scientific workflow in multicloud environment is proposed, the aim of which is to minimize workflow makespan and cost simultaneously while satisfying the reliability constraint.The proposed MOS algorithm is according to particle swarm optimization (PSO) technology, and the corresponding coding strategy takes both the tasks execution location and tasks order of data transmission into consideration. ...   * ### Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems\nIn this paper, a multi-objective scheduling (MOS) algorithm for scientific workflow in multicloud environment is proposed, the aim of which is to minimize workflow makespan and cost simultaneously while satisfying the reliability constraint. The proposed MOS algorithm is according to particle swarm optimization (PSO) technology, and the corresponding coding strategy takes both the tasks execution location and tasks order of data transmission into consideration. On the basis of real-world scientific workflow models, extensive simulation experiments demonstrate the significant multi-objective performances improvement of MOS algorithm over the CMOHEFT algorithm and the RANDOM algorithm.\n\n  * ### Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems\n\n2022, IEEE Transactions on Cloud Computing\n\n  * ### Task Scheduling for Multi-Cloud Computing Subject to Security and Reliability Constraints\n\n2021, IEEE Caa Journal of Automatica Sinica\n--------------------------------------------------------------------------------\nSecurity, reliability, cost, and energy-aware scheduling of real-time (https://pure.qub.ac.uk/files/616788380/Ahmad_Taghinezhad_Paper_4.pdf)\nciteturn85search12 [wordlim: 200] Published: 1.2 years ago; Security, Reliability, Cost, and Energy-aware ... Compute-Continuum Environments ... multi-tier computing en"
+    },
+    {
+      "batch": 6,
+      "queries": [
+        {
+          "key": "D487IH3U",
+          "title": "Failure-Aware Elastic Cloud Workflow Scheduling",
+          "prior": "E 摘要候选：工作流恢复",
+          "source": "https://doi.org/10.1109/TSC.2022.3188414"
+        },
+        {
+          "key": "U2DXBW7N",
+          "title": "Fault-Tolerant Cost-Efficient Scheduling for Energy and Deadline-Constrained IoT Workflows in Edge-Cloud Continuum",
+          "prior": "X 排除：主备或复制",
+          "source": "https://doi.org/10.1109/TSC.2025.3599497"
+        },
+        {
+          "key": "LRSJN8WM",
+          "title": "Secure Task Offloading in Blockchain-Enabled Mobile Edge Computing With Deep Reinforcement Learning",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/TNSM.2022.3190493"
+        },
+        {
+          "key": "W4HA9JMY",
+          "title": "Secure Video Offloading in MEC-Enabled IIoT Networks: A Multicell Federated Deep Reinforcement Learning Approach",
+          "prior": "F 相关但不列单副本基线",
+          "source": "https://doi.org/10.1109/TII.2023.3280314"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Failure-aware Elastic Cloud Workflow Scheduling | CoLab",
+          "url": "https://colab.ws/articles/10.1109%2Ftsc.2022.3188414"
+        },
+        {
+          "title": "dblp: Secure Video Offloading in MEC-Enabled IIoT Networks: A Multicell Federated Deep Reinforcement Learning Approach.",
+          "url": "https://dblp1.uni-trier.de/rec/journals/tii/ZhaoLH24.html"
+        },
+        {
+          "title": "Secure Task Offloading in Blockchain-Enabled Mobile Edge Computing With Deep Reinforcement Learning - King Fahd University of Petroleum & Minerals",
+          "url": "https://pure.kfupm.edu.sa/en/publications/secure-task-offloading-in-blockchain-enabled-mobile-edge-computin/"
+        },
+        {
+          "title": "Fault-tolerant cost-efficient scheduling for energy and deadline-constrained IoT workflows in edge-cloud continuum - Queen's University Belfast",
+          "url": "https://pure.qub.ac.uk/en/publications/fault-tolerant-cost-efficient-scheduling-for-energy-and-deadline-/"
+        },
+        {
+          "title": "Fault-Tolerant Cost-Efficient Scheduling for Energy and Deadline-Constrained IoT Workflows in Edge-Cloud Continuum | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/detail?JGLOBAL_ID=202502242091585049"
+        },
+        {
+          "title": "Secure Video Offloading in MEC-Enabled IIoT Networks: A Multicell Federated Deep Reinforcement Learning Approach - researchr publication",
+          "url": "https://researchr.org/publication/ZhaoLH24-0"
+        },
+        {
+          "title": "关于举办2022年信息学院暑期教研科研活动周的通知",
+          "url": "https://csci.chzu.edu.cn/2022/0824/c4288a260724/page.htm"
+        },
+        {
+          "title": "Failure-Aware Elastic Cloud Workflow Scheduling | Request PDF",
+          "url": "https://www.researchgate.net/publication/361764184_Failure-aware_Elastic_Cloud_Workflow_Scheduling?_tp=eyJjb250ZXh0Ijp7InBhZ2UiOiJzY2llbnRpZmljQ29udHJpYnV0aW9ucyIsInByZXZpb3VzUGFnZSI6bnVsbCwic3ViUGFnZSI6bnVsbH19"
+        },
+        {
+          "title": "IEEE Trans. Industrial Informatics 2024 — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/venue/e5554bc265b3/2024"
+        },
+        {
+          "title": "FRWS: Towards failure resilient workflow system",
+          "url": "https://eurekamag.com/research/107/494/107494300.php"
+        },
+        {
+          "title": "基于NOMA的海洋物联网安全计算卸载",
+          "url": "https://www.wlwxb.com.cn/rc-pub/front/front-article/download/77120881/lowqualitypdf/%E5%9F%BA%E4%BA%8ENOMA%E7%9A%84%E6%B5%B7%E6%B4%8B%E7%89%A9%E8%81%94%E7%BD%91%E5%AE%89%E5%85%A8%E8%AE%A1%E7%AE%97%E5%8D%B8%E8%BD%BD.pdf"
+        },
+        {
+          "title": "CN110780974A - A workflow-oriented fault-tolerant scheduling method in mobile edge computing environment - Google Patents",
+          "url": "https://patents.google.com/patent/CN110780974A/en"
+        },
+        {
+          "title": "ENACT - A Framework for Adaptive Scheduling and Deployments of Data Intensive Workloads on Energy Efficient Edge to Cloud Continuum",
+          "url": "https://eurekamag.com/research/095/971/095971481.php"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2023-03/Publications_Contents_Digest_2023_Feb.pdf"
+        },
+        {
+          "title": "Advances in Nonlinear Variational Inequalities",
+          "url": "https://internationalpubls.com/index.php/anvi/article/download/4343/2390/7591"
+        },
+        {
+          "title": "Computer Networks 280 (2026) 112164",
+          "url": "https://www.cs.newpaltz.edu/~lik/publications/Hongyi-Chen-CN-2026.pdf"
+        },
+        {
+          "title": "IEEE COMMUNICATIONS SURVEYS & TUTORIALS, VOL. 28, 2026",
+          "url": "https://cris.unibo.it/retrieve/handle/11585/1056392/c8a36e3f-3d55-4fa3-8166-0d2cf2c86f78/Reliability_and_Availability_in_Virtualized_Networks_A_Survey_on_Standards_Modeling_Approaches_and_Research_Challenges.pdf"
+        },
+        {
+          "title": "IEEE TRANSACTIONS ON COGNITIVE COMMUNICATIONS",
+          "url": "https://uwaterloo.ca/scholar/sites/ca.scholar/files/sshen/files/huang2025adaptive.pdf"
+        }
+      ],
+      "excerpt": "Failure-aware Elastic Cloud Workflow Scheduling | CoLab (https://colab.ws/articles/10.1109%2Ftsc.2022.3188414)\nciteturn86search0 [wordlim: 200] Published: 4.3 years ago; Crawled: 1.3 years ago; A failure-aware elastic cloud workflow scheduling algorithm is designed for both host and network device fault tolerance.\n\nIEEE Transactions on Services Computing, pages 1-14\n\n# Failure-aware Elastic Cloud Workflow Scheduling\n\nGuangshun Yao ^{1}\n\n, \n\nXiaoping Li ^{1}\n\n, \n\nQian Ren ^{2}\n\n, \n\nRubén Daniel Ruiz ^{3}\n\nHide authors affiliations Show authors affiliations: 3 affiliations\n\n^{1}\n\n \n\nSchool of Computer science and Engineering, Southeast University, Nanjing, China | \n\n^{2}\n\n \n\nCollege of Computer and Information Engineering, Chuzhou University, Chuzhou, China | \n\n^{3}\n\n \n\nGrupo de Sistemas de Optimización Aplicada, Universitat Politècnica de València, València, Spain | \n\nPublication type: Journal Article\n\nPublication date: 2022-07-04\n\nImage: Institute of Electrical and Electronics Engineers (IEEE)\n\nInstitute of Electrical and Electronics Engineers (IEEE)\n\nJournal: IEEE Transactions on Services Computing\n\nscimago Q1\n\nwos Q1\n\nSJR: 2.002\n\nCiteScore: 11.5\n\nImpact factor: 5.5\n\nISSN: 19391374, 23720204\n\nDOI:  10.1109/tsc.2022.3188414\n\nInformation Systems and Management\n\nAbstract\n\nWith an increasing complexity and functionality in cloud data centers, fault tolerance becomes an essential requirement for tasks executed in clouds, especially for workflows with task precedences. Hosts and network devices are the main physical components in a cloud data center. The PB (Primary-Backup) model is a desirable approach to fault tolerance. Many PB-based workflow scheduling algorithms have been proposed for host faults. However, only a few studies focus on cloud workflow scheduling considering network device faults. This paper analyzes the fault-tolerant properties for scheduling dependent tasks and migrating VMs based on the PB model, considering both host and network device faults in a cloud data center. A failure-aware elastic cloud workflow scheduling algorithm is designed for both host and network device fault tolerance. Additionally, an elastic resource provisioning mechanism"
+    },
+    {
+      "batch": 7,
+      "queries": [
+        {
+          "key": "PA4NK8Y5",
+          "title": "Modeling and Measuring Common Cause Failures in Measurement of Reliability of Nuclear Power Plant Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TIM.2021.3105265"
+        },
+        {
+          "key": "AZA8N8RU",
+          "title": "A simplified reliability analysis method for cloud computing systems considering common-cause failures",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1177/1748006X17703863"
+        },
+        {
+          "key": "B3LIAWIG",
+          "title": "DNN partitioning, task offloading, and resource allocation in dynamic vehicular networks: A lyapunov-guided diffusion-based reinforcement learning approach",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2024.3486728"
+        },
+        {
+          "key": "ITZ2WSIC",
+          "title": "Joint Optimization of Completion Ratio and Latency of Offloaded Tasks With Multiple Priority Levels in 5G Edge",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TNSM.2024.3525004"
+        }
+      ],
+      "sources": [
+        {
+          "title": "A simplified reliability analysis method for cloud computing systems considering common-cause failures",
+          "url": "https://ideas.repec.org/a/sae/risrel/v231y2017i3p324-333.html"
+        },
+        {
+          "title": "DNN Partitioning, Task Offloading, and Resource Allocation in Dynamic Vehicular Networks: A Lyapunov-Guided Diffusion-Based Reinforcement Learning Approach",
+          "url": "https://ieeexplore.ieee.org/document/10736570/"
+        },
+        {
+          "title": "DNN Partitioning, Task Offloading, and Resource Allocation in Dynamic Vehicular Networks: A Lyapunov-Guided Diffusion-Based Reinforcement Learning Approach",
+          "url": "https://arxiv.org/abs/2406.06986"
+        },
+        {
+          "title": "DNN Partitioning, Task Offloading, and Resource Allocation in Dynamic Vehicular Networks: A Lyapunov-Guided Diffusion-Based Reinforcement Learning Approach",
+          "url": "https://hub.hku.hk/bitstream/10722/353231/1/content.pdf"
+        },
+        {
+          "title": "Joint Optimization of Completion Ratio and Latency of Offloaded Tasks with Multiple Priority Levels in 5G Edge",
+          "url": "https://arxiv.org/abs/2407.11155"
+        },
+        {
+          "title": "Joint Optimization of Completion Ratio and Latency of Offloaded Tasks with Multiple Priority Levels in 5G Edge (2024) | Parisa Fard Moshiri | 3 Citations",
+          "url": "https://scispace.com/papers/joint-optimization-of-completion-ratio-and-latency-of-xiv4p1h2lcs8"
+        },
+        {
+          "title": "IEEE Transactions on Mobile Computing — Page 4",
+          "url": "https://bishtref.com/journals/9341/ieee-transactions-on-mobile-computing?page=4"
+        },
+        {
+          "title": "DNN Partitioning, Task Offloading, and Resource Allocation in Dynamic Vehicular Networks: A Lyapunov-Guided Diffusion-Based Reinforcement Learning Approach | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/detail?JGLOBAL_ID=202502217188683484"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2025-05/Publications_Contents_Digest_2025_Apr.pdf"
+        },
+        {
+          "title": "IEEE Trans. Mobile Computing 2025 — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/venue/ieee-trans-mobile-computing/2025"
+        },
+        {
+          "title": "Rankless | Zhibin Gao",
+          "url": "https://www.rankless.org/authors/zhibin-gao"
+        },
+        {
+          "title": "3.2.2 Number of books and chapters in edited volum",
+          "url": "https://siesgst.edu.in/images/Books%20%26%20conference%20paper%2022-23%20%281%29.pdf"
+        },
+        {
+          "title": "Dr. Burak Kantarci",
+          "url": "https://bkantarci.nextconlab.ca/CVKantarciBurak.pdf"
+        },
+        {
+          "title": "Collaborative deep neural network inference via distributed partitioning and resource optimization in vehicular edge computing - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0952197626006275"
+        },
+        {
+          "title": "Dr. Burak Kantarci",
+          "url": "https://www.site.uottawa.ca/~bkantarc/CV.pdf"
+        },
+        {
+          "title": "DNN Partitioning, Task Offloading, And Resource Allocation in Dynamic Vehicular Networks_ a Lyapunov-Guided Diffusion-Based Rein(科研通-Ablesci.com) | PDF | Deep Learning | Algorithms",
+          "url": "https://www.scribd.com/document/1072672545/DNN-Partitioning-Task-Offloading-And-Resource-Allocation-in-Dynamic-Vehicular-Networks-a-Lyapunov-Guided-Diffusion-Based-Rein-%E7%A7%91%E7%A0%94%E9%80%9A-Ablesci-com"
+        },
+        {
+          "title": "Lyapunov-Guided Deep Reinforcement Learning for Stable Online Computat...",
+          "url": "https://bishtref.com/articles/10.1109/twc.2021.3085319"
+        },
+        {
+          "title": "(PDF) Joint Optimization of Completion Ratio and Latency of Offloaded Tasks with Multiple Priority Levels in 5G Edge",
+          "url": "https://www.researchgate.net/publication/382301889_Joint_Optimization_of_Completion_Ratio_and_Latency_of_Offloaded_Tasks_with_Multiple_Priority_Levels_in_5G_Edge"
+        },
+        {
+          "title": "A Novel Hierarchical Co-Optimization Framework for Coordinated Task Scheduling and Power Dispatch in Computing Power Networks",
+          "url": "https://repositum.tuwien.at/bitstream/20.500.12708/227166/1/Luo-2025-A%20Novel%20Hierarchical%20Co-Optimization%20Framework%20for%20Coordinated%20...-smur.pdf"
+        },
+        {
+          "title": "Latency–Sustainability Trade-Offs in On-Device vs. Near-Edge Offloaded Semantic Segmentation",
+          "url": "https://eurekamag.com/research/110/004/110004183.php"
+        }
+      ],
+      "excerpt": "A simplified reliability analysis method for cloud computing systems considering common-cause failures (https://ideas.repec.org/a/sae/risrel/v231y2017i3p324-333.html)\nciteturn88search0 [wordlim: 200] Published: 9.4 years ago; Crawled: last week; # A simplified reliability analysis method for cloud computing systems considering common-cause failures ... \"A simplified reliability analysis method for cloud computing systems considering common-cause failures,\" Journal of Risk and Reliability, , vol. 231(3), pages 324-333, June.\n\n# A simplified reliability analysis method for cloud computing systems considering common-cause failures\n\n## Author\n\nListed:\n\n  * Ruiying Li\n  * Qiong Li\n  * Ning Huang\n  * Rui Kang\n\nRegistered:\n\n## Abstract\n\nVirtualization is one of the main features of cloud computing systems, which enables building multiple virtual machines on a single server. However, this feature brings new challenge in reliability modeling, as the failure of the server will make all its co-located virtual machines inoperable, which is a typical common-cause failure. To satisfy the demand of the cloud computing system, the reliability of the system is defined as the probability that at least a given number of virtual machines are operable. State-space enumeration is one method to calculate such reliability; however, due to the large number of combinations, it is time-consuming and impractical. To solve this problem, we propose a simplified reliability analysis method based on fault tree and state-space models. Two illustrative examples are studied to show the process and the effectiveness of our method. State enumeration and Monte Carlo simulation are also used to prove the correctness of our method as back-to-back verifications. Compared to the reliability analysis without considering common-cause failures, our results are quite different, which illustrates the necessity of considering common-cause failures in the reliability of cloud computing systems.\n\n## Suggested Citation\n\n* Ruiying Li & Qiong Li & Ning Huang & Rui Kang, 2017. \"A simplified reliability analysis method for cloud computing systems considering common-cause failures,\" Journal of Risk and Reliability"
+    },
+    {
+      "batch": 8,
+      "queries": [
+        {
+          "key": "DY7IND98",
+          "title": "Deadline-Aware Joint Task Scheduling and Offloading in Mobile-Edge Computing Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2024.3425854"
+        },
+        {
+          "key": "4PFKQZXL",
+          "title": "Delay-Sensitive Dependent Tasks Offloading and Resource Allocation in VEC: A Deep-Reinforcement Learning Approach",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2025.3577449"
+        },
+        {
+          "key": "59XAE276",
+          "title": "Resource Optimization for Semantic-Aware Networks With Task Offloading",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TWC.2024.3390407"
+        },
+        {
+          "key": "BFMWUF7E",
+          "title": "QoE-Driven Multi-Task Offloading for Semantic-Aware Edge Computing Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TNSE.2026.3662899"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Resource Optimization for Semantic-Aware Networks With Task Offloading | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/abstract/document/10508293/"
+        },
+        {
+          "title": "Resource Optimization for Semantic-Aware Networks with Task Offloading",
+          "url": "https://arxiv.org/abs/2301.08376"
+        },
+        {
+          "title": "Deadline-Aware Joint Task Scheduling and Offloading in Mobile Edge Computing Systems",
+          "url": "https://arxiv.org/abs/2507.18864"
+        },
+        {
+          "title": "Delay-Sensitive Dependent Tasks Offloading and Resource Allocation in VEC: A Deep-Reinforcement Learning Approach - 科研通",
+          "url": "https://www.ablesci.com/scholar/paper?id=rLYy1VWp3"
+        },
+        {
+          "title": "(PDF) Deadline-Aware Joint Task Scheduling and Offloading in Mobile Edge Computing Systems",
+          "url": "https://www.researchgate.net/publication/394049714_Deadline-Aware_Joint_Task_Scheduling_and_Offloading_in_Mobile_Edge_Computing_Systems"
+        },
+        {
+          "title": "dblp: Deadline-Aware Joint Task Scheduling and Offloading in Mobile Edge Computing Systems.",
+          "url": "https://dblp.org/rec/journals/corr/abs-2507-18864.html"
+        },
+        {
+          "title": "モバイルエッジコンピューティングシステムにおけるデッドラインを意識した共同タスクスケジューリングとオフローディング〖JST機械翻訳〗 | 文献情報 | J-GLOBAL 科学技術総合リンクセンター",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202502213507606261"
+        },
+        {
+          "title": "Deadline-Aware Joint Task Scheduling and Offloading in Mobile-Edge Computing Systems – Kudos: Growing the influence of research",
+          "url": "https://www.growkudos.com/publications/10.1109%252Fjiot.2024.3425854/reader"
+        },
+        {
+          "title": "Publications Conte",
+          "url": "https://minisite-demo-1.comsoc.org/system/files/2024-09/Publications_Contents_Digest_2024_Sep.pdf"
+        },
+        {
+          "title": "Task Scheduling in Deadline-Aware Mobile Edge Computing Systems",
+          "url": "https://eurekamag.com/research/088/221/088221585.php"
+        },
+        {
+          "title": "dblp: Symeon Chatzinotas",
+          "url": "https://dblp.org/pid/57/4418"
+        },
+        {
+          "title": "QoE-Driven Multi-Task Offloading for Semantic-Aware Edge Computing Systems - researchr publication",
+          "url": "https://researchr.org/publication/ChenFJLCS26"
+        },
+        {
+          "title": "Jiaan Zeng",
+          "url": "https://www.csauthors.net/jiaan-zeng/"
+        },
+        {
+          "title": "Deep Learning Enabled Resource",
+          "url": "https://qmro.qmul.ac.uk/xmlui/bitstream/handle/123456789/96614/Deep_Learning_Enabled_Resource_Allocation_in_Wireless_Communications.pdf?isAllowed=y&sequence=6"
+        },
+        {
+          "title": "Xiaoming Tao — Researcher Profile",
+          "url": "https://bishtref.com/authors/243610"
+        },
+        {
+          "title": "Joint optimization of task offloading and resource allocation for semantics-aware IoV edge computing - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1874490726003058"
+        },
+        {
+          "title": "KMPS: a reinforcement learning scheduler for Kubernetes edge-cloud systems",
+          "url": "https://strathprints.strath.ac.uk/95507/1/Huang-etal-IEEE-IOTJ-2026-KMPS-a-reinforcement-learning-scheduler-for-Kubernetes-edge-cloud-systems.pdf"
+        },
+        {
+          "title": "190. Zelin Ji, Zhijin Qin, Xiaoming Tao, and Zhu Han, “Resource Optimization for Semantic-Aware Networks With Task Offloading,” *IEEE Transaction on Wireless Communication*, vol. 23, no. 9, pp. 12284 - 12296, September 2024.",
+          "url": "https://www2.egr.uh.edu/~zhan2/index_files/cv.pdf"
+        },
+        {
+          "title": "Oranits: Mission Assignment and Task Of",
+          "url": "https://orbilu.uni.lu/bitstream/10993/66441/1/2507.19712v2.pdf"
+        }
+      ],
+      "excerpt": "Resource Optimization for Semantic-Aware Networks With Task Offloading | IEEE Journals & Magazine | IEEE Xplore (https://ieeexplore.ieee.org/abstract/document/10508293/)\nciteturn92search0 [wordlim: 200] Published: 2.5 years ago; Crawled: 3 days ago; # Resource Optimization for Semantic-Aware Networks With Task Offloading ... Edge computing, especially the edge intelligence system, enables local users to offload the computation tasks to the edge servers to reduce the computational energy consumption of user equipment and accelerate fast task execution. ... To overcome the challenge arising from scarce wireless communication resources, we propose a semantic-aware multi-modal task offloading system that facilitates the extraction and offloading of semantic task information to edge servers.\n\n# Resource Optimization for Semantic-Aware Networks With Task Offloading\n\nPublisher: IEEE\n\n## Abstract:\n\nThe limited capabilities of user equipment restrict the local implementation of computation-intensive applications. Edge computing, especially the edge intelligence syste...Show More\n\n## Metadata\n\n## Abstract:\n\nThe limited capabilities of user equipment restrict the local implementation of computation-intensive applications. Edge computing, especially the edge intelligence system, enables local users to offload the computation tasks to the edge servers to reduce the computational energy consumption of user equipment and accelerate fast task execution. However, the limited bandwidth of upstream channels may increase the task transmission latency and affect the computation offloading performance. To overcome the challenge arising from scarce wireless communication resources, we propose a semantic-aware multi-modal task offloading system that facilitates the extraction and offloading of semantic task information to edge servers. To cope with the different tasks with multi-modal data, a unified quality of experience (QoE) criterion is designed. Furthermore, a proximal policy optimization-based multi-agent reinforcement learning algorithm (MAPPO) is proposed to coordinate the resource management for wireless communications and computation in a distributed and low computational "
+    },
+    {
+      "batch": 9,
+      "queries": [
+        {
+          "key": "PLW4GAKC",
+          "title": "Deep Reinforcement Learning for Energy-Efficient Computation Offloading in Mobile-Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2021.3091142"
+        },
+        {
+          "key": "B3N4YJ9J",
+          "title": "Deadline-aware task offloading in vehicular networks using deep reinforcement learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1016/j.eswa.2024.123622"
+        },
+        {
+          "key": "R4RFPPLE",
+          "title": "Deep-Reinforcement-Learning-Based Task Offloading and Resource Allocation in Mobile Edge Computing Network With Heterogeneous Tasks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2024.3514108"
+        },
+        {
+          "key": "H6ZFNW6K",
+          "title": "Task-Specific Trust Prediction with GNN for Minimized Risk of Task Completion in Dynamic Collaborative Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/ICCWorkshops67674.2025.11162275"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Deadline-aware task offloading in vehicular networks using deep reinforcement learning - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0957417424004871"
+        },
+        {
+          "title": "dblp: Deadline-aware task offloading in vehicular networks using deep reinforcement learning.",
+          "url": "https://dblp.org/rec/journals/eswa/FarimaniAEES24.html"
+        },
+        {
+          "title": "dblp: ICC Workshops 2025",
+          "url": "https://dblp.org/db/conf/icc/icc2025w"
+        },
+        {
+          "title": "CMC | Free Full-Text | A Deep Reinforcement Learning-Based Pre-Allocation Mechanism for Efficient Task Offloading in Mobile Edge Computing",
+          "url": "https://www.techscience.com/cmc/v88n1/67307/html"
+        },
+        {
+          "title": "GitHub - mehrshaad/DeepRL-Offloading-MEC: Deep Reinforcement Learning for Energy-Efficient Computation Offloading in Mobile-Edge Computing · GitHub",
+          "url": "https://github.com/mehrshaad/DeepRL-Offloading-MEC"
+        },
+        {
+          "title": "Deep Reinforcement Learning for Energy-Efficient Computation Offloading in Mobile-Edge Computing",
+          "url": "https://ieeexplore.ieee.org/document/9462445/"
+        },
+        {
+          "title": "Task-Specific Trust Prediction with GNN for Minimized Risk of Task Completion in Dynamic Collaborative Systems | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/public/202502260587919980"
+        },
+        {
+          "title": "Xianbin WANG | Distinguished University Professor | FIEEE, FCAE, FEIC, Tier-1 CRC | Western University, London | UWO | Research profile",
+          "url": "https://www.researchgate.net/scientific-contributions/Xianbin-Wang-2336838187"
+        },
+        {
+          "title": "EdgeAutoOffloadAI a deep reinforcement learning framework for adaptive task offloading and resource management in mobile edge computing | Discover Computing | Springer Nature Link",
+          "url": "https://link.springer.com/article/10.1007/s10791-026-10037-9"
+        },
+        {
+          "title": "Deep-Reinforcement-Learning-Based Task Offloading and Resource Allocation in Mobile Edge Computing Network With Heterogeneous Tasks - researchr publication",
+          "url": "https://researchr.org/publication/JiangCZFZ25"
+        },
+        {
+          "title": "Deadline-aware task offloading in vehicular networks using deep reinforcement learning",
+          "url": "https://csap.snu.ac.kr/sites/default/files/papers/2024.ESWA.Farimani.Deadline-aware%20task%20offloading%20in%20vehicular%20networks%20using%20deep%20reinforcement%20learning.pdf"
+        },
+        {
+          "title": "Deep Reinforcement Learning for Energy-Efficient Computation Offloading in Mobile-Edge Computing - 西北工业大学",
+          "url": "https://pure.nwpu.edu.cn/zh/publications/deep-reinforcement-learning-for-energy-efficient-computation-offl"
+        },
+        {
+          "title": "Deep reinforcement learning for the computation offloading in MIMO-based Edge Computing - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1570870522002529"
+        },
+        {
+          "title": "Future work may explore several directions to further improve the effectiveness and adaptability of the proposed MATD3-based task offloading strategy. These include refining the reward function to better capture fairness in workload distribution, validating the model across a wider range of real-world traffic scenarios, and enabling task partitioning or replication to increase flexibility and reliability. Additionally, embedding dwell time prediction from [13] can make the system more realistic. Multi-hop task migration, where tasks are relayed through intermediate vehicles, could also be investigated to extend offloading range and optimize latency in sparse or highly dynamic networks. By advancing these areas, we aim to enhance the robustness, scalability, and fairness of intelligent task offloading in vehicular edge computing systems.",
+          "url": "https://www.tkn.tu-berlin.de/bib/zhou2025fairness-aware/zhou2025fairness-aware.pdf"
+        },
+        {
+          "title": "Task Offloading Decision and Resource Allocation Strategy 269",
+          "url": "https://cai.type.sk/content/2025/2/task-offloading-decision-and-resource-allocation-strategy-based-on-improved-ddpg-in-mobile-edge-computing/7123.pdf"
+        },
+        {
+          "title": "Prioritized Task Offloading in Vehicular Edge Computing Using Deep Reinforcement Learning",
+          "url": "https://ieeevtc.org/vtc2024spring/DATA/PID2024002413.pdf"
+        }
+      ],
+      "excerpt": "Deadline-aware task offloading in vehicular networks using deep reinforcement learning - ScienceDirect (https://www.sciencedirect.com/science/article/pii/S0957417424004871)\nciteturn91search0 [wordlim: 200] Published: 2.1 years ago; Crawled: last month; # Deadline-aware task offloading in vehicular networks using deep reinforcement learning ... Then, we propose a task offloading algorithm, aware of the vehicle’s direction, based on Rainbow, a deep Q-learning algorithm combining several independent improvements to the deep Q-network algorithm. ... To address issues in Q-learning methods, Deep Q-Network (DQN) algorithms, which approximate the Q-function using deep neural networks, have emerged to prove their efficiency in solving offloading decision problems with huge dimensional state and action spaces, where the agent can adapt well to complex environments via continuous interaction (Liu et al., 2019, Xu et al., 2022). ... In some related work, it is only decided whether to offload or process locally. ... ### IEEE Transactions on Vehicular Technology\n\n# Deadline-aware task offloading in vehicular networks using deep reinforcement learning\n\nAuthor links open overlay panel Mina Khoshbazm Farimani ^{a}, Soroush Karimian-Aliabadi ^{b}, Reza Entezari-Maleki ^{a} ^{c} ^{d}, Bernhard Egger ^{e}, Leonel Sousa ^{d}\n\nShow more\n\nCite\n\nAdd to Mendeley\n\nShare\n\n10.1016/j.eswa.2024.123622\n\nAccess through your organizationPurchase PDF\n\nMore actions\n\n  * Article preview\n  * Recommended articles\n  * Cited by (43)\n\n## Highlights\n\n  * •\n\nWe propose a Rainbow-based task offloading algorithm for vehicular networks.\n\n  * •\n\nThe proposed algorithm aims to jointly minimize average delay and energy consumption.\n\n  * •\n\nThe performance of the proposed approach is evaluated using real-world traffic data.\n\n  * •\n\nExperiments demonstrate significant improvement achieved by the proposed algorithm.\n\n## Abstract\n\nSmart vehicles have a rising demand for computation resources, and recently vehicular edge computing has been recognized as an effective solution. Edge servers deployed in roadside units are capable of accomplishing tasks beyond the capacity which is embedded inside the vehicles. How"
+    },
+    {
+      "batch": 10,
+      "queries": [
+        {
+          "key": "7AELAYCV",
+          "title": "Dependency-Aware Task Offloading Strategy via Heterogeneous Graph Neural Network and Deep Reinforcement Learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2025.3549441"
+        },
+        {
+          "key": "3IRPRCM2",
+          "title": "Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2025.3573379"
+        },
+        {
+          "key": "TPXBG6X5",
+          "title": "Dependent Task Offloading in Edge Computing Using GNN and Deep Reinforcement Learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2024.3374969"
+        },
+        {
+          "key": "63PE7ZRN",
+          "title": "Task Offloading in Internet of Vehicles: A DRL-Based Approach With Representation Learning for DAG Scheduling",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2025.3531887"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/document/11014496/"
+        },
+        {
+          "title": "Dependent Task Offloading in Edge Computing Using GNN and Deep Reinforcement Learning",
+          "url": "https://arxiv.org/abs/2303.17100"
+        },
+        {
+          "title": "Dependent Task Offloading in Edge Computing Using GNN and Deep Reinforcement Learning | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/document/10463608/"
+        },
+        {
+          "title": "GCN and DRL based on dependent task offloading mechanism in edge computing - ScienceDirect",
+          "url": "https://doi.org/10.1016/j.dcan.2025.10.001"
+        },
+        {
+          "title": "Dependency-Aware Task Offloading Strategy via Heterogeneous Graph Neural Network and Deep Reinforcement Learning | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/abstract/document/10918838/citations?tabFilter=papers"
+        },
+        {
+          "title": "dblp: Dependency-Aware Task Offloading Strategy via Heterogeneous Graph Neural Network and Deep Reinforcement Learning.",
+          "url": "https://dblp.uni-trier.de/rec/journals/iotj/WuZZLSD25.html"
+        },
+        {
+          "title": "Dependent tasks joint scheduling and offloading for edge computing based on deep reinforcement learning - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S1570870525003592"
+        },
+        {
+          "title": "Collaborative service caching for delay minimization in vehicular edge computing networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S221420962500004X"
+        },
+        {
+          "title": "Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/detail?JGLOBAL_ID=202502287385838912"
+        },
+        {
+          "title": "Deep reinforcement learning-based dependent task offloading for Edge Intelligent Controllers",
+          "url": "https://aresearch.uk/research/doi/10.1016%2Fj.future.2026.108819"
+        },
+        {
+          "title": "Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing - 科研通",
+          "url": "https://www.ablesci.com/assist/detail?id=Dk9NpQ"
+        },
+        {
+          "title": "2025",
+          "url": "https://www.jsps.go.jp/file/storage/inv_j_report2/r7-1/S25072.pdf"
+        },
+        {
+          "title": "Task Offloading in Edge Computing Using GNNs and DQN - ScienceDirect",
+          "url": "https://www.sciencedirect.com/org/science/article/pii/S1526149224001061"
+        },
+        {
+          "title": "Task Offloading in Internet of Vehicles: A DRL-based Approach with Representation Learning for DAG Scheduling · 研飞ivySCI",
+          "url": "https://www.ivysci.com/articles/8956239__Task_Offloading_in_Internet_of_Vehicles_A_DRLbased_Approach_with_Representation_Learning_for_DAG_Scheduling"
+        },
+        {
+          "title": "ARTICLE IN PRESS",
+          "url": "https://www.nature.com/articles/s41598-025-31056-4_reference.pdf"
+        },
+        {
+          "title": "OPEN CALL ARTICLE",
+          "url": "https://cam.tju.edu.cn/en/research/downAchiev.php?id=814"
+        },
+        {
+          "title": "BIBLIOGRAPHY",
+          "url": "https://www.buyya.com/students/ZhiyuPhDThesis2026.pdf"
+        },
+        {
+          "title": "Revisiting workflow scheduling with the power of edge computing: Taxonomy, review, and open challenges",
+          "url": "https://www.cs.newpaltz.edu/~lik/publications/Shenghai-Li-CSR-2026.pdf"
+        },
+        {
+          "title": "A Deep Reinforcement Learning Approach for Dependent Task Offloading in Multi-Access Edge Computing",
+          "url": "https://ceie.szu.edu.cn/heyejun/paper/Xiebo-TCCN.pdf"
+        }
+      ],
+      "excerpt": "Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing | IEEE Journals & Magazine | IEEE Xplore (https://ieeexplore.ieee.org/document/11014496/)\nciteturn90search0 [wordlim: 200] Published: 1.4 years ago; Crawled: last month; # Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing\n\n# Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing\n\nPublisher: IEEE\n\nAbstract\n\nAuthors\n\n## Abstract:\n\nAlthough some studies in recent years have focused on the coexistence of service and task dependencies in the collaborative optimization of service caching and task offlo...Show More\n\n## Metadata\n\n## Abstract:\n\nAlthough some studies in recent years have focused on the coexistence of service and task dependencies in the collaborative optimization of service caching and task offloading in Vehicle Edge Computing (VEC), the challenges brought by dual dependencies have not been fully addressed. Therefore, this paper proposes a more comprehensive joint optimization method for service caching and task offloading under dual dependencies. First, this paper proposes a service criticality prediction method based on the Gated Graph Recurrent Network (GGRN) to perceive complex task dependencies and accurately capture the service requirements of critical task types. Based on this, a hierarchical active-passive hybrid caching strategy is designed, which aims to satisfy diverse service demands while reducing the additional overhead caused by remote service requests. Second, a global task priority computation method based on application heterogeneity has been developed to prevent cascading delays in task chains. Finally, this paper formulates a joint optimization problem for service caching and task offloading in a three-layer VEC system, models it as a markov decision process, and applies a proximal policy optimization-driven collaborative optimization algorithm named COHCTO. Simulation results show that COHCTO achieves multi-objective optimization across metrics such as delay, energy consumption, caching hit rate, and application success rate under condition"
+    },
+    {
+      "batch": 11,
+      "queries": [
+        {
+          "key": "BR29Y6R8",
+          "title": "Multi-Agent Deep Reinforcement Learning Based Multi-Task Partial Computation Offloading in Mobile Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.2139/ssrn.4930170"
+        },
+        {
+          "key": "2YFEHPHE",
+          "title": "Joint Optimization of Task Offloading and Resource Allocation in Smart Factories via Cascaded Dual-Branch Network-Based Deep Reinforcement Learning Approach",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2025.3648781"
+        },
+        {
+          "key": "EULCLEHC",
+          "title": "Dependency-Aware Task Offloading in Edge Computing: A Bi-Level Optimization Integrating Reinforcement Learning and Heuristics",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2025.3649712"
+        },
+        {
+          "key": "KB8RWT83",
+          "title": "Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2020.3036871"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems",
+          "url": "https://arxiv.org/abs/2005.02459"
+        },
+        {
+          "title": "Multi-agent deep reinforcement learning based multi-task partial computation offloading in mobile edge computing - Macquarie University",
+          "url": "https://researchers.mq.edu.au/en/publications/multi-agent-deep-reinforcement-learning-based-multi-task-partial-/"
+        },
+        {
+          "title": "Deep reinforcement learning-based low-latency task offloading for mobile-edge computing networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1568494624009384"
+        },
+        {
+          "title": "Task offloading optimization in mobile edge computing based on a deep reinforcement learning algorithm using density clustering and ensemble learning | Scientific Reports",
+          "url": "https://www.nature.com/articles/s41598-024-84038-3"
+        },
+        {
+          "title": "Joint Optimization of Task Offloading and Resource Allocation in Smart Factories via Cascaded Dual-Branch Network-Based Deep Reinforcement Learning Approach",
+          "url": "https://www.researchgate.net/publication/399104414_Joint_Optimization_of_Task_Offloading_and_Resource_Allocation_in_Smart_Factories_via_Cascaded_Dual-Branch_Network-Based_Deep_Reinforcement_Learning_Approach?_tp=eyJjb250ZXh0Ijp7InBhZ2UiOiJzY2llbnRpZmljQ29udHJpYnV0aW9ucyIsInByZXZpb3VzUGFnZSI6bnVsbCwic3ViUGFnZSI6bnVsbH19"
+        },
+        {
+          "title": "Task graph offloading via deep reinforcement learning in mobile edge computing - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0167739X24001638"
+        },
+        {
+          "title": "Task offloading in Multiple-Services Mobile Edge Computing: A deep reinforcement learning algorithm - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0140366423000385"
+        },
+        {
+          "title": "Distributed task offloading in edge computing: A multi-objective adaptive deep reinforcement learning algorithm - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0952197625026843"
+        },
+        {
+          "title": "Optimizing task offloading in MIMO-enabled vehicular networks through deep reinforcement learning - ScienceDirect",
+          "url": "https://doi.org/10.1016/j.vehcom.2025.100901"
+        },
+        {
+          "title": "A bi-level mobility-aware deep reinforcement learning approach for fault-tolerant task offloading in vehicular edge-cloud computing | Scientific Reports",
+          "url": "https://www.nature.com/articles/s41598-026-45763-z"
+        },
+        {
+          "title": "Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems",
+          "url": "https://ieeexplore.ieee.org/document/9253665/"
+        },
+        {
+          "title": "A collaborative optimization strategy for computing offloading and resource allocation based on multi-agent deep reinforcement learning - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0045790622005067"
+        },
+        {
+          "title": "GitHub - hanlizora/MADRL-Based-Multi-Task-Partial-Computation-Offloading-in-MEC: Open source code for paper: Multi-Agent Deep Reinforcement Learning Based Multi-Task Partial Computation Offloading in Mobile Edge Computing · GitHub",
+          "url": "https://github.com/hanlizora/MADRL-Based-Multi-Task-Partial-Computation-Offloading-in-MEC"
+        },
+        {
+          "title": "futgencompsys2020.dvi",
+          "url": "https://ftp.math.utah.edu/pub/tex/bib/futgencompsys2020.pdf"
+        },
+        {
+          "title": "DOI: 10.32604/cmc.2024.059689",
+          "url": "https://cdn.techscience.cn/files/cmc/2025/TSP_CMC-82-2/TSP_CMC_59689/TSP_CMC_59689.pdf"
+        },
+        {
+          "title": "A survey on computation offloading in edge systems: From the perspective of deep reinforcement learning approaches",
+          "url": "https://www.cs.newpaltz.edu/~lik/publications/Peng-Peng-CSR-2024"
+        },
+        {
+          "title": "2766　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　计算机研究与发展 2023，60（12）",
+          "url": "https://crad.ict.ac.cn/cn/article/pdf/preview/10.7544/issn1000-1239.202220192.pdf"
+        },
+        {
+          "title": "Dynamic Task Offloading in Edge Computing based on Dependency-aware Reinforcement Learning",
+          "url": "https://www4.comp.polyu.edu.hk/~labimcl/paper/Dynamic_Task_Offloading_in_Edge_Computing_based_on_Dependency-aware_Reinforcement_Learning.pdf"
+        },
+        {
+          "title": "Journal of Communications, vol. 20, no. 6, 2025",
+          "url": "https://artefacts-discovery.researcher.life/full_text/DA-2/ab/abef9424a01e3d86ad185781ce2fdd69/full_text/a6abfa31f0e3829d8729e1091f85cfa7.pdf"
+        }
+      ],
+      "excerpt": "Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems (https://arxiv.org/abs/2005.02459)\nciteturn89academia12 [wordlim: 200] Published: 6.5 years ago; Title: Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems ... Due to the uncertain load dynamics at the edge nodes, it is challenging for each device to determine its offloading decision (i.e., whether to offload or not, and which edge node it should offload its task to) in a decentralized manner.\nTitle: Deep Reinforcement Learning for Task Offloading in Mobile Edge Computing Systems\nAuthors: Ming Tang, Vincent W. S. Wong\nDate: Fri Apr 10 20:01:27 2020\n\nIn mobile edge computing systems, an edge node may have a high load when a large number of mobile devices offload their tasks to it. Those offloaded tasks may experience large processing delay or even be dropped when their deadlines expire. Due to the uncertain load dynamics at the edge nodes, it is challenging for each device to determine its offloading decision (i.e., whether to offload or not, and which edge node it should offload its task to) in a decentralized manner. In this work, we consider non-divisible and delay-sensitive tasks as well as edge load dynamics, and formulate a task offloading problem to minimize the expected long-term cost. We propose a model-free deep reinforcement learning-based distributed algorithm, where each device can determine its offloading decision without knowing the task models and offloading decision of other devices. To improve the estimation of the long-term cost in the algorithm, we incorporate the long short-term memory (LSTM), dueling deep Q-network (DQN), and double-DQN techniques. Simulation results with 50 mobile devices and five edge nodes show that the proposed algorithm can reduce the ratio of dropped tasks and average task delay by 86.4%-95.4% and 18.0%-30.1%, respectively, when compared with several existing algorithms.--------------------------------------------------------------------------------\nMulti-agent deep reinforcement learning based multi-task partial computation offloading in mobile edge computing - Macquarie University (https://researchers.mq.e"
+    },
+    {
+      "batch": 12,
+      "queries": [
+        {
+          "key": "GYKZNERD",
+          "title": "DTA-RL: Dynamic Topology Adaptive Reinforcement Learning Approach for Task Offloading in Mobile Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/GLOBECOM52923.2024.10901650"
+        },
+        {
+          "key": "LLBC7NK2",
+          "title": "A Survey of Computation Offloading With Task Types",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TITS.2024.3410896"
+        },
+        {
+          "key": "QEMFHEUZ",
+          "title": "Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JSAC.2026.3669481"
+        },
+        {
+          "key": "JMH8VJRX",
+          "title": "Dependent Task Offloading for Edge Computing based on Deep Reinforcement Learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TC.2021.3131040"
+        }
+      ],
+      "sources": [
+        {
+          "title": "A Survey of Computation Offloading with Task Types",
+          "url": "https://arxiv.org/abs/2401.01017"
+        },
+        {
+          "title": "Dependent Task Offloading for Edge Computing based on Deep Reinforcement Learning | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/abstract/document/9627763"
+        },
+        {
+          "title": "Dependent tasks joint scheduling and offloading for edge computing based on deep reinforcement learning - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S1570870525003592"
+        },
+        {
+          "title": "A Survey of Computation Offloading With Task Types - University of Surrey",
+          "url": "https://openresearch.surrey.ac.uk/esploro/outputs/journalArticle/A-Survey-of-Computation-Offloading-With/99892466602346"
+        },
+        {
+          "title": "Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks",
+          "url": "https://arxiv.org/abs/2602.23667"
+        },
+        {
+          "title": "GCN and DRL based on dependent task offloading mechanism in edge computing - ScienceDirect",
+          "url": "https://doi.org/10.1016/j.dcan.2025.10.001"
+        },
+        {
+          "title": "Rankless | Dependent Task Offloading for Edge Computing based on Deep Reinforcement Learning",
+          "url": "https://www.rankless.org/hit-papers/10.1109/tc.2021.3131040"
+        },
+        {
+          "title": "dblp: Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks.",
+          "url": "https://dblp.dagstuhl.de/rec/journals/corr/abs-2602-23667.html"
+        },
+        {
+          "title": "DTA-RL:モバイルエッジコンピューティングにおけるタスクオフローディングのための動的トポロジー適応型強化学習アプローチ〖JST機械翻訳〗 | 文献情報 | J-GLOBAL 科学技術総合リンクセンター",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202502274135389652"
+        },
+        {
+          "title": "A Survey of Computation Offloading with Task Types | alphaXiv",
+          "url": "https://www.alphaxiv.org/replicate/2401.01017"
+        },
+        {
+          "title": "Dependent Task Graph Offloading Model Based on Deep Reinforcement Learning in Mobile Edge Computing",
+          "url": "https://www.mdpi.com/2079-9292/14/16/3184"
+        },
+        {
+          "title": "Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks",
+          "url": "https://www.connectedpapers.com/main/aff2823f55f014b9d8638d6780b8928afe1af359"
+        },
+        {
+          "title": "(PDF) Blockchain-Enabled Routing for Zero-Trust Low-Altitude Intelligent Networks",
+          "url": "https://www.researchgate.net/publication/401418775_Blockchain-Enabled_Routing_for_Zero-Trust_Low-Altitude_Intelligent_Networks"
+        },
+        {
+          "title": "A Survey of Computation Offloading with Task Type | AI Research Paper Details",
+          "url": "https://www.aimodels.fyi/papers/arxiv/survey-computation-offloading-task-types"
+        },
+        {
+          "title": "Binder1.pdf",
+          "url": "https://www.proceedings.com/content/079/079037webtoc.pdf"
+        },
+        {
+          "title": "Dynamic Task Offloading in Edge Computing based on Dependency-aware Reinforcement Learning",
+          "url": "https://www4.comp.polyu.edu.hk/~labimcl/paper/Dynamic_Task_Offloading_in_Edge_Computing_based_on_Dependency-aware_Reinforcement_Learning.pdf"
+        },
+        {
+          "title": "Metaversalize",
+          "url": "https://www.meta.reapress.com/journal/article/download/47/57/191"
+        },
+        {
+          "title": "R",
+          "url": "https://cdn.techscience.cn/files/cmc/2026/TSP_CMC-87-2/TSP_CMC_75426/TSP_CMC_75426.pdf"
+        },
+        {
+          "title": "Journal of Computers Vol. 36 No. 3, June 2025, pp. 173-190",
+          "url": "https://csroc.org.tw/journal/JOC36-3/JOC3603-12.pdf"
+        },
+        {
+          "title": "Zhang et al. / J. Intell. Comput. Netw. 2025 1",
+          "url": "https://www.ffspub.com/index.php/jicn/article/download/13/11"
+        }
+      ],
+      "excerpt": "A Survey of Computation Offloading with Task Types (https://arxiv.org/abs/2401.01017)\nciteturn95academia12 [wordlim: 200] Published: 3.1 years ago; Title: A Survey of Computation Offloading with Task Types ... This motivates our survey, which seeks to classify the state-of-the-art (SoTA) from the task type point-of-view.\nTitle: A Survey of Computation Offloading with Task Types\nAuthors: Siqi Zhang, Na Yi, Yi Ma\nDate: Thu Sep 21 09:35:55 2023\n\nComputation task offloading plays a crucial role in facilitating computation-intensive applications and edge intelligence, particularly in response to the explosive growth of massive data generation. Various enabling techniques, wireless technologies and mechanisms have already been proposed for task offloading, primarily aimed at improving the quality of services (QoS) for users. While there exists an extensive body of literature on this topic, exploring computation offloading from the standpoint of task types has been relatively underrepresented. This motivates our survey, which seeks to classify the state-of-the-art (SoTA) from the task type point-of-view. To achieve this, a thorough literature review is conducted to reveal the SoTA from various aspects, including architecture, objective, offloading strategy, and task types, with the consideration of task generation. It has been observed that task types are associated with data and have an impact on the offloading process, including elements like resource allocation and task assignment. Building upon this insight, computation offloading is categorized into two groups based on task types: static task-based offloading and dynamic task-based offloading. Finally, a prospective view of the challenges and opportunities in the field of future computation offloading is presented.--------------------------------------------------------------------------------\nDependent Task Offloading for Edge Computing based on Deep Reinforcement Learning | IEEE Journals & Magazine | IEEE Xplore (https://ieeexplore.ieee.org/abstract/document/9627763)\nciteturn95search0 [wordlim: 200] Published: 4.9 years ago; Crawled: last week; # Dependent Task Offloading for Edge Computing based on Deep R"
+    },
+    {
+      "batch": 13,
+      "queries": [
+        {
+          "key": "LPSHDQDN",
+          "title": "Generalizable Pareto-Optimal Offloading With Reinforcement Learning in Mobile Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TSC.2025.3604371"
+        },
+        {
+          "key": "PE23628M",
+          "title": "Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TNSE.2025.3627391"
+        },
+        {
+          "key": "3MNQIJXL",
+          "title": "GCNCO: Graph Attention-Driven Offloading and Orchestration via Computing and Networking Coordination for Holographic Services",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TCC.2026.3653066"
+        },
+        {
+          "key": "GXJWVCJ9",
+          "title": "Time-Dependent Path Selection and Online Learning for Efficient DAG Task Offloading in In-network Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2026.3662691"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://xplorestaging.ieee.org/document/11222958"
+        },
+        {
+          "title": "Generalizable Pareto-Optimal Offloading With Reinforcement Learning in Mobile Edge Computing | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/document/11144916/"
+        },
+        {
+          "title": "Generalizable Pareto-Optimal Offloading with Reinforcement Learning in Mobile Edge Computing",
+          "url": "https://arxiv.org/abs/2509.10474"
+        },
+        {
+          "title": "Time-Dependent Path Selection and Online Learning for Efficient DAG Task Offloading in In-Network Computing | Request PDF",
+          "url": "https://www.researchgate.net/publication/400634859_Time-Dependent_Path_Selection_and_Online_Learning_for_Efficient_DAG_Task_Offloading_in_In-network_Computing"
+        },
+        {
+          "title": "GCNCO: Graph Attention-Driven Offloading and Orchestration via Computing and Networking Coordination for Holographic Services | Request PDF",
+          "url": "https://www.researchgate.net/publication/399711366_GCNCO_Graph_Attention-Driven_Offloading_and_Orchestration_via_Computing_and_Networking_Coordination_for_Holographic_Services"
+        },
+        {
+          "title": "Generalizable Pareto-Optimal Offloading With Reinforcement Learning in Mobile Edge Computing — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/work/generalizable-pareto-optimal-offloading-with-reinforcement-learning-in-mobile/wrk_310718c3af11b3ab83a53452f5f082ac"
+        },
+        {
+          "title": "Generalizable Pareto-Optimal Offloading with Reinforcement Learning in Mobile Edge Computing · Pith",
+          "url": "https://pith.science/paper/2509.10474"
+        },
+        {
+          "title": "Weiwen Zhang — Researcher Profile",
+          "url": "https://bishtref.com/authors/62780"
+        },
+        {
+          "title": "Time-Dependent Path Selection and Online Learning for Efficient DAG Task Offloading in In-Network Computing - researchr publication",
+          "url": "https://researchr.org/publication/ZhangOMCC26"
+        },
+        {
+          "title": "モバイルエッジコンピューティングにおける強化学習を用いた一般化可能Pareto最適オフローディング〖JST機械翻訳〗 | 文献情報 | J-GLOBAL 科学技術総合リンクセンター",
+          "url": "https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202502218013868699"
+        },
+        {
+          "title": "dblp: Generalizable Pareto-Optimal Offloading with Reinforcement Learning in Mobile Edge Computing.",
+          "url": "https://dblp.uni-trier.de/rec/journals/corr/abs-2509-10474.html"
+        },
+        {
+          "title": "dblp: Ning Yang 0005",
+          "url": "https://dblp.org/pid/67/1751-5.html"
+        },
+        {
+          "title": "Generalizable Pareto-Optimal Offloading With Reinforcement Learning in Mobile Edge Computing - 科研通",
+          "url": "https://www.ablesci.com/scholar/paper?id=rXLaVWqkr"
+        },
+        {
+          "title": "Research In",
+          "url": "https://mingtang.website/cv.pdf"
+        },
+        {
+          "title": "Adaptive Reinfor",
+          "url": "https://www.preprints.org/frontend/manuscript/5f6aa11e3f4f77d996794a2aaef76c0c/download_pub"
+        },
+        {
+          "title": "ADAPT-ROMA: Adap",
+          "url": "https://www.preprints.org/frontend/manuscript/05451c6ea2d53aaa1d53b5e42281e7a5/download_pub"
+        },
+        {
+          "title": "Adaptive Pareto-",
+          "url": "https://www.preprints.org/frontend/manuscript/1bf531f7fb60277f472aea388b73c4bd/download_pub"
+        },
+        {
+          "title": "PACE: Proactive",
+          "url": "https://www.preprints.org/frontend/manuscript/e344d9b08efdbd66c844acd0be73bfb0/download_pub"
+        }
+      ],
+      "excerpt": "Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks | IEEE Journals & Magazine | IEEE Xplore (https://xplorestaging.ieee.org/document/11222958)\nciteturn96search0 [wordlim: 200] Published: last year; Crawled: today; # Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks ... In edge computing power network environments, there is a growing demand to support compute-intensive Agentic AI Services, which are composed of interdependent functions r...\n\n# Graph-Aware Diffusion Policy for Fault-Tolerant Agentic AI Service Migration in Edge Computing Power Networks\n\nPublisher: IEEE\n\nAbstract\n\n## Document Sections\n\n  * I.\n\nIntroduction\n\n  * II.\n\nBackground and Related Work\n\n  * III.\n\nSystem Model and Problem Formulation\n\n  * IV.\n\nGraph-Aware Diffusion Policy\n\n  * V.\n\nExperiments and Insights\n\nShow Full Outline\n\n## Abstract:\n\nIn edge computing power network environments, there is a growing demand to support compute-intensive Agentic AI Services, which are composed of interdependent functions r...Show More\n\n## Metadata\n\n## Abstract:\n\nIn edge computing power network environments, there is a growing demand to support compute-intensive Agentic AI Services, which are composed of interdependent functions represented as Directed Acyclic Graphs (DAGs). Nevertheless, the challenges posed by dynamic resource volatility and potential node failures significantly impact reliable task execution. Existing solutions (often reactive heuristics or GAN-based models) struggle to anticipate risks and overlook DAG dependencies. This paper introduces GADP, a Graph-Aware Diffusion Policy framework designed to facilitate proactive fault-tolerant DAG workload migration in large-scale edge computing systems. This paper presents GADP, a Graph-Aware Diffusion Policy framework for proactive, fault-tolerant DAG workload migration in large-scale edge systems. GADP integrates three key modules: a Transformer-GAT fault predictor for failure probability and type estimation; a DAG encoder that learns structure-preserving task embeddings via multi-round attention; and a diffusion policy generato"
+    },
+    {
+      "batch": 14,
+      "queries": [
+        {
+          "key": "ER9V72FJ",
+          "title": "A Deep Reinforcement Learning With Transformer Integration for Directed Acyclic Graph Scheduling in Edge Networks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TWC.2025.3619100"
+        },
+        {
+          "key": "VJAI2MHD",
+          "title": "Adaptive Fault-Tolerant Strategy for Latency-Aware IoT Application Executing in Edge Computing Environment",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2022.3144026"
+        },
+        {
+          "key": "RGZK7ICH",
+          "title": "SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JSAC.2024.3460066"
+        },
+        {
+          "key": "PSZNCDSZ",
+          "title": "Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TPDS.2021.3098467"
+        }
+      ],
+      "sources": [
+        {
+          "title": "dblp: SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks.",
+          "url": "https://www.dblp.de/rec/journals/jsac/MinardiDVC25.html"
+        },
+        {
+          "title": "Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing",
+          "url": "https://arxiv.org/abs/2007.09236"
+        },
+        {
+          "title": "ORBilu: SAST-VNE: A Flexible Framework for Network Slicing in Beyond-5G Integrated Satellite-Terrestrial Networks - 2025",
+          "url": "https://orbilu.uni.lu/handle/10993/57121"
+        },
+        {
+          "title": "A Deep Reinforcement Learning With Transformer Integration for Directed Acyclic Graph Scheduling in Edge Networks",
+          "url": "https://eurekamag.com/research/108/422/108422642.php"
+        },
+        {
+          "title": "(PDF) SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks",
+          "url": "https://www.researchgate.net/publication/384211256_SAST-VNE_A_Flexible_Framework_for_Network_Slicing_in_6G_Integrated_Satellite-Terrestrial_Networks"
+        },
+        {
+          "title": "SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks",
+          "url": "https://orbilu.uni.lu/bitstream/10993/57121/1/SAST-VNE_A_Flexible_Framework_for_Network_Slicing_in_6G_Integrated_Satellite-Terrestrial_Networks%20%281%29.pdf"
+        },
+        {
+          "title": "DAG-based workflows scheduling using Actor–Critic Deep Reinforcement Learning - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0167739X23003485"
+        },
+        {
+          "title": "Rankless | Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing",
+          "url": "https://www.rankless.org/hit-papers/10.1109/tpds.2021.3098467"
+        },
+        {
+          "title": "dblp: Jie Feng 0004",
+          "url": "https://dblp.dagstuhl.de/pid/24/7003-4.html"
+        },
+        {
+          "title": "dblp: Yanlong Zhai",
+          "url": "https://dblp.org/pid/24/6442.html"
+        },
+        {
+          "title": "2)",
+          "url": "https://www.comsoc.org/system/files/2022-08/Publications_Contents_Digest_2022_Aug.pdf"
+        },
+        {
+          "title": "GitHub - JedMills/MTFL-For-Personalised-DNNs: Code for 'Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing', published in IEEE TPDS. · GitHub",
+          "url": "https://github.com/JedMills/MTFL-For-Personalised-DNNs"
+        },
+        {
+          "title": "Adaptive Fault-Tolerant Strategy for Latency-Aware IoT Application Executing in Edge Computing Environment - researchr publication",
+          "url": "https://researchr.org/publication/MudassarZL22"
+        },
+        {
+          "title": "Multi-Task Federated Learning for Personalised Deep Neura… | Minicod",
+          "url": "https://www.minicod.com/papers/multi-task-federated-learning-for-personalised-deep-neural-networks-in-edge-computing-7fc3a1b2"
+        },
+        {
+          "title": "A Deep Reinforcement Learning With Transformer Integration for Directed Acyclic Graph Scheduling in Edge Networks — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/work/a-deep-reinforcement-learning-with-transformer-integration"
+        },
+        {
+          "title": "Publications Conte",
+          "url": "https://minisite-demo-1.comsoc.org/system/files/2025-01/Publications_Contents_Digest_2025_Jan.pdf"
+        },
+        {
+          "title": "Sustainable edge computing: Challenges and future directions",
+          "url": "https://clouds.cis.unimelb.edu.au/papers/SustainableEdgeCompSPE.pdf"
+        },
+        {
+          "title": "Delft University of Technology",
+          "url": "https://pure.tudelft.nl/ws/portalfiles/portal/242758223/3676641.3715989.pdf"
+        },
+        {
+          "title": "IEEE TRANSACTIONS ON VEHICULAR TECHNOLOGY, VOL. XX, NO. XX, XXX 2023",
+          "url": "https://wicon.arizona.edu/sites/default/files/2023-11/Latency_Estimation_and_Computational_Task_Offloading_in_Vehicular_Mobile_Edge_Computing_Applications_TVT__Camera_Ready_v3_compressed.pdf"
+        }
+      ],
+      "excerpt": "dblp: SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks. (https://www.dblp.de/rec/journals/jsac/MinardiDVC25.html)\nciteturn94search0 [wordlim: 200] Crawled: last month; SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks.\n\n# \"SAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated ...\"\n\n  * help us\n\n    * How can I correct errors in dblp?\n    * contact dblp\n\nMario Minardi et al. (2025)\n\n  *   * Image: use mirror server\n\n\n## Details and statistics\n\n  * show external API response\n\n    * JSON @ openalex.org\n\nsee also:\n\n    * API doc @ openalex.org\n\nDOI: 10.1109/JSAC.2024.3460066\n\naccess: openImage\n\ntype: Journal Article\n\nmetadata version: 2025-06-15\n\n  * Image: Journal Articles\n\n    * view\n\n\ndblp key:\n\n      * journals/jsac/MinardiDVC25\n\n    * ask others\n\n      * Google\n      * Google Scholar\n      * Semantic Scholar\n      * Internet Archive Scholar\n      * CiteSeerX\n      * PubPeer\n\n    * share record\n\n      * Bluesky\n      * Reddit\n      * BibSonomy\n      * LinkedIn\n\npersistent URL:\n\n      * https://dblp.org/rec/journals/jsac/MinardiDVC25\n\nMario MinardiImage: 0000-0002-4620-2703, Youssouf DrifImage: 0000-0003-1471-7195, Thang X. VuImage: 0000-0002-8374-443X, Symeon ChatzinotasImage: 0000-0001-5122-0001:\nSAST-VNE: A Flexible Framework for Network Slicing in 6G Integrated Satellite-Terrestrial Networks. IEEE J. Sel. Areas Commun. 43(1): 234-244 (2025)\n\nImage\n\nlast updated on 2025-06-15 21:07 CEST by the dblp team\n\n all metadata released as open data under CC0 1.0 license--------------------------------------------------------------------------------\nMulti-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing (https://arxiv.org/abs/2007.09236)\nciteturn94academia12 [wordlim: 200] Published: 6.3 years ago; Title: Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing\nTitle: Multi-Task Federated Learning for Personalised Deep Neural Networks in Edge Computing\nAuthors: Jed Mills, Jia Hu, Geyong Min\nDate: Fri Jul 17 21:11:01 2020\n\nFederated Learning (FL) is an emerging approach for collaboratively train"
+    },
+    {
+      "batch": 15,
+      "queries": [
+        {
+          "key": "I2DXEUAC",
+          "title": "Adaptive Federated Learning in Resource Constrained Edge Computing Systems",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JSAC.2019.2904348"
+        },
+        {
+          "key": "QSJ2J5ZM",
+          "title": "DRL-SFCP: Adaptive Service Function Chains Placement with Deep Reinforcement Learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/ICC42927.2021.9500964"
+        },
+        {
+          "key": "3XBX6G9W",
+          "title": "Dependency-Aware Computation Offloading for Mobile Edge Computing With Edge-Cloud Cooperation",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TCC.2020.3037306"
+        },
+        {
+          "key": "W72PA7L4",
+          "title": "Computing Power Networking Meets Blockchain: A Reputation-Enhanced Trading Framework for Decentralized IoT Cloud Services",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/JIOT.2024.3358379"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dependency-Aware Computation Offloading for Mobile Edge Computing with Edge-Cloud Cooperation - PolyU Scholars Hub",
+          "url": "https://research.polyu.edu.hk/en/publications/dependency-aware-computation-offloading-for-mobile-edge-computing/"
+        },
+        {
+          "title": "Adaptive Federated Learning in Resource Constrained Edge Computing Systems",
+          "url": "https://arxiv.org/abs/1804.05271"
+        },
+        {
+          "title": "dblp: Adaptive Federated Learning in Resource Constrained Edge Computing Systems.",
+          "url": "https://dblp.uni-trier.de/rec/journals/jsac/WangTSLMHC19.html"
+        },
+        {
+          "title": "Computing Power Networking Meets Blockchain: A Reputation-Enhanced Trading Framework for Decentralized IoT Cloud Services",
+          "url": "https://www.researchgate.net/publication/377705200_Computing_Power_Networking_Meets_Blockchain_A_Reputation-Enhanced_Trading_Framework_for_Decentralized_IoT_Cloud_Services"
+        },
+        {
+          "title": "Constrai",
+          "url": "https://cpb-us-e1.wpmucdn.com/sites.psu.edu/dist/a/74125/files/2017/08/SW_JSAC2018_main_submitted-2jmtmie.pdf"
+        },
+        {
+          "title": "Adaptive federated learning for resource-constrained IoT devices through edge intelligence and multi-edge clustering | Scientific Reports",
+          "url": "https://doi.org/10.1038/s41598-024-78239-z"
+        },
+        {
+          "title": "Dependency-aware computation offloading for mobile edge computing with edge-cloud cooperation",
+          "url": "https://repository.hkust.edu.hk/ir/bitstream/1783.1-125211/1/125211-1.pdf"
+        },
+        {
+          "title": "Adaptive Federated Learning in Resource Constrained Edge Computing Systems",
+          "url": "https://explore.openaire.eu/search/publication?pid=10.1109%2Fjsac.2019.2904348"
+        },
+        {
+          "title": "DRL-SFCP: Adaptive Service Function Chains",
+          "url": "https://geminilight.cn/resource/paper/icc-2021-drl-sfcp.pdf"
+        },
+        {
+          "title": "DRL-SFCP: Adaptive Service Function Chains Placement with Deep Reinforcement Learning — Lacuna",
+          "url": "https://lacuna.tiptreesystems.com/work/drl-sfcp-adaptive-service-function-chains-placement-with-deep-reinforcement/wrk_87c915a2d10e0f4cc1d01e2ed9e90e1a"
+        },
+        {
+          "title": "MetaRoute-SFC: QoE-driven cooperative SFC routing in industrial metaverse networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1389128626006997"
+        },
+        {
+          "title": "FedDA: Resource-adaptive federated learning with dual-alignment aggregation optimization for heterogeneous edge devices - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0167739X24005156"
+        },
+        {
+          "title": "Dependency-Aware Computation Offloading for Mobile Edge Computing With Edge-Cloud Cooperation - Katalog - SLUB Dresden",
+          "url": "https://katalog.slub-dresden.de/id/ai-49-aHR0cHM6Ly9kb2kub3JnLzEwLjExMDkvdGNjLjIwMjAuMzAzNzMwNg"
+        },
+        {
+          "title": "Jin Zhao - Homepage",
+          "url": "https://zjin-hust.github.io/"
+        },
+        {
+          "title": "Zou, Tao; Rong, Xibai; Zhu, Qiang (2026) Predictive mobility-aware service function chain migration in mobile edge computing: An approach based on hierarchical reinforcement learning. Computer Networks, 278. doi:10.1016/j.comnet.2026.112071",
+          "url": "https://zh.mindat.org/reference.php?id=19603581"
+        },
+        {
+          "title": "IEEE International Conference on Communications",
+          "url": "https://geminilight.cn/resource/slide/icc-2021-drl-sfcp-slide.pdf"
+        },
+        {
+          "title": "Published as a conference paper at ICLR 2026",
+          "url": "https://openreview.net/pdf/7ba83e1430516c9adca987c8d85ba3fc748627a8.pdf"
+        },
+        {
+          "title": "A collaborative computation and dependency-aware task offloading method for vehicular edge computing: a reinforcement learning approach | Journal of Cloud Computing | Springer Nature Link",
+          "url": "https://link.springer.com/article/10.1186/s13677-022-00340-3"
+        },
+        {
+          "title": "Proceedings of CECNet 2022: The 12th International Conference on Electronics, Communications and Networks (CECNet 2022), 4–7 November 2022: Cost-Efficient Service Function Chaining with CoMP Zero-Forcing Beamforming in Mobile Edge Networks",
+          "url": "https://journals.sagepub.com/doi/pdf/10.3233/FAIA220568?download=true"
+        }
+      ],
+      "excerpt": "Dependency-Aware Computation Offloading for Mobile Edge Computing with Edge-Cloud Cooperation - PolyU Scholars Hub (https://research.polyu.edu.hk/en/publications/dependency-aware-computation-offloading-for-mobile-edge-computing/)\nciteturn93search0 [wordlim: 200] Published: 6.8 years ago; Crawled: 3 weeks ago; # Dependency-Aware Computation Offloading for Mobile Edge Computing with Edge-Cloud Cooperation\n\n# Dependency-Aware Computation Offloading for Mobile Edge Computing with Edge-Cloud Cooperation\n\n  * Long Chen\n  * , Jigang Wu\n  * , Jun Zhang\n  * , Hong Ning Dai\n  * , Xin Long\n  * , Mianyang Yao\n\n  * The Hong Kong Polytechnic University\n\nResearch output: Journal article publication › Journal article › Academic research › peer-review\n\n118   Link opens in a new tab Citations (Scopus)\n\n## Abstract\n\nMost of existing mobile edge computing (MEC) studies consider the remote cloud server as a special edge server, the opportunity of edge-cloud collaboration has not been well exploited. We propose a dependency-aware offloading scheme in MEC with edge-cloud cooperation under task dependency constraints. Each mobile device has a limited budget and has to determine which sub-task should be computed locally or should be sent to the edge or remote cloud. We formulate two NP-hard task finishing time minimization sub-problems. We then devise one greedy algorithm with approximation ratio of <formula><tex>${1+\\epsilon}$</tex></formula> for the first mode with edge-cloud cooperation without edge-edge cooperation. Then we design an efficient greedy algorithm for the second mode, considering both edge-cloud and edge-edge cooperations. Extensive simulation results show that for the first mode, the proposed greedy algorithm achieves near optimal performance for typical task topologies. On average, it outperforms the modified Hermes benchmark algorithm by about 23%~43.6% in terms of application finishing time with given budgets. By further exploiting collaborations among edge servers in the second cooperation mode, the proposed algorithm helps to achieve over 20.3% average performance gain on the application finishing time over the first mode under various scenarios. Real-world exp"
+    },
+    {
+      "batch": 16,
+      "queries": [
+        {
+          "key": "H6SPPX6D",
+          "title": "Dynamic Topology and Resource Allocation for Distributed Training in Mobile Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2025.3581510"
+        },
+        {
+          "key": "EAAV8HTE",
+          "title": "Security-Aware Virtual Network Embedding Algorithm Based on Reinforcement Learning",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TNSE.2020.2995863"
+        },
+        {
+          "key": "9S7IWB66",
+          "title": "Failure Aware Semi-Centralized Virtual Network Embedding in Cloud Computing Fat-Tree Data Center Networks",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TCC.2020.2984604"
+        },
+        {
+          "key": "WUVH6FVA",
+          "title": "AI-Empowered Virtual Network Embedding: A Comprehensive Survey",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/COMST.2024.3424533"
+        }
+      ],
+      "sources": [
+        {
+          "title": "IEEE TRANSACTIONS ON CLOUD COMPUTING, VOL. 10",
+          "url": "https://www.csie.cgu.edu.tw/~prasankumarsahoo/Publication_PDF/journal/j53.pdf"
+        },
+        {
+          "title": "Failure Aware Semi-Centralized Virtual Network Embedding in Cloud Computing Fat-Tree Data Center Networks",
+          "url": "https://arxiv.org/abs/2111.02727"
+        },
+        {
+          "title": "dblp: AI-Empowered Virtual Network Embedding: A Comprehensive Survey.",
+          "url": "https://dblp.dagstuhl.de/rec/journals/comsur/WuCXZJZ25.html"
+        },
+        {
+          "title": "Security-Aware Virtual Network Embedding Algorithm based on Reinforcement Learning",
+          "url": "https://arxiv.org/abs/2202.02452"
+        },
+        {
+          "title": "AI-Empowered Virtual Network Embedding: A Comprehensive Survey",
+          "url": "https://eurekamag.com/research/100/099/100099908.php"
+        },
+        {
+          "title": "QoS-Aware Virtual Network Embedding | Springer Nature Link",
+          "url": "https://link.springer.com/book/10.1007/978-981-16-5221-9"
+        },
+        {
+          "title": "Failure Aware Semi-Centralized Virtual Network Embedding in Cloud Computing Fat-Tree Data Center Networks",
+          "url": "https://www.emergentmind.com/papers/2111.02727"
+        },
+        {
+          "title": "Under review as a conference paper at ICLR 2026",
+          "url": "https://openreview.net/pdf?id=jngvm9MGyv"
+        },
+        {
+          "title": "Security-Aware Virtual Network Embedding Algorithm based on Reinforcement Learning - Papers with Code Search",
+          "url": "https://papers.app.nz/view/paper?id=419561"
+        },
+        {
+          "title": "IEEE Network Security Domain Project List",
+          "url": "https://www.projectcentersinchennai.co.in/assets/IEEE-Project-Titles-2021-V2.pdf"
+        },
+        {
+          "title": "dblp: Peiying Zhang 0001",
+          "url": "https://dblp.org/pid/24/9047.html"
+        },
+        {
+          "title": "Ailing Xiao",
+          "url": "https://www.csauthors.net/ailing-xiao/"
+        },
+        {
+          "title": "AI-Empowered Virtual Network Embedding:A Comprehensive Survey - 科研通",
+          "url": "https://www.ablesci.com/assist/detail?id=WlPAym"
+        },
+        {
+          "title": "sdn-nfv-papers/README.md at main · GeminiLight/sdn-nfv-papers · GitHub",
+          "url": "https://ithub.global.ssl.fastly.net/GeminiLight/sdn-nfv-papers/blob/main/README.md"
+        },
+        {
+          "title": "(PDF) Failure Aware Semi-Centralized Virtual Network Embedding in Cloud Computing Fat-Tree Data Center Networks",
+          "url": "https://www.researchgate.net/publication/355924945_Failure_Aware_Semi-Centralized_Virtual_Network_Embedding_in_Cloud_Computing_Fat-Tree_Data_Center_Networks"
+        },
+        {
+          "title": "Dynamic Topology and Resource Allocation for Distributed Training in Mobile Edge Computing | Article Information | J-GLOBAL",
+          "url": "https://jglobal.jst.go.jp/en/detail?JGLOBAL_ID=202502243410090646"
+        },
+        {
+          "title": "Security-Aware Virtual Network Embedding Algorithm based on Reinforcement Learning | alphaXiv",
+          "url": "https://www.alphaxiv.org/overview/2202.02452"
+        }
+      ],
+      "excerpt": "1156\nIEEE TRANSACTIONS ON CLOUD COMPUTING, VOL. 10 (https://www.csie.cgu.edu.tw/~prasankumarsahoo/Publication_PDF/journal/j53.pdf)\nciteturn97search12 [wordlim: 200] Published: 1.4 years ago; Failure Aware Semi-Centralized Virtual Network ... Considering both of the above-mentioned research issues, a novel Failure aware Semi-Centralized VNE (FSC-VNE) algorithm is proposed ... Index Terms—Cloud computing, virtual network embedding (VNE), fat-tree data center, resource mapping\n1156\nIEEE TRANSACTIONS ON CLOUD COMPUTING, VOL. 10, NO. 2, APRIL-JUNE 2022\nFailure Aware Semi-Centralized Virtual Network\nEmbedding in Cloud Computing Fat-Tree\nData Center Networks\nChinmaya Kumar Dehury , Member, IEEE and Prasan Kumar Sahoo\n, Senior Member, IEEE\nAbstract—In Cloud Computing, the tenants opting for the Infrastructure as a Service (IaaS) send the resource requirements to the Cloud\nService Provider (CSP) in the form of Virtual Network (VN) consisting of a set of inter-connected Virtual Machines (VM). Embedding the VN\nonto the existing physical network is known as Virtual Network Embedding (VNE) problem. One of the major research challenges is to\nallocate the physical resources such that the failure of the physical resources would bring less impact onto the users’ service. Additionally,\nthe major challenge is to handle the embedding process of growing number of incoming users’ VNs from the algorithm design point-of-view.\nConsidering both of the above-mentioned research issues, a novel Failure aware Semi-Centralized VNE (FSC-VNE) algorithm is proposed\nfor the Fat-Tree data center network with the goal to reduce the impact of the resource failure onto the existing users. The impact of failure of\nthe Physical Machines (PMs), physical links and network devices are taken into account while allocating the resources to the users. The\nbeauty of the proposed algorithm is that the VMs are assigned to different PMs in a semi-centralized manner. In other words, the embedding\nalgorithm is executed by multiple physical servers in order to concurrently embed the VMs of a VN and reduces the embedding time.\nExtensive simulation results show that the proposed algorithm can outperform over other "
+    },
+    {
+      "batch": 17,
+      "queries": [
+        {
+          "key": "INLCXIPK",
+          "title": "Repeatable Multi-Dimensional Virtual Network Embedding in Cloud Service Platform",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TSC.2021.3102016"
+        },
+        {
+          "key": "NLXUEQJ7",
+          "title": "Location Privacy-Aware Task Offloading in Mobile Edge Computing",
+          "prior": "G 非本次可靠性卸载候选",
+          "source": "https://doi.org/10.1109/TMC.2023.3254553"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Location Privacy-Aware Task Offloading in Mobile Edge Computing | IEEE Journals & Magazine | IEEE Xplore",
+          "url": "https://ieeexplore.ieee.org/abstract/document/10065551"
+        },
+        {
+          "title": "Repeatable multi-dimensional virtual network embedding in cloud service platform - Macquarie University",
+          "url": "https://researchers.mq.edu.au/en/publications/repeatable-multi-dimensional-virtual-network-embedding-in-cloud-s/"
+        },
+        {
+          "title": "Privacy‐Aware Online Task Offloading for Mobile‐Edge Computing - Zhu - 2021 - Wireless Communications and Mobile Computing - Wiley Online Library",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1155/2021/6622947"
+        },
+        {
+          "title": "dblp: Location Privacy-Aware Task Offloading in Mobile Edge Computing.",
+          "url": "https://dblp.uni-trier.de/rec/journals/tmc/WangSLHPHR24.html"
+        },
+        {
+          "title": "Location Privacy-Preserving Task Offloading in LEO Satellite Mobile Edge Computing",
+          "url": "https://eurekamag.com/research/110/668/110668803.php"
+        },
+        {
+          "title": "Safe-Learning-Based Location-Privacy-Preserved Task Offloading in Mobile Edge Computing",
+          "url": "https://www.mdpi.com/2079-9292/13/1/89"
+        },
+        {
+          "title": "Privacy-preserving task offloading with flipped Huber distribution in mobile edge computing - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1084804526001396"
+        },
+        {
+          "title": "Privacy-Aware Offloading in Mobile-Edge Computing",
+          "url": "https://eurekamag.com/research/105/447/105447158.php"
+        },
+        {
+          "title": "dblp: IEEE Transactions on Services Computing, Volume 15",
+          "url": "https://dblp.uni-trier.de/db/journals/tsc/tsc15.html"
+        },
+        {
+          "title": "Mobility-aware and energy-efficient offloading for mobile edge computing in cellular networks - ScienceDirect",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1570870524000830"
+        },
+        {
+          "title": "Privacy-Preserving Task Offloading Strategies in MEC - PMC",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9823524/"
+        },
+        {
+          "title": "dblp: Desheng Wang 0002",
+          "url": "https://dblp.org/pid/19/1084-2.html"
+        },
+        {
+          "title": "Enter short title in File/Properties/Summary",
+          "url": "https://dirros.openscience.si/Dokument.php?id=41861&lang=eng"
+        },
+        {
+          "title": "338                                                                 References",
+          "url": "https://www.tkn.tu-berlin.de/bib/ergenc2025resilience/ergenc2025resilience.pdf"
+        },
+        {
+          "title": "International Journal of",
+          "url": "https://ijisae.org/index.php/IJISAE/article/download/4913/3604/9934"
+        },
+        {
+          "title": "Full text available at: http://dx.doi.org/10.1561/1300000074",
+          "url": "https://www.nowpublishers.com/article/DownloadSummary/NET-074"
+        },
+        {
+          "title": "Journal of Network and Systems Management           (2026) 34:54",
+          "url": "https://conand.me/publications/rezaei-rash-2026.pdf"
+        },
+        {
+          "title": "Towards Privacy-Preserving and Personalized Smart Homes via Tailored Small Language Models",
+          "url": "https://www4.comp.polyu.edu.hk/~csyqzheng/papers/HomeLLaMa.pdf"
+        }
+      ],
+      "excerpt": "Location Privacy-Aware Task Offloading in Mobile Edge Computing | IEEE Journals & Magazine | IEEE Xplore (https://ieeexplore.ieee.org/abstract/document/10065551)\nciteturn98search0 [wordlim: 200] Published: 3.6 years ago; Crawled: last week; # Location Privacy-Aware Task Offloading in Mobile Edge Computing ... In this paper, we propose a novel location privacy-aware task offloading framework (LPA-Offload) for both single-server and multi-server scenarios, which provides strict and provable location privacy protection while achieving efficient task offloading.\n\n# Location Privacy-Aware Task Offloading in Mobile Edge Computing\n\nPublisher: IEEE\n\n## Abstract:\n\nIn mobile edge computing (MEC), users can offload tasks to nearby MEC servers to reduce computation cost. Considering that the size of offloaded tasks could disclose user...Show More\n\n## Metadata\n\n## Abstract:\n\nIn mobile edge computing (MEC), users can offload tasks to nearby MEC servers to reduce computation cost. Considering that the size of offloaded tasks could disclose user location information, several location privacy-preserving task offloading mechanisms have been proposed under the single-server scenario. However, to the best of our knowledge, none of them could provide a strict privacy protection guarantee or be applicable to the multi-server scenario where the user's location can be inferred more accurately if servers collude with each other. In this paper, we propose a novel location privacy-aware task offloading framework (LPA-Offload) for both single-server and multi-server scenarios, which provides strict and provable location privacy protection while achieving efficient task offloading. Specifically, we propose a location perturbation mechanism that allows each user to perturb its real location within a rational perturbation region and provides a differential privacy guarantee. To make a satisfactory offloading strategy, we propose a perturbation region determination mechanism and an offloading strategy generation mechanism that adaptively select a proper perturbation region according to the customized privacy factor, and then generate an optimal offloading strategy based on the perturbed loc"
+    }
+  ]
+}

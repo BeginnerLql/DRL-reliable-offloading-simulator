@@ -5,13 +5,13 @@ The exponential kernel implemented here is
     R_jk = exp(-d_jk / ell_phy)
 
 where ``d_jk`` is the Haversine distance in kilometres and ``ell_phy`` is a
-positive correlation length in kilometres.  This represents latent physical
-environmental risk correlation; it is not a failure-event Pearson
+nonnegative correlation length in kilometres (zero means independent nodes).
+This represents latent physical environmental risk correlation, not failure-event Pearson
 correlation, a failure probability, or a joint failure probability.
 
-This module only computes matrices or samples explicitly requested latent risk
-fields.  It does not modify ``Server.base_failure_rate`` or mutate simulator
-state.
+Gauss-Hermite integration below marginalizes the unknown field, assuming
+conditionally independent node failures during CPU execution only. No other
+common-cause failures are added. Nothing here mutates simulator state.
 """
 
 from __future__ import annotations
@@ -79,11 +79,13 @@ def build_spatial_correlation_matrix(
     distance_matrix: object,
     correlation_length_km: object,
 ) -> np.ndarray:
-    """Build ``exp(-D / correlation_length_km)`` from a valid distance matrix."""
+    """Build ``exp(-D / ell)``; ell=0 gives independent node risks."""
     correlation_length = float(correlation_length_km)
-    if correlation_length <= 0:
-        raise ValueError("correlation_length_km must be positive")
+    if not np.isfinite(correlation_length) or correlation_length < 0:
+        raise ValueError("correlation_length_km must be finite and nonnegative")
     matrix = np.asarray(distance_matrix, dtype=float)
+    if correlation_length == 0:
+        return np.eye(matrix.shape[0], dtype=float)
     return np.exp(-matrix / correlation_length)
 
 
@@ -152,3 +154,106 @@ def map_spatial_risk_to_effective_failure_rates(
     risk = np.asarray(spatial_risk_field, dtype=float)
     beta = float(beta_p)
     return base_rates * np.exp(beta * risk - 0.5 * beta ** 2)
+
+
+def _normal_gh_rule(quadrature_order: int, beta_p: float) -> tuple[np.ndarray, np.ndarray]:
+    """Convert physicists' Hermite nodes/weights to standard-normal expectation."""
+    if isinstance(quadrature_order, (bool, np.bool_)) or not isinstance(
+        quadrature_order, (int, np.integer)
+    ) or quadrature_order < 1:
+        raise ValueError("quadrature_order must be a positive integer")
+    if not np.isfinite(beta_p) or beta_p < 0:
+        raise ValueError("beta_p must be finite and nonnegative")
+    nodes, weights = np.polynomial.hermite.hermgauss(quadrature_order)
+    return np.sqrt(2.0) * nodes, weights / np.sqrt(np.pi)
+
+
+def _cpu_failure_exposure(computation_demand, processing_frequency, base_failure_rate):
+    """Return lambda_0 * C/f with NumPy broadcasting; units cancel."""
+    demand, frequency, rate = np.broadcast_arrays(
+        np.asarray(computation_demand, dtype=float),
+        np.asarray(processing_frequency, dtype=float),
+        np.asarray(base_failure_rate, dtype=float),
+    )
+    if (not all(np.all(np.isfinite(value)) for value in (demand, frequency, rate))
+            or np.any(demand < 0) or np.any(frequency <= 0) or np.any(rate < 0)):
+        raise ValueError("C and lambda_0 must be finite and nonnegative; f must be positive")
+    return rate * (demand / frequency)
+
+
+def _conditional_failure_probability(exposure, risk, beta_p):
+    multiplier = map_spatial_risk_to_effective_failure_rates(1.0, risk, beta_p)
+    return -np.expm1(-exposure * multiplier)
+
+
+def compute_marginal_failure_probability(
+    computation_demand,
+    processing_frequency,
+    base_failure_rate,
+    beta_p: float = 0.5,
+    *,
+    quadrature_order: int = 32,
+) -> np.ndarray:
+    """Return qbar=E[1-exp(-lambda(Z)*C/f)] using one-dimensional GH.
+
+    Inputs broadcast; demand is in cycles, frequency in cycles/s, rate in 1/s.
+    Upload and queue time do not contribute to the failure exposure.
+    """
+    nodes, weights = _normal_gh_rule(quadrature_order, beta_p)
+    exposure = _cpu_failure_exposure(
+        computation_demand, processing_frequency, base_failure_rate,
+    )
+    failures = _conditional_failure_probability(exposure[..., None], nodes, beta_p)
+    return np.average(failures, weights=weights, axis=-1)
+
+
+def compute_pair_reliability_gh(
+    computation_demand,
+    processing_frequencies,
+    base_failure_rates,
+    risk_correlation,
+    beta_p: float = 0.5,
+    *,
+    quadrature_order: int = 32,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return (R_corr, R_ind), marginalizing an unknown bivariate Gaussian field.
+
+    Frequencies and base rates have a final axis of length two, in (m,n) order.
+    Demand and rho broadcast over their leading axes. For T tasks and P pairs,
+    use demand (T,1), frequencies/rates (P,2), rho (P,); outputs are (T,P).
+
+    Set Z_m=U and Z_n=rho*U+sqrt(1-rho**2)*V for independent standard normals
+    U,V. Tensor GH computes 1-E[q_m*q_n]; R_ind=1-qbar_m*qbar_n uses the SAME
+    one-node marginals. Rho is latent risk correlation in [0,1], not failure
+    correlation. Rho=1 is supported, including colocated distinct servers.
+    """
+    nodes, weights = _normal_gh_rule(quadrature_order, beta_p)
+    frequencies = np.asarray(processing_frequencies, dtype=float)
+    rates = np.asarray(base_failure_rates, dtype=float)
+    rho = np.asarray(risk_correlation, dtype=float)
+    if frequencies.ndim == 0 or rates.ndim == 0 or (
+        frequencies.shape[-1] != 2 or rates.shape[-1] != 2
+    ):
+        raise ValueError("processing_frequencies and base_failure_rates must end in two nodes")
+    if not np.all(np.isfinite(rho)) or np.any((rho < 0) | (rho > 1)):
+        raise ValueError("risk_correlation must be finite and in [0,1]")
+    exposure = _cpu_failure_exposure(
+        np.asarray(computation_demand, dtype=float)[..., None], frequencies, rates,
+    )
+    exposure, rho = np.broadcast_arrays(exposure, rho[..., None])
+    rho = rho[..., 0]
+    failures = _conditional_failure_probability(exposure[..., None], nodes, beta_p)
+    marginals = np.average(failures, weights=weights, axis=-1)
+    independent = 1.0 - marginals[..., 0] * marginals[..., 1]
+    risk_n = (rho[..., None, None] * nodes[:, None]
+              + np.sqrt(1.0 - rho**2)[..., None, None] * nodes[None, :])
+    failures_n = _conditional_failure_probability(
+        exposure[..., 1, None, None], risk_n, beta_p,
+    )
+    joint_weights = weights[:, None] * weights[None, :]
+    # Normalize the finite-precision weight sum, keeping saturated probabilities valid.
+    joint_failure = np.sum(
+        failures[..., 0, :, None] * failures_n * joint_weights,
+        axis=(-2, -1),
+    ) / joint_weights.sum()
+    return 1.0 - joint_failure, independent

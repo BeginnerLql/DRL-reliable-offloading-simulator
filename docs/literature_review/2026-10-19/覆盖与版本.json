@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-19",
+  "source": "Zotero local read-only API; live metadata and attachment paths; PDFium text extraction",
+  "library_records": 247,
+  "readable_pdf_records": 177,
+  "missing_pdf_files": 67,
+  "no_pdf_attachment": 3,
+  "all_missing_records_queried_online": 70,
+  "broad_related_records": 86,
+  "related_local_pdf": 57,
+  "related_web_system_model": 6,
+  "related_abstract_only": 23,
+  "remaining_not_baseline_scope": 161,
+  "categories": {
+    "任务复制/主备/恢复": 22,
+    "CPU故障可靠性单节点": 4,
+    "相关背景：不作直接基线": 20,
+    "相关故障/数据或服务部署参考": 10,
+    "期限/链路/尾风险可靠性": 9,
+    "任务拆分/协作/资源配置": 9,
+    "单节点放置＋故障恢复": 4,
+    "摘要候选：粒度/机制待确认": 8
+  },
+  "repo_head": "594165d68f1e9bc99b781c00a53239ced0260192",
+  "changed_since_20261013": {
+    "added_keys": [
+      "XVKWEK76",
+      "8DE59KN9"
+    ],
+    "removed_keys": [
+      "Q6RYBM4T",
+      "D7D2ZEC2",
+      "YVCSPE65",
+      "46CQT2SF"
+    ]
+  },
+  "note": "86为广义相关记录，含背景与不建议直接比较的模型；不是86种可直接复现算法。PDF可读指正文解析成功，本次未逐页渲染全部PDF。沿用已核对模型笔记并核对当前可用文件，新增论文及TORE-NET正式版另行核读。"
+}

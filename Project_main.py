@@ -53,6 +53,8 @@ def build_model():
     if model_name == "ppo":
         from agents.ppo_agent import PPOAgent
 
+        if not torch.cuda.is_available():
+            raise RuntimeError("PPO simulation requires a CUDA GPU; CUDA is unavailable in this environment.")
         model = PPOAgent(
             num_states=params.num_states,
             num_actions=params.num_actions,
@@ -82,16 +84,32 @@ def build_model():
 
 def run_simulation():
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    torch.set_num_threads(1)
     np.random.seed(params.EXPERIMENT_SEED)
     torch.manual_seed(params.EXPERIMENT_SEED)
+    ml = MainLoop(None, params.total_episodes, params.taskno, params.num_states, params.num_actions)
+    feasibility = ml.reliability_feasibility()
+    print(f"Reliability feasibility: {feasibility}")
+    if str(params.model_summary).strip().lower() == "ppo" and feasibility["no_safe_action_count"] == params.taskno:
+        raise RuntimeError(
+            "PPO training has no feasible decisions: every task uses fallback. "
+            "Inspect task reliability requirements and server failure rates before training. "
+            "Run tools/audit_objective_alignment.py for a read-only feasibility scan."
+        )
     model = build_model()
-
-    ml = MainLoop(model, params.total_episodes, params.taskno, params.num_states, params.num_actions)
+    ml.model = model
     ml.EP()
 
     save_params_and_logs(
         params, ml.log_data, ml.task_results,
         run_id=run_id,
+        server_profiles=ml.server_profiles,
+        run_metadata={"use_safety_mask": ml.use_safety_mask,
+                      "reliability_failure_rate_scale": ml.failure_rate_scale,
+                      "reliability_gh_order": 32,
+                      "objective": "mean effective QoS over all tasks",
+                      "ppo_reward_assignment": "completion interval",
+                      **feasibility},
     )
     if str(params.model_summary).strip().lower() == "ppo":
         checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"

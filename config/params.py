@@ -3,6 +3,15 @@
 from config.configuration import parameters
 
 
+def effective_spatial_risk_beta():
+    """Zero disables the latent risk multiplier, retaining base transient failures.
+
+    Configure before a run, before any task reliability snapshots are built.
+    This differs from zero spatial correlation, which retains random node risks.
+    """
+    return params.SPATIAL_RISK_BETA_P if params.SPATIAL_RISK_ENABLED else 0.0
+
+
 class params:
     # Experiment
     model_summary = parameters.model_summary  # Options: "dqn", "ppo", "ddpg"
@@ -18,6 +27,8 @@ class params:
         parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
     )
     TASK_DEMAND_RANGE = parameters.TASK_DEMAND_RANGE
+    TASK_DEADLINE_SCALE = parameters.TASK_DEADLINE_SCALE
+    QOS_GRACE_MULTIPLIER = parameters.QOS_GRACE_MULTIPLIER
     taskno = parameters.taskno
     TASK_ARRIVAL_RATE = parameters.TASK_ARRIVAL_RATE
 
@@ -33,7 +44,7 @@ class params:
     EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
 
     # State/action dimensions for the current observation and unordered pairs.
-    num_states = 5 * NUM_SERVERS + 2
+    num_states = 5 * NUM_SERVERS + 3  # Server features + task size, demand, deadline.
     num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
 
     # DDPG
