@@ -104,16 +104,13 @@ def generate_task_params(
     *,
     dataset: str = "train",
 ) -> pd.DataFrame:
-    """Write one fixed task set; size, CPU cycles and tier order are independent."""
+    """Write fixed tasks with independent uniform size, demand and reliability."""
     profile_stream = {"train": 1, "evaluation": 2}[dataset]
     if filename is None:
         filename = TRAIN_TASK_PATH if dataset == "train" else EVALUATION_TASK_PATH
     num_tasks = parameters.taskno
-    reliability_levels = parameters.TASK_RELIABILITY_REQUIREMENT_LEVELS
-    if num_tasks % len(reliability_levels):
-        raise ValueError("taskno must be divisible by the number of reliability levels.")
-    reliability_requirements = _profile_rng(profile_stream, 2).permutation(
-        np.repeat(reliability_levels, num_tasks // len(reliability_levels))
+    reliability_requirements = _profile_rng(profile_stream, 2).uniform(
+        *parameters.TASK_RELIABILITY_REQUIREMENT_RANGE, size=num_tasks
     )
 
     task_sizes_mb = _profile_rng(profile_stream, 0).uniform(

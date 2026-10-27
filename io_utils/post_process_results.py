@@ -36,17 +36,21 @@ def process_all_results(root_dir: str):
             "Episodes": len(logs),
             "Task_Outcomes": len(outcomes),
             "Mean_Episode_Reward": logs["Episode Reward"].mean(),
-            "Overall_RSR": outcomes["requirement_satisfied"].mean(),
-            "Mean_Task_Latency_s": outcomes["task_latency"].mean(),
-            "P95_Task_Latency_s": outcomes["task_latency"].quantile(0.95),
+            # Every episode has the same fixed task count.
+            "Overall_RSR": logs["RSR"].mean(),
+            "Mean_Task_Delay_s": outcomes["task_delay"].mean(),
+            "Mean_Task_Upload_Delay_s": outcomes["task_upload_delay"].mean(),
+            "Mean_Task_Queue_Delay_s": outcomes["task_queue_delay"].mean(),
+            "Mean_Task_Execution_Delay_s": outcomes["task_execution_delay"].mean(),
         })
 
         episode_metrics = outcomes.groupby("episode").agg(
             Task_Count=("task_id", "size"),
-            RSR=("requirement_satisfied", "mean"),
-            P95_Task_Latency_s=("task_latency", lambda values: values.quantile(0.95)),
+            Mean_Task_Upload_Delay_s=("task_upload_delay", "mean"),
+            Mean_Task_Queue_Delay_s=("task_queue_delay", "mean"),
+            Mean_Task_Execution_Delay_s=("task_execution_delay", "mean"),
         )
-        episodes = logs[["Episode", "Episode Reward", "task_Avg_Delay"]].merge(
+        episodes = logs[["Episode", "Episode Reward", "task_Avg_Delay", "RSR"]].merge(
             episode_metrics, left_on="Episode", right_index=True,
         ).sort_values("Episode")
         for index, (key, value) in enumerate(metadata.items()):

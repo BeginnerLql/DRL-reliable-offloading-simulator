@@ -2,6 +2,8 @@
 
 
 class parameters:
+    # Change experiment settings here before running comparisons; do not override
+    # them in runner scripts. Regenerate workbooks after changing profile ranges.
     # Experiment
     model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg"
     total_episodes = 100
@@ -13,18 +15,15 @@ class parameters:
     # Workload
     TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
-    # Main-experiment task reliability requirement tiers.
-    TASK_RELIABILITY_REQUIREMENT_LEVELS = (0.9, 0.99, 0.999, 0.9999)
-    TASK_DEMAND_RANGE = (2.0e9, 4.0e9)  # CPU cycles, continuous uniform
+    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)  # Continuous uniform.
+    TASK_DEMAND_RANGE = (4.0e9, 8.0e9)  # CPU cycles, continuous uniform; 2x original demand.
     taskno = 200
 
     # Unified server parameters
     SERVER_PROCESSING_FREQ_RANGE = (1.0e9, 4.0e9)  # cycles/s; equivalent to 1–4 GHz
     SERVER_TRANSMISSION_RATE_RANGE = (5.0, 20.0)  # MB/s, continuous uniform
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
-    SERVER_FAILURE_RATE_RANGE = (0.1, 0.5)
-
-    STATE_FAILURE_RATE_SCALE = 0.5  # s^-1; scales with the base failure-rate range.
+    SERVER_FAILURE_RATE_RANGE = (0.01, 0.05)
 
     # One quasi-static spatial-risk field is sampled per episode when enabled.
     SPATIAL_RISK_ENABLED = True
@@ -33,7 +32,7 @@ class parameters:
     # Not yet a literature-calibrated final experiment parameter.
     SPATIAL_RISK_BETA_P = 0.5
     # SeedSequence derives independent server/train/evaluation profile streams.
-    PROFILE_SEED = 2026
+    PROFILE_SEED = 2028
     # Runtime seed; arrival, spatial-risk and agent RNGs are unchanged here.
     EXPERIMENT_SEED = 2026
 

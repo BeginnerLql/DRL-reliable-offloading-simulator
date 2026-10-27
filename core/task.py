@@ -27,11 +27,8 @@ class Task:
             "finish_time": None,
         }
         self.task_completion_time = None
+        self.first_completed_replica = None
         self.task_completion_event = self.env.event()
-
-    def get_transmission_rate(self, server):
-        """Return the server's fixed upload rate in MB/s."""
-        return server.transmission_rate
 
     def execute_task(self, server_A, server_B):
         self.replica_A["server_id"] = server_A.server_id
@@ -47,8 +44,7 @@ class Task:
         yield self.env.all_of([process_A, process_B])
 
     def _run_replica(self, server, replica_name, replica_info):
-        transmission_rate = self.get_transmission_rate(server)
-        transmission_time = self.task_size / transmission_rate  # MB / (MB/s) = s
+        transmission_time = self.task_size / server.transmission_rate  # MB / (MB/s) = s
         yield self.env.timeout(transmission_time)
 
         replica_info["queue_enter_time"] = float(self.env.now)
@@ -71,10 +67,11 @@ class Task:
             replica_info["finish_time"] = float(self.env.now)
             self.env_state.complete_replica_execution(server.server_id)
 
-        self._signal_task_completion()
+        self._signal_task_completion(replica_info)
 
-    def _signal_task_completion(self):
+    def _signal_task_completion(self, replica_info):
         if self.task_completion_event.triggered:
             return
+        self.first_completed_replica = replica_info
         self.task_completion_time = float(self.env.now)
         self.task_completion_event.succeed(self.task_completion_time)

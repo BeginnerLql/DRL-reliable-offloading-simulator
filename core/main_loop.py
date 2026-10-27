@@ -235,8 +235,9 @@ class MainLoop:
             task.replica_B_reliability = (
                 self.env_state.compute_replica_reliability(task, server_B)
             )
-            task.pair_reliability = (
-                self.env_state.compute_pair_reliability(task, server_A, server_B)
+            # Replica failures are independent conditional on the episode field.
+            task.pair_reliability = float(
+                1.0 - (1.0 - task.replica_A_reliability) * (1.0 - task.replica_B_reliability)
             )
 
             if self.model_name == "ppo":
@@ -284,16 +285,21 @@ class MainLoop:
             self.model.train_step()
 
         task_avg_delay = self.episodic_delay / self.maxTask
+        episode_rsr = sum(
+            task.pair_reliability >= task.reliability_requirement
+            for task in self.env_state.tasks.values()
+        ) / self.maxTask
         self.log_data.append((
             self.this_episode,
             self.episodic_reward,
             task_avg_delay,
+            episode_rsr,
         ))
 
         print(
             f"Episode {self.this_episode} | "
             f"Episode Reward: {self.episodic_reward:.3f} | "
-            f"task_Avg_Delay: {task_avg_delay:.3f} s"
+            f"task_Avg_Delay: {task_avg_delay:.3f} s | RSR: {episode_rsr:.2%}"
         )
 
     def _drain_pending_tasks(self):
@@ -321,6 +327,7 @@ class MainLoop:
 
     def get_task_outcome_info(self, task):
         """Build task-level outcome data from its lifecycle and saved snapshot."""
+        first = task.first_completed_replica
         return {
             "episode": self.this_episode,
             "task_id": task.id,
@@ -337,7 +344,10 @@ class MainLoop:
             "replica_B_cpu_start_time": task.replica_B["cpu_start_time"],
             "replica_B_finish_time": task.replica_B["finish_time"],
             "task_completion_time": task.task_completion_time,
-            "task_latency": task.task_completion_time - task.arrival_time,
+            "task_delay": task.task_completion_time - task.arrival_time,
+            "task_upload_delay": first["queue_enter_time"] - task.arrival_time,
+            "task_queue_delay": first["cpu_start_time"] - first["queue_enter_time"],
+            "task_execution_delay": first["finish_time"] - first["cpu_start_time"],
             "replica_A_reliability": task.replica_A_reliability,
             "replica_B_reliability": task.replica_B_reliability,
             "pair_reliability": task.pair_reliability,
@@ -347,7 +357,7 @@ class MainLoop:
         }
 
     def compute_reward(self, outcome_info):
-        return -float(outcome_info["task_latency"])
+        return -float(outcome_info["task_delay"])
 
     def _get_ppo_terminal_time(self):
         """Use the latest actual outcome timestamp for PPO terminal timing."""
@@ -373,7 +383,7 @@ class MainLoop:
                     self.ppo_last_resolved_outcome_time, task_outcome_time
                 )
             self._finalize_resolved_task(
-                task_counter, task_reward, outcome_info["task_latency"]
+                task_counter, task_reward, outcome_info["task_delay"]
             )
 
     def add_train(self):
@@ -384,7 +394,7 @@ class MainLoop:
 
             outcome_info = self.get_task_outcome_info(task)
             reward = self.compute_reward(outcome_info)
-            delay = outcome_info["task_latency"]
+            delay = outcome_info["task_delay"]
 
             temp = list(self.tempbuffer[task_counter])
             temp[2] = reward

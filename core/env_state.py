@@ -101,21 +101,6 @@ class EnvironmentState:
         execution_time = task.computation_demand / server.processing_frequency
         return float(np.exp(-failure_rate * execution_time))
 
-    def compute_pair_reliability(self, task, server_A, server_B):
-        """Assume independent replica failures conditional on the episode field."""
-        reliability_A = self.compute_replica_reliability(task, server_A)
-        reliability_B = self.compute_replica_reliability(task, server_B)
-        return float(
-            1.0 - (1.0 - reliability_A) * (1.0 - reliability_B)
-        )
-
-    def is_reliability_requirement_satisfied(self, task, server_A, server_B):
-        """Compare theoretical pair reliability with the task requirement."""
-        return bool(
-            self.compute_pair_reliability(task, server_A, server_B)
-            >= task.reliability_requirement
-        )
-
     def add_task(self, task_object):
         """Add a task object to the environment state."""
         task_id = task_object.id
@@ -140,7 +125,7 @@ class EnvironmentState:
         size_min, size_max = params.TASK_SIZE_RANGE
         demand_min, demand_max = params.TASK_DEMAND_RANGE
         state = np.concatenate((
-            np.asarray(failure_rates) / params.STATE_FAILURE_RATE_SCALE,
+            np.asarray(failure_rates),  # Active failure rates in s^-1, without scaling.
             (np.asarray(frequencies) - frequency_min) / (frequency_max - frequency_min),
             (np.asarray(transmission_rates) - rate_min) / (rate_max - rate_min),
             np.asarray(running_backlogs),  # Raw remaining CPU time in seconds.

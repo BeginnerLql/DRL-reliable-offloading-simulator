@@ -16,24 +16,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from config.configuration import parameters
+from core.spatial_risk import haversine_distance_km
 
-EARTH_RADIUS_KM = 6371.0088
 TOPOLOGY_COLUMNS = ["Server_ID", "Site_ID", "Latitude", "Longitude"]
-
-
-def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Return great-circle distance between coordinates in kilometres."""
-    lat1_rad, lon1_rad = math.radians(float(lat1)), math.radians(float(lon1))
-    lat2_rad, lon2_rad = math.radians(float(lat2)), math.radians(float(lon2))
-    delta_lat, delta_lon = lat2_rad - lat1_rad, lon2_rad - lon1_rad
-    hav = (
-        math.sin(delta_lat / 2.0) ** 2
-        + math.cos(lat1_rad)
-        * math.cos(lat2_rad)
-        * math.sin(delta_lon / 2.0) ** 2
-    )
-    hav = min(1.0, max(0.0, hav))
-    return 2.0 * EARTH_RADIUS_KM * math.asin(math.sqrt(hav))
 
 
 def _site_id_sort_key(site_id: object) -> tuple:
@@ -70,7 +55,7 @@ def _distance_profile(candidates: pd.DataFrame) -> tuple[np.ndarray, float, floa
     pair_distances = []
     for left in range(candidate_count):
         for right in range(left + 1, candidate_count):
-            distance = haversine_km(*coordinates[left], *coordinates[right])
+            distance = haversine_distance_km(*coordinates[left], *coordinates[right])
             distances[left, right] = distances[right, left] = distance
             pair_distances.append(distance)
 
@@ -114,7 +99,7 @@ def _select_balanced_topology(
     centroid_lat = math.fsum(coordinates[:, 0]) / K
     centroid_lon = math.fsum(coordinates[:, 1]) / K
     center_distances = [
-        haversine_km(latitude, longitude, centroid_lat, centroid_lon)
+        haversine_distance_km(latitude, longitude, centroid_lat, centroid_lon)
         for latitude, longitude in coordinates
     ]
     first = min(
@@ -166,7 +151,7 @@ def _select_balanced_topology(
     selected_frame = selected_frame[TOPOLOGY_COLUMNS]
     score, counts = _objective(selected, bins)
     selected_distances = [
-        haversine_km(
+        haversine_distance_km(
             coordinates[left, 0], coordinates[left, 1],
             coordinates[right, 0], coordinates[right, 1],
         )
@@ -185,12 +170,6 @@ def _select_balanced_topology(
         "maximum_distance": max(selected_distances),
     }
     return selected_frame, summary
-
-
-def select_balanced_topology(candidates: pd.DataFrame, num_servers: int) -> pd.DataFrame:
-    """Select N sites with balanced global near, mid, and far pair distances."""
-    selected, _ = _select_balanced_topology(candidates, num_servers)
-    return selected
 
 
 def prepare_topology(

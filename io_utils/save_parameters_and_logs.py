@@ -35,17 +35,18 @@ def save_params_and_logs(
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
 
-    # Logs dataframe: one raw episode reward and current episode mean task latency.
+    # Logs dataframe: raw reward, mean task delay and reliability satisfaction rate.
     df_logs = pd.DataFrame(
         [
             {
                 "Episode": episode,
                 "Episode Reward": episodic_reward,
                 "task_Avg_Delay": task_avg_delay,
+                "RSR": episode_rsr,
             }
-            for episode, episodic_reward, task_avg_delay in log_data
+            for episode, episodic_reward, task_avg_delay, episode_rsr in log_data
         ],
-        columns=["Episode", "Episode Reward", "task_Avg_Delay"],
+        columns=["Episode", "Episode Reward", "task_Avg_Delay", "RSR"],
     )
 
     task_result_columns = [
@@ -64,7 +65,10 @@ def save_params_and_logs(
         "replica_B_cpu_start_time",
         "replica_B_finish_time",
         "task_completion_time",
-        "task_latency",
+        "task_delay",
+        "task_upload_delay",
+        "task_queue_delay",
+        "task_execution_delay",
         "replica_A_reliability",
         "replica_B_reliability",
         "pair_reliability",
