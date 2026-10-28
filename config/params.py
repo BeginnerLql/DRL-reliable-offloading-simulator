@@ -28,6 +28,7 @@ class params:
 
     SPATIAL_RISK_ENABLED = parameters.SPATIAL_RISK_ENABLED
     SPATIAL_RISK_BETA_P = parameters.SPATIAL_RISK_BETA_P
+    SPATIAL_RISK_GH_ORDER = parameters.SPATIAL_RISK_GH_ORDER
     PROFILE_SEED = parameters.PROFILE_SEED
     EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
 
@@ -56,6 +57,7 @@ class params:
     epsilon_end_dqn = parameters.epsilon_end_dqn
     epsilon_decay_dqn = parameters.epsilon_decay_dqn
     # PPO
+    RELIABILITY_ACTION_MASK_ENABLED = parameters.RELIABILITY_ACTION_MASK_ENABLED
     hidden_layers_ppo = parameters.hidden_layers_ppo
     af_ppo = parameters.af_ppo
     actor_lr_ppo = parameters.actor_lr_ppo

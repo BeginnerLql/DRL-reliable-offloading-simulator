@@ -1,4 +1,4 @@
-"""Server CPU metadata, task objects and episode spatial context."""
+"""Server CPU metadata, task objects and observable baseline server parameters."""
 
 import numpy as np
 from config.params import params
@@ -8,11 +8,6 @@ class EnvironmentState:
     def __init__(self):
         self.servers = {}  # Server objects and CPU backlog metadata.
         self.tasks = {}
-        self.spatial_risk_server_ids = None
-        self.spatial_distance_matrix = None
-        self.spatial_correlation_matrix = None
-        self.spatial_risk_field = None
-        self.effective_failure_rates = None
 
     def add_server_and_init_environment(self, server_object):
         """Add a server object to the environment state."""
@@ -70,37 +65,6 @@ class EnvironmentState:
         """Get a server object by its ID."""
         return self.servers[server_id]['server_object']
 
-    def set_episode_spatial_risk_context(
-        self,
-        server_ids,
-        distance_matrix,
-        correlation_matrix,
-        spatial_risk_field,
-        effective_failure_rates,
-    ):
-        """Store one immutable-in-practice episode spatial-risk realization."""
-        self.spatial_risk_server_ids = list(server_ids)
-        self.spatial_distance_matrix = np.array(distance_matrix, dtype=float, copy=True)
-        self.spatial_correlation_matrix = np.array(correlation_matrix, dtype=float, copy=True)
-        self.spatial_risk_field = np.array(spatial_risk_field, dtype=float, copy=True)
-        self.effective_failure_rates = {
-            server_id: float(effective_failure_rates[index])
-            for index, server_id in enumerate(server_ids)
-        }
-
-    def get_active_failure_rate(self, server_id):
-        """Return episode-effective or baseline transient fault arrival rate."""
-        server_object = self.get_server_by_id(server_id)
-        if self.effective_failure_rates is None:
-            return server_object.base_failure_rate
-        return self.effective_failure_rates[server_id]
-
-    def compute_replica_reliability(self, task, server):
-        """Return exp(-lambda_active * C/f); C/f is CPU execution seconds."""
-        failure_rate = self.get_active_failure_rate(server.server_id)
-        execution_time = task.computation_demand / server.processing_frequency
-        return float(np.exp(-failure_rate * execution_time))
-
     def add_task(self, task_object):
         """Add a task object to the environment state."""
         task_id = task_object.id
@@ -114,7 +78,7 @@ class EnvironmentState:
         for server_id in server_ids:
             server = self.get_server_by_id(server_id)
             running, waiting = self.get_server_backlog_components(server_id, task.env.now)
-            failure_rates.append(self.get_active_failure_rate(server_id))
+            failure_rates.append(server.base_failure_rate)
             frequencies.append(server.processing_frequency)
             transmission_rates.append(server.transmission_rate)
             running_backlogs.append(running)
@@ -125,7 +89,7 @@ class EnvironmentState:
         size_min, size_max = params.TASK_SIZE_RANGE
         demand_min, demand_max = params.TASK_DEMAND_RANGE
         state = np.concatenate((
-            np.asarray(failure_rates),  # Active failure rates in s^-1, without scaling.
+            np.asarray(failure_rates),  # Base failure rates in s^-1, without scaling.
             (np.asarray(frequencies) - frequency_min) / (frequency_max - frequency_min),
             (np.asarray(transmission_rates) - rate_min) / (rate_max - rate_min),
             np.asarray(running_backlogs),  # Raw remaining CPU time in seconds.

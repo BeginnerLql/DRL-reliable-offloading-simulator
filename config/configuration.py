@@ -25,15 +25,17 @@ class parameters:
     # TEMPORARY: base transient failure intensity range, unit: s^-1.
     SERVER_FAILURE_RATE_RANGE = (0.01, 0.05)
 
-    # One quasi-static spatial-risk field is sampled per episode when enabled.
+    # Integrate unknown Gaussian risk using GH; no episode risk field is sampled.
+    # False sets pair correlation to zero, retaining the same marginal risk.
     SPATIAL_RISK_ENABLED = True
     # Baseline correlation length = median server-pair distance / ln(2).
     # TEMPORARY exploratory calibration value.
     # Not yet a literature-calibrated final experiment parameter.
     SPATIAL_RISK_BETA_P = 0.5
+    SPATIAL_RISK_GH_ORDER = 32  # Quadrature nodes per dimension.
     # SeedSequence derives independent server/train/evaluation profile streams.
     PROFILE_SEED = 2028
-    # Runtime seed; arrival, spatial-risk and agent RNGs are unchanged here.
+    # Runtime seed for task arrivals and agents; GH reliability is deterministic.
     EXPERIMENT_SEED = 2026
 
     # RL hyperparameters
@@ -59,6 +61,7 @@ class parameters:
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
     # PPO
+    RELIABILITY_ACTION_MASK_ENABLED = True  # PPO only; follows SPATIAL_RISK_ENABLED.
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4

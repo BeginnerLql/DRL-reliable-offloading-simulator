@@ -11,7 +11,10 @@ class Task:
         self.reliability_requirement = task_profile["Reliability_Requirement"]
         self.replica_A_reliability = None
         self.replica_B_reliability = None
-        self.pair_reliability = None
+        self.pair_reliability_correlated = None
+        self.pair_reliability_independent = None
+        self.feasible_action_count = None  # Before fallback; evaluated for PPO.
+        self.mask_fallback_used = False
 
         self.arrival_time = float(self.env.now)
         self.replica_A = {

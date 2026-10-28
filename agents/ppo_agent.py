@@ -123,27 +123,54 @@ class PPOAgent:
         self.dones = []
         self.old_log_probs = []
         self.delta_times = []
+        self.action_masks = []
 
     def _to_tensor(self, x):
         return torch.tensor(np.array(x), dtype=torch.float32, device=self.device)
 
-    def select_action(self, state, epsilon):
+    def _action_distribution(self, logits, action_mask=None):
+        """Use the same masked distribution for sampling, ratios and entropy."""
+        if action_mask is not None:
+            mask = torch.as_tensor(action_mask, dtype=torch.bool, device=self.device)
+            if mask.shape != logits.shape and mask.shape != (self.num_actions,):
+                raise ValueError("Action mask shape must match the action logits")
+            if not mask.any(dim=-1).all():
+                raise ValueError("Action mask must allow at least one action per state")
+            logits = logits.masked_fill(~mask, float("-inf"))
+        return Categorical(logits=logits)
+
+    def select_action(self, state, epsilon, *, action_mask=None):
         """Sample from policy_old; epsilon is unused by PPO."""
         state_tensor = self._to_tensor(state).unsqueeze(0)
         with torch.no_grad():
             # Sample from policy_old for more stable on-policy behavior
             logits = self.policy_old(state_tensor)
-            dist = Categorical(logits=logits)
+            dist = self._action_distribution(logits, action_mask)
             action = dist.sample()
         return int(action.item())
 
-    def store_transition(self, s, a, r, s_next, delta_t, done=False):
+    def store_transition(self, s, a, r, s_next, delta_t, done=False, *, action_mask=None):
         """Store one arrival-ordered SMDP transition.
 
         ``delta_t`` is the elapsed simulation time to the next decision
         epoch (or terminal drain), measured in seconds.
         """
         delta_t = float(delta_t)
+        mask = (
+            np.ones(self.num_actions, dtype=bool)
+            if action_mask is None else np.array(action_mask, dtype=bool, copy=True)
+        )
+        if mask.shape != (self.num_actions,):
+            raise ValueError("Transition action mask must have one entry per action")
+        if not 0 <= int(a) < self.num_actions or not mask[int(a)]:
+            raise ValueError("Stored action must be allowed by its action mask")
+
+        # Recompute with the decision-time mask, before policy_old is updated.
+        with torch.no_grad():
+            s_tensor = self._to_tensor(s).unsqueeze(0)
+            dist = self._action_distribution(self.policy_old(s_tensor), mask)
+            a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
+            old_log_prob = float(dist.log_prob(a_tensor).item())
 
         self.states.append(np.array(s, copy=True))
         self.actions.append(int(a))
@@ -151,14 +178,8 @@ class PPOAgent:
         self.next_states.append(np.array(s_next, copy=True))
         self.dones.append(bool(done))
         self.delta_times.append(delta_t)
-
-        # Store old log-prob using policy_old (standard PPO approach).
-        with torch.no_grad():
-            s_tensor = self._to_tensor(s).unsqueeze(0)
-            logits = self.policy_old(s_tensor)
-            dist = Categorical(logits=logits)
-            a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
-            self.old_log_probs.append(float(dist.log_prob(a_tensor).item()))
+        self.action_masks.append(mask)
+        self.old_log_probs.append(old_log_prob)
 
     def train_step(self):
         """Optimize the arrival-ordered event-driven PPO rollout."""
@@ -182,6 +203,9 @@ class PPOAgent:
         )
         old_log_probs = torch.tensor(
             self.old_log_probs, dtype=torch.float32, device=self.device
+        )
+        action_masks = torch.tensor(
+            np.array(self.action_masks), dtype=torch.bool, device=self.device,
         )
 
         values = self.value_net(states)
@@ -237,7 +261,7 @@ class PPOAgent:
                 b_old_log_probs = old_log_probs[batch_idx]
 
                 logits = self.policy_net(b_states)
-                dist = Categorical(logits=logits)
+                dist = self._action_distribution(logits, action_masks[batch_idx])
                 log_probs = dist.log_prob(b_actions)
                 entropy = dist.entropy().mean()
 
@@ -305,3 +329,4 @@ class PPOAgent:
         self.dones.clear()
         self.old_log_probs.clear()
         self.delta_times.clear()
+        self.action_masks.clear()

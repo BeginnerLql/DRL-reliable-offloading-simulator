@@ -7,11 +7,10 @@ from config.params import params
 from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH
 from pathlib import Path
 from core.spatial_risk import (
+    GaussHermiteReliability,
     build_distance_matrix,
     build_spatial_correlation_matrix,
     compute_baseline_correlation_length_km,
-    map_spatial_risk_to_effective_failure_rates,
-    sample_spatial_risk_field,
 )
 
 import simpy
@@ -51,7 +50,11 @@ class MainLoop:
         self.env = None
         self.env_state = None
         self.arrival_rng = np.random.default_rng(params.EXPERIMENT_SEED)
-        self.spatial_risk_rng = np.random.default_rng(params.EXPERIMENT_SEED + 1)
+        self.reliability_integrator = GaussHermiteReliability(
+            params.SPATIAL_RISK_BETA_P, params.SPATIAL_RISK_GH_ORDER,
+        )
+        self.pair_risk_correlations = None
+        self.pair_reliability_cache = {}  # Fixed profiles and CPU-only exposures.
         self.log_data = []
         self.task_results = []
 
@@ -59,6 +62,7 @@ class MainLoop:
         self.ppo_last_decision_state = None
         self.ppo_last_decision_action = None
         self.ppo_last_decision_time = None
+        self.ppo_last_decision_action_mask = None
         self.ppo_last_resolved_outcome_time = None
 
     def _load_run_profiles(self):
@@ -114,52 +118,86 @@ class MainLoop:
             self.ppo_last_decision_state = None
             self.ppo_last_decision_action = None
             self.ppo_last_decision_time = None
+            self.ppo_last_decision_action_mask = None
             self.ppo_last_resolved_outcome_time = None
 
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
 
             self.setServers()
-            self._initialize_episode_spatial_risk()
+            if self.pair_risk_correlations is None:
+                self._initialize_spatial_correlations()
             self.env.process(self.Iteration())
             self.env.run()
             for task in sorted(self.env_state.tasks.values(), key=lambda item: item.id):
                 self.task_results.append(self.get_task_outcome_info(task))
 
-    def _initialize_episode_spatial_risk(self):
-        """Sample and store one quasi-static spatial risk field for this episode."""
-        if not params.SPATIAL_RISK_ENABLED:
-            return
+    def _initialize_spatial_correlations(self):
+        """Build fixed pair correlations once per run, without sampling risk."""
         server_objects = [
             server_info["server_object"]
             for server_info in self.env_state.servers.values()
         ]
         server_ids, distance_matrix = build_distance_matrix(server_objects)
-        correlation_length_km = compute_baseline_correlation_length_km(distance_matrix)
-        correlation_matrix = build_spatial_correlation_matrix(
-            distance_matrix,
-            correlation_length_km,
+        if params.SPATIAL_RISK_ENABLED:
+            correlation_length_km = compute_baseline_correlation_length_km(distance_matrix)
+            correlation_matrix = build_spatial_correlation_matrix(
+                distance_matrix, correlation_length_km,
+            )
+        else:
+            correlation_matrix = np.eye(len(server_ids))
+        self.pair_risk_correlations = {
+            (server_a, server_b): float(correlation_matrix[row, column])
+            for row, server_a in enumerate(server_ids)
+            for column, server_b in enumerate(server_ids)
+        }
+
+    def _get_pair_reliability(self, task, server_a, server_b):
+        """Reuse GH results across episodes with the same fixed profiles."""
+        key = (task.computation_demand, server_a.server_id, server_b.server_id)
+        if key in self.pair_reliability_cache:
+            return self.pair_reliability_cache[key]
+        exposure_a = (
+            server_a.base_failure_rate * task.computation_demand / server_a.processing_frequency
         )
-        spatial_risk_field = sample_spatial_risk_field(
-            correlation_matrix,
-            rng=self.spatial_risk_rng,
+        exposure_b = (
+            server_b.base_failure_rate * task.computation_demand / server_b.processing_frequency
         )
-        base_failure_rates = np.array([
-            self.env_state.get_server_by_id(server_id).base_failure_rate
-            for server_id in server_ids
-        ], dtype=float)
-        effective_failure_rates = map_spatial_risk_to_effective_failure_rates(
-            base_failure_rates,
-            spatial_risk_field,
-            params.SPATIAL_RISK_BETA_P,
+        result = self.reliability_integrator.compute_pair(
+            exposure_a, exposure_b,
+            self.pair_risk_correlations[(server_a.server_id, server_b.server_id)],
         )
-        self.env_state.set_episode_spatial_risk_context(
-            server_ids,
-            distance_matrix,
-            correlation_matrix,
-            spatial_risk_field,
-            effective_failure_rates,
+        self.pair_reliability_cache[key] = result
+        return result
+
+    def _get_reliability_action_mask(self, task):
+        """Keep feasible pairs; if none qualify, keep all exact reliability maxima.
+
+        Correlations already reflect SPATIAL_RISK_ENABLED. Disabling the mask
+        still records the original feasible count, but never triggers fallback.
+        """
+        reliabilities = np.array([
+            self._get_pair_reliability(task, *self.extract_parameters_from_index(index)).correlated
+            for index in range(self.num_actions)
+        ])
+        mask = reliabilities >= task.reliability_requirement
+        task.feasible_action_count = int(mask.sum())
+        task.mask_fallback_used = (
+            params.RELIABILITY_ACTION_MASK_ENABLED and task.feasible_action_count == 0
         )
+        if not params.RELIABILITY_ACTION_MASK_ENABLED:
+            return None
+        if task.mask_fallback_used:
+            mask = reliabilities == reliabilities.max()
+        return mask
+
+    def _set_task_reliabilities(self, task, server_a, server_b):
+        """Store the selected pair's marginal and joint reliability results."""
+        result = self._get_pair_reliability(task, server_a, server_b)
+        task.replica_A_reliability = result.replica_a
+        task.replica_B_reliability = result.replica_b
+        task.pair_reliability_correlated = result.correlated
+        task.pair_reliability_independent = result.independent
 
     def _sample_interarrival_time(self):
         """Sample one inter-arrival time for the common Poisson workload."""
@@ -206,6 +244,7 @@ class MainLoop:
                         self.G_state,
                         delta_t=float(delta_t),
                         done=False,
+                        action_mask=self.ppo_last_decision_action_mask,
                     )
             elif self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
@@ -224,26 +263,21 @@ class MainLoop:
                 server_A, server_B = self.extract_parameters_from_action(self.G_action)
             else:
                 eps = self.get_epsilon(self.this_episode)
-                action_index = self.model.select_action(self.G_state, eps)
+                if self.model_name == "ppo":
+                    action_mask = self._get_reliability_action_mask(task)
+                    action_index = self.model.select_action(self.G_state, eps, action_mask=action_mask)
+                else:
+                    action_index = self.model.select_action(self.G_state, eps)
                 self.G_action = int(action_index)
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
 
-            # Freeze the decision-time reliability snapshot before execution.
-            task.replica_A_reliability = (
-                self.env_state.compute_replica_reliability(task, server_A)
-            )
-            task.replica_B_reliability = (
-                self.env_state.compute_replica_reliability(task, server_B)
-            )
-            # Replica failures are independent conditional on the episode field.
-            task.pair_reliability = float(
-                1.0 - (1.0 - task.replica_A_reliability) * (1.0 - task.replica_B_reliability)
-            )
+            self._set_task_reliabilities(task, server_A, server_B)
 
             if self.model_name == "ppo":
                 self.ppo_last_decision_state = self.G_state
                 self.ppo_last_decision_action = self.G_action
                 self.ppo_last_decision_time = current_time
+                self.ppo_last_decision_action_mask = action_mask
             else:
                 # Store the DQN/DDPG task transition.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
@@ -275,6 +309,7 @@ class MainLoop:
                     terminal_next_state,
                     delta_t=float(delta_t),
                     done=True,
+                    action_mask=self.ppo_last_decision_action_mask,
                 )
             # Each arrival-ordered decision receives its own task outcome.
             self.model.rewards[:] = [
@@ -285,21 +320,33 @@ class MainLoop:
             self.model.train_step()
 
         task_avg_delay = self.episodic_delay / self.maxTask
-        episode_rsr = sum(
-            task.pair_reliability >= task.reliability_requirement
+        episode_rsr_correlated = sum(
+            task.pair_reliability_correlated >= task.reliability_requirement
             for task in self.env_state.tasks.values()
+        ) / self.maxTask
+        episode_rsr_independent = sum(
+            task.pair_reliability_independent >= task.reliability_requirement
+            for task in self.env_state.tasks.values()
+        ) / self.maxTask
+        mask_fallback_rate = sum(
+            task.mask_fallback_used for task in self.env_state.tasks.values()
         ) / self.maxTask
         self.log_data.append((
             self.this_episode,
             self.episodic_reward,
             task_avg_delay,
-            episode_rsr,
+            episode_rsr_correlated,
+            episode_rsr_independent,
+            mask_fallback_rate,
         ))
 
         print(
             f"Episode {self.this_episode} | "
             f"Episode Reward: {self.episodic_reward:.3f} | "
-            f"task_Avg_Delay: {task_avg_delay:.3f} s | RSR: {episode_rsr:.2%}"
+            f"task_Avg_Delay: {task_avg_delay:.3f} s | "
+            f"RSR (correlated): {episode_rsr_correlated:.2%} | "
+            f"RSR (independent): {episode_rsr_independent:.2%} | "
+            f"Mask Fallback: {mask_fallback_rate:.2%}"
         )
 
     def _drain_pending_tasks(self):
@@ -334,6 +381,8 @@ class MainLoop:
             "task_size": task.task_size,
             "computation_demand": task.computation_demand,
             "reliability_requirement": task.reliability_requirement,
+            "feasible_action_count": task.feasible_action_count,
+            "mask_fallback_used": task.mask_fallback_used,
             "arrival_time": task.arrival_time,
             "server_A_id": task.replica_A["server_id"],
             "server_B_id": task.replica_B["server_id"],
@@ -350,9 +399,13 @@ class MainLoop:
             "task_execution_delay": first["finish_time"] - first["cpu_start_time"],
             "replica_A_reliability": task.replica_A_reliability,
             "replica_B_reliability": task.replica_B_reliability,
-            "pair_reliability": task.pair_reliability,
-            "requirement_satisfied": bool(
-                task.pair_reliability >= task.reliability_requirement
+            "pair_reliability_correlated": task.pair_reliability_correlated,
+            "pair_reliability_independent": task.pair_reliability_independent,
+            "requirement_satisfied_correlated": bool(
+                task.pair_reliability_correlated >= task.reliability_requirement
+            ),
+            "requirement_satisfied_independent": bool(
+                task.pair_reliability_independent >= task.reliability_requirement
             ),
         }
 

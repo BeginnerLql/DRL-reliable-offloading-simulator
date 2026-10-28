@@ -37,7 +37,9 @@ def process_all_results(root_dir: str):
             "Task_Outcomes": len(outcomes),
             "Mean_Episode_Reward": logs["Episode Reward"].mean(),
             # Every episode has the same fixed task count.
-            "Overall_RSR": logs["RSR"].mean(),
+            "Overall_RSR_Correlated": logs["RSR_Correlated"].mean(),
+            "Overall_RSR_Independent": logs["RSR_Independent"].mean(),
+            "Overall_Mask_Fallback_Rate": logs["Mask_Fallback_Rate"].mean(),
             "Mean_Task_Delay_s": outcomes["task_delay"].mean(),
             "Mean_Task_Upload_Delay_s": outcomes["task_upload_delay"].mean(),
             "Mean_Task_Queue_Delay_s": outcomes["task_queue_delay"].mean(),
@@ -50,7 +52,10 @@ def process_all_results(root_dir: str):
             Mean_Task_Queue_Delay_s=("task_queue_delay", "mean"),
             Mean_Task_Execution_Delay_s=("task_execution_delay", "mean"),
         )
-        episodes = logs[["Episode", "Episode Reward", "task_Avg_Delay", "RSR"]].merge(
+        episodes = logs[[
+            "Episode", "Episode Reward", "task_Avg_Delay", "RSR_Correlated", "RSR_Independent",
+            "Mask_Fallback_Rate",
+        ]].merge(
             episode_metrics, left_on="Episode", right_index=True,
         ).sort_values("Episode")
         for index, (key, value) in enumerate(metadata.items()):

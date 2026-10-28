@@ -35,18 +35,27 @@ def save_params_and_logs(
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
 
-    # Logs dataframe: raw reward, mean task delay and reliability satisfaction rate.
+    # Report the correlated and independent reliability satisfaction rates.
     df_logs = pd.DataFrame(
         [
             {
                 "Episode": episode,
                 "Episode Reward": episodic_reward,
                 "task_Avg_Delay": task_avg_delay,
-                "RSR": episode_rsr,
+                "RSR_Correlated": episode_rsr_correlated,
+                "RSR_Independent": episode_rsr_independent,
+                "Mask_Fallback_Rate": mask_fallback_rate,
             }
-            for episode, episodic_reward, task_avg_delay, episode_rsr in log_data
+            for (
+                episode, episodic_reward, task_avg_delay,
+                episode_rsr_correlated, episode_rsr_independent,
+                mask_fallback_rate,
+            ) in log_data
         ],
-        columns=["Episode", "Episode Reward", "task_Avg_Delay", "RSR"],
+        columns=[
+            "Episode", "Episode Reward", "task_Avg_Delay",
+            "RSR_Correlated", "RSR_Independent", "Mask_Fallback_Rate",
+        ],
     )
 
     task_result_columns = [
@@ -55,6 +64,8 @@ def save_params_and_logs(
         "task_size",
         "computation_demand",
         "reliability_requirement",
+        "feasible_action_count",
+        "mask_fallback_used",
         "arrival_time",
         "server_A_id",
         "server_B_id",
@@ -71,8 +82,10 @@ def save_params_and_logs(
         "task_execution_delay",
         "replica_A_reliability",
         "replica_B_reliability",
-        "pair_reliability",
-        "requirement_satisfied",
+        "pair_reliability_correlated",
+        "pair_reliability_independent",
+        "requirement_satisfied_correlated",
+        "requirement_satisfied_independent",
     ]
     df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
 
@@ -89,8 +102,8 @@ def save_params_and_logs(
 
     ws_logs = wb["Logs"]
     for column, title, axis_title, anchor in (
-        (2, "Rewards per Episode", "Reward", "F2"),
-        (3, "task_Avg_Delay per Episode", "task_Avg_Delay (s)", "F20"),
+        (2, "Rewards per Episode", "Reward", "G2"),
+        (3, "task_Avg_Delay per Episode", "task_Avg_Delay (s)", "G20"),
     ):
         chart = LineChart()
         chart.title = title
