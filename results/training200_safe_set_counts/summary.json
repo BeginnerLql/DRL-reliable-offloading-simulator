@@ -1,0 +1,59 @@
+{
+  "dataset": "training",
+  "tasks": 200,
+  "candidate_pairs": 28,
+  "safe_task_pair_combinations": 2759,
+  "empty_safe_set_tasks": 16,
+  "mean_safe_pairs_per_task": 13.795,
+  "most_frequent_node_by_pair_occurrences": 2,
+  "node_counts": [
+    {
+      "server_id": 1,
+      "safe_pair_occurrences": 662,
+      "covered_task_count": 163,
+      "covered_task_fraction": 0.815
+    },
+    {
+      "server_id": 2,
+      "safe_pair_occurrences": 1067,
+      "covered_task_count": 184,
+      "covered_task_fraction": 0.92
+    },
+    {
+      "server_id": 3,
+      "safe_pair_occurrences": 606,
+      "covered_task_count": 155,
+      "covered_task_fraction": 0.775
+    },
+    {
+      "server_id": 4,
+      "safe_pair_occurrences": 158,
+      "covered_task_count": 75,
+      "covered_task_fraction": 0.375
+    },
+    {
+      "server_id": 5,
+      "safe_pair_occurrences": 528,
+      "covered_task_count": 149,
+      "covered_task_fraction": 0.745
+    },
+    {
+      "server_id": 6,
+      "safe_pair_occurrences": 667,
+      "covered_task_count": 164,
+      "covered_task_fraction": 0.82
+    },
+    {
+      "server_id": 7,
+      "safe_pair_occurrences": 961,
+      "covered_task_count": 184,
+      "covered_task_fraction": 0.92
+    },
+    {
+      "server_id": 8,
+      "safe_pair_occurrences": 869,
+      "covered_task_count": 177,
+      "covered_task_fraction": 0.885
+    }
+  ]
+}

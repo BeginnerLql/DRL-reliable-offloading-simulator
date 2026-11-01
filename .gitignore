@@ -17,6 +17,8 @@ venv/
 Thumbs.db
 
 # Generated data and results
+# Keep the full 1.6-million-task training trace local; commit its summaries.
+/results/ppo_20261031_180331_baseline/task_results.csv
 
 # Logs
 *.log

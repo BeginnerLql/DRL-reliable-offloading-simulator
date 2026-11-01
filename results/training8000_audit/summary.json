@@ -1,0 +1,170 @@
+{
+  "first100_delay_s": 13.145710188728476,
+  "last100_delay_s": 5.326334718575696,
+  "reduction_percent": 59.48233574217501,
+  "queue_share_of_reduction": 0.9848903030945197,
+  "last_500_vs_previous_500_reduction_percent": 1.8795305447635131,
+  "last_1000_vs_previous_1000_reduction_percent": 3.7951505456424126,
+  "server_assignment": [
+    {
+      "window": "first100",
+      "server_id": 1,
+      "dispatch_fraction": 0.1916,
+      "winner_fraction": 0.15645,
+      "mean_assigned_queue_s": 4.833577218268597
+    },
+    {
+      "window": "first100",
+      "server_id": 2,
+      "dispatch_fraction": 0.5155,
+      "winner_fraction": 0.05965,
+      "mean_assigned_queue_s": 41.13096125310597
+    },
+    {
+      "window": "first100",
+      "server_id": 3,
+      "dispatch_fraction": 0.14705,
+      "winner_fraction": 0.07505,
+      "mean_assigned_queue_s": 14.90654435653847
+    },
+    {
+      "window": "first100",
+      "server_id": 4,
+      "dispatch_fraction": 0.0317,
+      "winner_fraction": 0.0298,
+      "mean_assigned_queue_s": 0.6783089477573363
+    },
+    {
+      "window": "first100",
+      "server_id": 5,
+      "dispatch_fraction": 0.13775,
+      "winner_fraction": 0.1067,
+      "mean_assigned_queue_s": 4.188987853195093
+    },
+    {
+      "window": "first100",
+      "server_id": 6,
+      "dispatch_fraction": 0.26285,
+      "winner_fraction": 0.24465,
+      "mean_assigned_queue_s": 3.18158186730618
+    },
+    {
+      "window": "first100",
+      "server_id": 7,
+      "dispatch_fraction": 0.4047,
+      "winner_fraction": 0.1438,
+      "mean_assigned_queue_s": 28.239605640461154
+    },
+    {
+      "window": "first100",
+      "server_id": 8,
+      "dispatch_fraction": 0.30885,
+      "winner_fraction": 0.1839,
+      "mean_assigned_queue_s": 15.64006815703386
+    },
+    {
+      "window": "last100",
+      "server_id": 1,
+      "dispatch_fraction": 0.1848,
+      "winner_fraction": 0.15035,
+      "mean_assigned_queue_s": 2.200709746106819
+    },
+    {
+      "window": "last100",
+      "server_id": 2,
+      "dispatch_fraction": 0.77735,
+      "winner_fraction": 0.0098,
+      "mean_assigned_queue_s": 83.56369230385681
+    },
+    {
+      "window": "last100",
+      "server_id": 3,
+      "dispatch_fraction": 0.10045,
+      "winner_fraction": 0.0192,
+      "mean_assigned_queue_s": 3.851579874101996
+    },
+    {
+      "window": "last100",
+      "server_id": 4,
+      "dispatch_fraction": 0.0659,
+      "winner_fraction": 0.0608,
+      "mean_assigned_queue_s": 1.5297765698486863
+    },
+    {
+      "window": "last100",
+      "server_id": 5,
+      "dispatch_fraction": 0.12195,
+      "winner_fraction": 0.0815,
+      "mean_assigned_queue_s": 2.3338222156174173
+    },
+    {
+      "window": "last100",
+      "server_id": 6,
+      "dispatch_fraction": 0.28805,
+      "winner_fraction": 0.26615,
+      "mean_assigned_queue_s": 2.593700761965857
+    },
+    {
+      "window": "last100",
+      "server_id": 7,
+      "dispatch_fraction": 0.2433,
+      "winner_fraction": 0.2194,
+      "mean_assigned_queue_s": 2.8323761515970483
+    },
+    {
+      "window": "last100",
+      "server_id": 8,
+      "dispatch_fraction": 0.2182,
+      "winner_fraction": 0.1928,
+      "mean_assigned_queue_s": 2.3708841064503443
+    }
+  ],
+  "audit": {
+    "episodes": 8000,
+    "tasks": 1600000,
+    "tasks_per_episode": 200,
+    "training_rsr": 0.9200000000000002,
+    "training_fallback_rate": 0.08,
+    "max_delay_formula_error_s": 4.263256414560601e-14,
+    "max_delay_decomposition_error_s": 1.4654943925052066e-14
+  },
+  "capacity": {
+    "total_server_cycles_per_second": 20688601427.225773,
+    "mean_task_cycles": 5982646381.581471,
+    "replicas_per_task": 2,
+    "arrival_tasks_per_second": 2,
+    "offered_cycles_per_second": 23930585526.325886,
+    "necessary_stability_arrival_bound": 1.7290510008178759
+  },
+  "slower_replica_mean_delay_s": {
+    "first100": 34.66578249196256,
+    "last100": 68.36409304823498
+  },
+  "late_training_windows": [
+    {
+      "start": 5001,
+      "end": 6000,
+      "mean_delay_s": 6.066094182840032
+    },
+    {
+      "start": 6001,
+      "end": 7000,
+      "mean_delay_s": 5.58935341460682
+    },
+    {
+      "start": 7001,
+      "end": 8000,
+      "mean_delay_s": 5.3772290379944865
+    },
+    {
+      "start": 7001,
+      "end": 7500,
+      "mean_delay_s": 5.428241769040853
+    },
+    {
+      "start": 7501,
+      "end": 8000,
+      "mean_delay_s": 5.326216306948119
+    }
+  ]
+}

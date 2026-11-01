@@ -10,6 +10,7 @@ from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH, RESULTS_DIR, ensure_
 
 def save_params_and_logs(
     params, log_data, task_results, run_id, *, task_parameters_path=TRAIN_TASK_PATH,
+    task_results_csv_path=None,
 ):
     ensure_dirs()
 
@@ -87,7 +88,13 @@ def save_params_and_logs(
         "requirement_satisfied_correlated",
         "requirement_satisfied_independent",
     ]
-    df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
+    if task_results_csv_path is None:
+        df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
+    else:
+        # Long runs exceed Excel's row limit; point to the complete CSV instead.
+        df_task_results = pd.DataFrame({
+            "TaskResults_CSV": [str(task_results_csv_path)],
+        })
 
     # Exclusive creation preserves every existing experiment workbook.
     with open(filename, "xb") as output:

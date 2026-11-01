@@ -1,0 +1,18 @@
+{
+  "arrival_rate": 0.5,
+  "episodes": 500,
+  "task_executions": 100000,
+  "mean_delay_seconds": 2.7386397283499195,
+  "mean_delay_met_seconds": 2.731086718681696,
+  "mean_delay_unmet_seconds": 2.81994565595491,
+  "mean_upload_delay_seconds": 0.6274668018020105,
+  "mean_queue_delay_seconds": 0.2513385705813845,
+  "mean_execution_delay_seconds": 1.8598343559665247,
+  "p95_task_delay_seconds": 4.307784967733296,
+  "rsr_correlated": 0.915,
+  "mask_fallback_rate": 0.085,
+  "weights_and_optimizer_unchanged": true,
+  "source_checkpoint_sha256": "570240a1cf33568785e2fb648cc839a7fbf637d368abdbfd1f503a06f8bcb9d3",
+  "directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_163748_arrival0.5_frozen_eval500",
+  "workbook": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_163748_arrival0.5_frozen_eval500.xlsx"
+}

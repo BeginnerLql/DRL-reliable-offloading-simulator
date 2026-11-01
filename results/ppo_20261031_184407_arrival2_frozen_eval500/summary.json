@@ -1,0 +1,14 @@
+{
+  "evaluation_episodes": 500,
+  "evaluation_tasks": 100000,
+  "mean_delay_seconds": 5.358064549879153,
+  "episode_mean_delay_std_seconds": 0.630244868424851,
+  "mean_upload_delay_seconds": 0.9079803127485145,
+  "mean_queue_delay_seconds": 2.2618182423340056,
+  "mean_execution_delay_seconds": 2.188265994796631,
+  "rsr_correlated": 0.9149999999999998,
+  "rsr_independent": 0.9299999999999998,
+  "mask_fallback_rate": 0.08499999999999998,
+  "weights_and_optimizer_unchanged": true,
+  "source_checkpoint_sha256": "570240a1cf33568785e2fb648cc839a7fbf637d368abdbfd1f503a06f8bcb9d3"
+}

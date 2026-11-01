@@ -6,14 +6,14 @@ class parameters:
     # them in runner scripts. Regenerate workbooks after changing profile ranges.
     # Experiment
     model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg"
-    total_episodes = 100
+    total_episodes = 8000
     EXPERIMENT_TAG = "baseline"
 
     # Infrastructure
     NUM_SERVERS = 8
 
     # Workload
-    TASK_ARRIVAL_RATE = 0.5  # Poisson task-arrival rate, unit: tasks/s
+    TASK_ARRIVAL_RATE = 2.0  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
     TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)  # Continuous uniform.
     TASK_DEMAND_RANGE = (4.0e9, 8.0e9)  # CPU cycles, continuous uniform; 2x original demand.

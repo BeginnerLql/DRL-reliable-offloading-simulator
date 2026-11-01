@@ -1,10 +1,13 @@
 from datetime import datetime
+from contextlib import nullcontext
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import torch
 
 from io_utils.save_parameters_and_logs import save_params_and_logs
+from io_utils.long_run_logger import LongRunLogger
 from config.params import params
 from config.paths import RESULTS_DIR
 from core.main_loop import MainLoop
@@ -81,22 +84,31 @@ def build_model():
 
 
 def run_simulation():
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_id = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
     np.random.seed(params.EXPERIMENT_SEED)
     torch.manual_seed(params.EXPERIMENT_SEED)
     model = build_model()
 
-    ml = MainLoop(model, params.total_episodes, params.taskno, params.num_states, params.num_actions)
-    ml.EP()
+    # A worksheet can contain at most 1,048,575 data rows plus its header.
+    stream_results = params.total_episodes * params.taskno > 1_048_575
+    logger_context = LongRunLogger(params, model, run_id) if stream_results else nullcontext()
+    with logger_context as logger:
+        ml = MainLoop(
+            model, params.total_episodes, params.taskno, params.num_states, params.num_actions,
+            episode_end_callback=logger,
+        )
+        ml.EP()
 
-    save_params_and_logs(
-        params, ml.log_data, ml.task_results,
-        run_id=run_id,
-    )
-    if str(params.model_summary).strip().lower() == "ppo":
-        checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
-        model.save_model(checkpoint_path)
-        print(f"Saved PPO checkpoint: {checkpoint_path}")
+        # Persist the trained model before producing the final Excel report.
+        if str(params.model_summary).strip().lower() == "ppo":
+            checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
+            model.save_model(checkpoint_path)
+            print(f"Saved PPO checkpoint: {checkpoint_path}")
+        save_params_and_logs(
+            params, ml.log_data, ml.task_results,
+            run_id=run_id,
+            task_results_csv_path=logger.task_results_csv_path if logger else None,
+        )
 
 
 def main():
