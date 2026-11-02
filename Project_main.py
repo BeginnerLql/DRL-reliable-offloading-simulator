@@ -13,9 +13,15 @@ from config.paths import RESULTS_DIR
 from core.main_loop import MainLoop
 
 
-def build_model():
-    """Build the configured DQN, PPO or DDPG agent."""
+def build_model(*, device="cuda"):
+    """Build the configured learning agent or Corr-delayGreedy baseline."""
     model_name = str(params.model_summary).strip().lower()
+
+    if model_name == "corr-delaygreedy":
+        from agents.corr_delay_greedy_agent import CorrDelayGreedyAgent
+
+        print("Corr-delayGreedyAgent is set.")
+        return CorrDelayGreedyAgent()
 
     if model_name == "ddpg":
         from agents.ddpg_agent import ddpgModel
@@ -60,7 +66,7 @@ def build_model():
             num_states=params.num_states,
             num_actions=params.num_actions,
             hidden_layers=params.hidden_layers_ppo,
-            device="cuda",
+            device=device,
             gamma=params.gamma_ppo,
             actor_lr=params.actor_lr_ppo,
             critic_lr=params.critic_lr_ppo,
@@ -79,15 +85,15 @@ def build_model():
 
     raise ValueError(
         f"Unsupported params.model_summary='{params.model_summary}'. "
-        "Use one of: 'ddpg', 'dqn', 'ppo'."
+        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy'."
     )
 
 
-def run_simulation():
+def run_simulation(*, device="cuda"):
     run_id = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
     np.random.seed(params.EXPERIMENT_SEED)
     torch.manual_seed(params.EXPERIMENT_SEED)
-    model = build_model()
+    model = build_model(device=device)
 
     # A worksheet can contain at most 1,048,575 data rows plus its header.
     stream_results = params.total_episodes * params.taskno > 1_048_575
@@ -100,6 +106,7 @@ def run_simulation():
         ml.EP()
 
         # Persist the trained model before producing the final Excel report.
+        checkpoint_path = None
         if str(params.model_summary).strip().lower() == "ppo":
             checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
             model.save_model(checkpoint_path)
@@ -109,6 +116,7 @@ def run_simulation():
             run_id=run_id,
             task_results_csv_path=logger.task_results_csv_path if logger else None,
         )
+    return checkpoint_path
 
 
 def main():

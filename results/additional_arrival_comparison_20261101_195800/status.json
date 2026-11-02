@@ -1,0 +1,15 @@
+{
+  "status": "failed",
+  "training": false,
+  "evaluation_episodes_per_rate": 500,
+  "evaluation_seed": 2027,
+  "rates": [
+    1.5,
+    2.5,
+    3.0
+  ],
+  "ppo_runs": {},
+  "phase": "ppo_evaluation",
+  "current_arrival_rate": 1.5,
+  "error": "RuntimeError('Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx')"
+}

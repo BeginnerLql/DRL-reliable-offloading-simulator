@@ -1,0 +1,8 @@
+{
+  "0.5": "results/ppo_20261101_163748_arrival0.5_frozen_eval500",
+  "1.0": "results/ppo_20261101_164009_arrival1_frozen_eval500",
+  "1.5": "results/ppo_20261101_195828_arrival1.5_frozen_eval500",
+  "2.0": "results/ppo_20261031_184407_arrival2_frozen_eval500",
+  "2.5": "results/ppo_20261101_195828_arrival2.5_frozen_eval500",
+  "3.0": "results/ppo_20261101_195828_arrival3_frozen_eval500"
+}

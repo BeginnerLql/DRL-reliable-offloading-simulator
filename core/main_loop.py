@@ -32,11 +32,13 @@ class MainLoop:
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
+        if self.model_name == "corr-delaygreedy" and not params.SPATIAL_RISK_ENABLED:
+            raise ValueError("Corr-delayGreedy requires SPATIAL_RISK_ENABLED=True.")
 
         self.this_episode = 0
 
         self.G_state = []
-        self.G_action = None  # DDPG: list of floats | DQN/PPO: int action index
+        self.G_action = None  # DDPG: list of floats | other agents: int action index
         self.index_of_actions = self.generate_combinations()
 
         self.episodic_reward = 0
@@ -176,8 +178,8 @@ class MainLoop:
     def _get_reliability_action_mask(self, task):
         """Keep feasible pairs; if none qualify, keep all exact reliability maxima.
 
-        Correlations already reflect SPATIAL_RISK_ENABLED. Disabling the mask
-        still records the original feasible count, but never triggers fallback.
+        Correlations already reflect SPATIAL_RISK_ENABLED. Corr-delayGreedy
+        always masks; PPO follows RELIABILITY_ACTION_MASK_ENABLED.
         """
         reliabilities = np.array([
             self._get_pair_reliability(task, *self.extract_parameters_from_index(index)).correlated
@@ -185,10 +187,11 @@ class MainLoop:
         ])
         mask = reliabilities >= task.reliability_requirement
         task.feasible_action_count = int(mask.sum())
-        task.mask_fallback_used = (
-            params.RELIABILITY_ACTION_MASK_ENABLED and task.feasible_action_count == 0
+        mask_enabled = (
+            params.RELIABILITY_ACTION_MASK_ENABLED or self.model_name == "corr-delaygreedy"
         )
-        if not params.RELIABILITY_ACTION_MASK_ENABLED:
+        task.mask_fallback_used = mask_enabled and task.feasible_action_count == 0
+        if not mask_enabled:
             return None
         if task.mask_fallback_used:
             mask = reliabilities == reliabilities.max()
@@ -228,7 +231,7 @@ class MainLoop:
             # PPO closes the previous arrival-to-arrival interval before
             # observing the new task. DQN/DDPG use
             # task-centric bookkeeping below.
-            if self.model_name == "ppo":
+            if self.model_name in ("ppo", "corr-delaygreedy"):
                 self._collect_resolved_task_outcomes()
 
             task_id = self.taskCounter
@@ -249,7 +252,7 @@ class MainLoop:
                         done=False,
                         action_mask=self.ppo_last_decision_action_mask,
                     )
-            elif self.taskCounter > 1:
+            elif self.model_name in ("dqn", "ddpg") and self.taskCounter > 1:
                 # Complete s' for the previous transition and train on any
                 # resolved DQN/DDPG task transitions.
                 prev = list(self.tempbuffer[self.taskCounter - 1])
@@ -264,6 +267,12 @@ class MainLoop:
                     self.G_action, self.this_episode, self.total_episodes
                 )
                 server_A, server_B = self.extract_parameters_from_action(self.G_action)
+            elif self.model_name == "corr-delaygreedy":
+                action_mask = self._get_reliability_action_mask(task)
+                self.G_action = self.model.select_action(
+                    task, self.env_state, self.index_of_actions, action_mask=action_mask,
+                )
+                server_A, server_B = self.extract_parameters_from_index(self.G_action)
             else:
                 eps = self.get_epsilon(self.this_episode)
                 if self.model_name == "ppo":
@@ -281,7 +290,7 @@ class MainLoop:
                 self.ppo_last_decision_action = self.G_action
                 self.ppo_last_decision_time = current_time
                 self.ppo_last_decision_action_mask = action_mask
-            else:
+            elif self.model_name in ("dqn", "ddpg"):
                 # Store the DQN/DDPG task transition.
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
@@ -289,7 +298,7 @@ class MainLoop:
             self.pendingList.append(self.taskCounter)
             self.taskCounter += 1
 
-        if self.model_name != "ppo":
+        if self.model_name in ("dqn", "ddpg"):
             # The final DQN/DDPG transition uses the last observed state.
             if self.taskCounter > 1:
                 last = list(self.tempbuffer[self.taskCounter - 1])
@@ -355,7 +364,7 @@ class MainLoop:
     def _drain_pending_tasks(self):
         """Wait for pending tasks' first-replica completion events."""
         while len(self.pendingList) > 0:
-            if self.model_name == "ppo":
+            if self.model_name in ("ppo", "corr-delaygreedy"):
                 self._collect_resolved_task_outcomes()
             else:
                 self.add_train()

@@ -1,0 +1,61 @@
+{
+  "status": "completed",
+  "ppo_rerun": false,
+  "scope": "One arrival realization per rate; PPO episode 1 is paired. PPO 500-episode means are provided as separate context.",
+  "results": [
+    {
+      "arrival_rate": 0.5,
+      "baseline_episodes": 1,
+      "baseline_tasks": 200,
+      "baseline_mean_delay_seconds": 2.6278958228098777,
+      "baseline_p95_delay_seconds": 3.9704149399738045,
+      "baseline_mean_queue_delay_seconds": 0.355131227217567,
+      "baseline_rsr_correlated": 0.915,
+      "baseline_fallback_rate": 0.085,
+      "ppo_episode1_mean_delay_seconds": 2.799589657261233,
+      "ppo_500episode_mean_delay_seconds": 2.7386397283499195,
+      "paired_arrivals_verified": true,
+      "evaluation_seed": 2027,
+      "server_sha256": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+      "evaluation_tasks_sha256": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+      "baseline_workbook": "results/corr-delaygreedy_20261101_193503_arrival0.5_eval_once.xlsx",
+      "ppo_source": "results/ppo_20261101_163748_arrival0.5_frozen_eval500"
+    },
+    {
+      "arrival_rate": 1.0,
+      "baseline_episodes": 1,
+      "baseline_tasks": 200,
+      "baseline_mean_delay_seconds": 3.8970516350587308,
+      "baseline_p95_delay_seconds": 7.709039373949323,
+      "baseline_mean_queue_delay_seconds": 1.2957169596057276,
+      "baseline_rsr_correlated": 0.915,
+      "baseline_fallback_rate": 0.085,
+      "ppo_episode1_mean_delay_seconds": 3.591927600436436,
+      "ppo_500episode_mean_delay_seconds": 3.496509579260394,
+      "paired_arrivals_verified": true,
+      "evaluation_seed": 2027,
+      "server_sha256": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+      "evaluation_tasks_sha256": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+      "baseline_workbook": "results/corr-delaygreedy_20261101_193503_arrival1_eval_once.xlsx",
+      "ppo_source": "results/ppo_20261101_164009_arrival1_frozen_eval500"
+    },
+    {
+      "arrival_rate": 2.0,
+      "baseline_episodes": 1,
+      "baseline_tasks": 200,
+      "baseline_mean_delay_seconds": 10.865602098493428,
+      "baseline_p95_delay_seconds": 24.93293085289864,
+      "baseline_mean_queue_delay_seconds": 7.478832950003193,
+      "baseline_rsr_correlated": 0.915,
+      "baseline_fallback_rate": 0.085,
+      "ppo_episode1_mean_delay_seconds": 6.050052167527895,
+      "ppo_500episode_mean_delay_seconds": 5.358064549879153,
+      "paired_arrivals_verified": true,
+      "evaluation_seed": 2027,
+      "server_sha256": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+      "evaluation_tasks_sha256": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+      "baseline_workbook": "results/corr-delaygreedy_20261101_193503_arrival2_eval_once.xlsx",
+      "ppo_source": "results/ppo_20261031_184407_arrival2_frozen_eval500"
+    }
+  ]
+}
