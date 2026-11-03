@@ -32,9 +32,17 @@ class Task:
         self.task_completion_time = None
         self.first_completed_replica = None
         self.task_completion_event = self.env.event()
+        self.base_delay_at_decision = None
+        self.predicted_delay_at_decision = None
+        self.observations_at_decision = None
+        self.rasoul_feedback_processed = False
 
-    def execute_task(self, server_A, server_B):
+    def execute_task(self, server_A, server_B=None):
         self.replica_A["server_id"] = server_A.server_id
+        if server_B is None:
+            # One upload, queue entry, CPU execution and completion signal.
+            yield self.env.process(self._run_replica(server_A, "replica_A", self.replica_A))
+            return
         self.replica_B["server_id"] = server_B.server_id
 
         process_A = self.env.process(

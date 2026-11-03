@@ -19,7 +19,8 @@ class LongRunLogger:
     def __init__(self, params, model, run_id):
         self.params = params
         self.model = model
-        self.run_dir = Path(RESULTS_DIR) / f"{params.model_summary}_{run_id}_{params.EXPERIMENT_TAG}"
+        self.model_name = str(params.model_summary).strip().lower()
+        self.run_dir = Path(RESULTS_DIR) / f"{self.model_name}_{run_id}_{params.EXPERIMENT_TAG}"
         self.run_dir.mkdir(parents=True, exist_ok=False)
         self.task_results_csv_path = self.run_dir / "task_results.csv"
         self.task_writer = None
@@ -34,6 +35,7 @@ class LongRunLogger:
             key: value for key, value in vars(self.params).items()
             if not key.startswith("_")
         }
+        settings["model_summary"] = self.model_name
         (self.run_dir / "parameters.json").write_text(
             json.dumps(settings, indent=2), encoding="utf-8",
         )

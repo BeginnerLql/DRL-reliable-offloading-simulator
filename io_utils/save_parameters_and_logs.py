@@ -1,4 +1,4 @@
-"""Write task outcomes after both replicas finish, with fixed-schema logs."""
+"""Write task outcomes after execution drains, with compatible episode logs."""
 
 import os
 import pandas as pd
@@ -32,6 +32,7 @@ def save_params_and_logs(
         for attr, value in vars(params).items()
         if not attr.startswith("_") and not attr.endswith(other_model_suffixes)
     }
+    params_data["model_summary"] = [model_name]
     params_data["run_id"] = [run_id]
     df_params = pd.DataFrame(params_data).transpose().reset_index()
     df_params.columns = ["Parameter", "Value"]
@@ -88,6 +89,12 @@ def save_params_and_logs(
         "requirement_satisfied_correlated",
         "requirement_satisfied_independent",
     ]
+    if model_name == "rasoul-delay":
+        task_result_columns.extend([
+            "replica_count", "task_reliability", "requirement_satisfied",
+            "base_delay_at_decision", "predicted_delay_at_decision",
+            "observations_at_decision", "delay_discrepancy",
+        ])
     if task_results_csv_path is None:
         df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
     else:

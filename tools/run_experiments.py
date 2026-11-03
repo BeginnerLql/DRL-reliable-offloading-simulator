@@ -1,4 +1,4 @@
-"""Unified training, frozen PPO evaluation and paired greedy comparison."""
+"""Training, frozen PPO evaluation, paired greedy comparison and RASOUL runs."""
 
 import argparse
 import copy
@@ -40,6 +40,12 @@ def write_json(path, value):
 
 @contextmanager
 def temporary_params(**settings):
+    if "model_summary" in settings:
+        settings["model_summary"] = str(settings["model_summary"]).strip().lower()
+    if "model_summary" in settings and "num_actions" not in settings:
+        servers = settings.get("NUM_SERVERS", params.NUM_SERVERS)
+        settings["num_actions"] = (servers if str(settings["model_summary"]).strip().lower() == "rasoul-delay"
+                                   else servers * (servers - 1) // 2)
     original = {key: getattr(params, key) for key in settings}
     try:
         for key, value in settings.items():
@@ -97,6 +103,7 @@ def frozen_evaluation(model, episodes, *, seed, task_path, callback=None):
 
 
 def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_id):
+    agent = str(agent).strip().lower()
     task_path = Path(task_path).resolve()
     task_count = len(pd.read_excel(task_path))
     if not task_count:
@@ -112,6 +119,9 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
         recorded.update(EVALUATION_ONLY=True, INFERENCE_DEVICE=device,
                         ACTION_SELECTION=("sample masked categorical policy" if agent == "ppo"
                                           else "deterministic safe-set greedy"))
+        if agent == "rasoul-delay":
+            recorded.update(REPLICA_COUNT=1, RELIABILITY_SEMANTICS="GH single-server marginal",
+                            ACTION_SELECTION="single-replica delay LCB with completed feedback")
         if agent == "ppo":
             checkpoint = Path(checkpoint).resolve()
             source_hash = digest(checkpoint)
@@ -156,6 +166,16 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
                              torch.load(logger.run_dir / "checkpoint_latest.pt",
                                         map_location="cpu", weights_only=True))
             summary.update(weights_and_optimizer_unchanged=True, source_checkpoint_sha256=source_hash)
+        if agent == "rasoul-delay":
+            summary.update(replica_count=1, rsr_single=float(tasks.requirement_satisfied.mean()),
+                           mean_single_reliability=float(tasks.task_reliability.mean()))
+            write_json(logger.run_dir / "learning_statistics.json", dict(
+                scope="Final episode only; statistics reset at each episode start",
+                decisions=model.decision_count,
+                completed_counts=model.completed_counts, discrepancy_sums=model.discrepancy_sums,
+                mean_discrepancies={server: model.discrepancy_sums[server] / count if count else None
+                                    for server, count in model.completed_counts.items()},
+            ))
         write_json(logger.run_dir / "summary.json", summary)
         return logger.run_dir
 
@@ -238,7 +258,7 @@ def positive_float(value):
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("train-eval", "ppo", "greedy", "compare"))
+    parser.add_argument("mode", choices=("train-eval", "ppo", "greedy", "compare", "rasoul"))
     parser.add_argument("--rates", nargs="+", type=positive_float, default=[params.TASK_ARRIVAL_RATE])
     parser.add_argument("--episodes", type=int, default=500, help="evaluation episodes per arrival rate")
     parser.add_argument("--seed", type=int, default=2027, help="evaluation seed, not a training seed")
@@ -312,6 +332,13 @@ def main(argv=None):
             checkpoint = run_simulation(device=device)
         comparisons = []
         for rate in args.rates:
+            if args.mode == "rasoul":
+                state.update(phase="rasoul_evaluation", current_arrival_rate=rate)
+                write_json(report_dir / "status.json", state)
+                directory = evaluate("rasoul-delay", rate, episodes=args.episodes, seed=args.seed,
+                                     device=device, checkpoint=None, task_path=args.task_path, run_id=run_id)
+                state.setdefault("rasoul_runs", {})[rate] = str(directory)
+                continue
             if args.mode != "greedy":
                 state.update(phase="ppo_evaluation", current_arrival_rate=rate)
                 write_json(report_dir / "status.json", state)

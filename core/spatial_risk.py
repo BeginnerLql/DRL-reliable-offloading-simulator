@@ -141,6 +141,13 @@ class GaussHermiteReliability:
         # expm1 avoids subtracting two nearly equal numbers for small exposure.
         return -np.expm1(-exposure * multiplier)
 
+    def compute_marginal(self, exposure: float) -> float:
+        """Use the same GH nodes, weights and conditional risk as compute_pair."""
+        exposure = float(exposure)
+        if not np.isfinite(exposure) or exposure < 0:
+            raise ValueError("exposure must be finite and nonnegative")
+        return float(1.0 - self.weights @ self._conditional_failure(exposure, self.nodes))
+
     def compute_pair(self, exposure_a: float, exposure_b: float, rho: float) -> PairReliability:
         """Return reliabilities for dimensionless exposures and latent correlation.
 

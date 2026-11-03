@@ -1,0 +1,16 @@
+{
+  "status": "completed",
+  "mode": "rasoul",
+  "episodes_per_rate": 3,
+  "evaluation_seed": 2027,
+  "rates": [
+    2.0
+  ],
+  "device": "cpu",
+  "ppo_runs": {},
+  "phase": "completed",
+  "current_arrival_rate": 2.0,
+  "rasoul_runs": {
+    "2.0": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/rasoul-delay_20261103_152349_198579_arrival2_eval3"
+  }
+}

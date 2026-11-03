@@ -5,7 +5,7 @@ class parameters:
     # Change experiment settings here before running comparisons; do not override
     # them in runner scripts. Regenerate workbooks after changing profile ranges.
     # Experiment
-    model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy"
+    model_summary = "ppo"  # Also: "dqn", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy", "RASOUL-Delay"
     total_episodes = 8000
     EXPERIMENT_TAG = "baseline"
 
@@ -37,6 +37,9 @@ class parameters:
     PROFILE_SEED = 2028
     # Runtime seed for task arrivals and agents; GH reliability is deterministic.
     EXPERIMENT_SEED = 2026
+
+    # RASOUL-Delay: exploration coefficient in seconds; not tuned.
+    RASOUL_DELAY_EXPLORATION_C = 0.5
 
     # RL hyperparameters
 

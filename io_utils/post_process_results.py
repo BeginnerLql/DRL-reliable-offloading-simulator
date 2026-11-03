@@ -14,6 +14,7 @@ def process_all_results(root_dir: str):
     summaries = []
     episode_tables = []
     pair_tables = []
+    single_tables = []
 
     for path in sorted(root.glob("*.xlsx")):
         if path.name.startswith("~$") or path.name == "Final_Result_All.xlsx":
@@ -23,6 +24,13 @@ def process_all_results(root_dir: str):
             logs = pd.read_excel(workbook, sheet_name="Logs")
             outcomes = pd.read_excel(workbook, sheet_name="TaskResults")
             servers = pd.read_excel(workbook, sheet_name="Servers")
+        if "TaskResults_CSV" in outcomes:
+            csv_path = Path(outcomes.TaskResults_CSV.iloc[0])
+            if not csv_path.is_file():
+                # Preserve the original directory spelling for relocated legacy runs.
+                relocated = path.parent / csv_path.parent.name / csv_path.name
+                csv_path = relocated if relocated.is_file() else path.with_suffix("") / "task_results.csv"
+            outcomes = pd.read_csv(csv_path)
 
         params_map = dict(zip(params_df["Parameter"], params_df["Value"]))
         metadata = {
@@ -45,6 +53,11 @@ def process_all_results(root_dir: str):
             "Mean_Task_Queue_Delay_s": outcomes["task_queue_delay"].mean(),
             "Mean_Task_Execution_Delay_s": outcomes["task_execution_delay"].mean(),
         })
+        single_replica = str(params_map["model_summary"]).strip().lower() == "rasoul-delay"
+        if single_replica:
+            summaries[-1].update(Replica_Count=1,
+                                 Overall_RSR_Single=outcomes.requirement_satisfied.mean(),
+                                 Mean_Task_Reliability=outcomes.task_reliability.mean())
 
         episode_metrics = outcomes.groupby("episode").agg(
             Task_Count=("task_id", "size"),
@@ -61,6 +74,17 @@ def process_all_results(root_dir: str):
         for index, (key, value) in enumerate(metadata.items()):
             episodes.insert(index, key, value)
         episode_tables.append(episodes)
+
+        if single_replica:
+            selections = outcomes.server_A_id.value_counts().reindex(
+                sorted(servers.Server_ID.astype(int)), fill_value=0,
+            ).rename_axis("Server_ID").rename("Selections").reset_index()
+            selections["Share"] = selections.Selections / len(outcomes)
+            for index, (key, value) in enumerate(metadata.items()):
+                selections.insert(index, key, value)
+            single_tables.append(selections)
+            print(f"Read {path.name}: {len(logs)} episodes, {len(outcomes)} single-replica outcomes")
+            continue
 
         # Pair order does not distinguish the two replicas.
         selected_pairs = np.sort(
@@ -83,14 +107,20 @@ def process_all_results(root_dir: str):
         raise ValueError("No experiment result workbooks found.")
 
     output_path = root / "Final_Result_All.xlsx"
-    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-        pd.DataFrame(summaries).to_excel(writer, sheet_name="ModelSummary", index=False)
-        pd.concat(episode_tables, ignore_index=True).to_excel(
-            writer, sheet_name="EpisodeMetrics", index=False,
-        )
-        pd.concat(pair_tables, ignore_index=True).to_excel(
-            writer, sheet_name="PairSelection", index=False,
-        )
+    with output_path.open("xb") as output:
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            pd.DataFrame(summaries).to_excel(writer, sheet_name="ModelSummary", index=False)
+            pd.concat(episode_tables, ignore_index=True).to_excel(
+                writer, sheet_name="EpisodeMetrics", index=False,
+            )
+            if pair_tables:
+                pd.concat(pair_tables, ignore_index=True).to_excel(
+                    writer, sheet_name="PairSelection", index=False,
+                )
+            if single_tables:
+                pd.concat(single_tables, ignore_index=True).to_excel(
+                    writer, sheet_name="ServerSelection", index=False,
+                )
     print(f"Saved {output_path}")
 
 

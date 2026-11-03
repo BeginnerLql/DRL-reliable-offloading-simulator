@@ -5,7 +5,7 @@ from config.configuration import parameters
 
 class params:
     # Experiment
-    model_summary = parameters.model_summary  # Greedy: "Corr-delayGreedy" / "Indep-delayGreedy".
+    model_summary = str(parameters.model_summary).strip().lower()
     total_episodes = parameters.total_episodes
     EXPERIMENT_TAG = parameters.EXPERIMENT_TAG
 
@@ -31,10 +31,12 @@ class params:
     SPATIAL_RISK_GH_ORDER = parameters.SPATIAL_RISK_GH_ORDER
     PROFILE_SEED = parameters.PROFILE_SEED
     EXPERIMENT_SEED = parameters.EXPERIMENT_SEED
+    RASOUL_DELAY_EXPLORATION_C = parameters.RASOUL_DELAY_EXPLORATION_C
 
-    # State/action dimensions for the current observation and unordered pairs.
+    # RASOUL uses server actions; existing models retain unordered server pairs.
     num_states = 5 * NUM_SERVERS + 2
-    num_actions = NUM_SERVERS * (NUM_SERVERS - 1) // 2
+    num_actions = (NUM_SERVERS if str(model_summary).strip().lower() == "rasoul-delay"
+                   else NUM_SERVERS * (NUM_SERVERS - 1) // 2)
 
     # DDPG
     std_dev_ddpg = parameters.std_dev_ddpg

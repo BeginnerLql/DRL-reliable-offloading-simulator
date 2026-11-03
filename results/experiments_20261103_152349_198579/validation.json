@@ -1,0 +1,82 @@
+{
+  "branch": "main",
+  "head": "1def657b340070205ccf792ca1807c0d005c3cc8",
+  "unit_tests": {
+    "command": "python -m unittest discover -s tests -v",
+    "tests": 25,
+    "passed": true
+  },
+  "regression": {
+    "Corr-delayGreedy": {
+      "episodes": 2,
+      "tasks": 400,
+      "num_actions": 28,
+      "exact_match": true,
+      "sha256": "f5870b810ad2063a15b38b9db40124406630991897de73d7cfb3a69c6db6ef3f"
+    },
+    "Indep-delayGreedy": {
+      "episodes": 2,
+      "tasks": 400,
+      "num_actions": 28,
+      "exact_match": true,
+      "sha256": "c41d8229e1b68f4361172382c02c98685c490cd609eb124bddbe1dedc90eafe4"
+    },
+    "ppo": {
+      "episodes": 2,
+      "tasks": 400,
+      "num_actions": 28,
+      "exact_match": true,
+      "sha256": "2193482cb1177712be5d3b9c594deac605897c4e497a416c262609cf9f31d867"
+    }
+  },
+  "smoke_summary": {
+    "arrival_rate": 2.0,
+    "episodes": 3,
+    "task_executions": 600,
+    "mean_delay_seconds": 118.0306782425372,
+    "episode_mean_delay_std_seconds": 3.417026069439263,
+    "p95_task_delay_seconds": 224.93025960684216,
+    "mean_upload_delay_seconds": 0.37666591090048634,
+    "mean_queue_delay_seconds": 115.98101891599613,
+    "mean_execution_delay_seconds": 1.6729934156405908,
+    "rsr_correlated": 0.0,
+    "rsr_independent": 0.0,
+    "mask_fallback_rate": 1.0,
+    "inference_device": "cpu",
+    "replica_count": 1,
+    "rsr_single": 0.0,
+    "mean_single_reliability": 0.9652282457364125
+  },
+  "input_sha256": {
+    "data/task_parameters_evaluation.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+    "data/server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+    "data/task_parameters.xlsx": "77b0ce9ab94e56140652808ba6a23d1d0d7686e0e943424c4d5b54782871aa20"
+  },
+  "changed_source_files": [
+    "Project_main.py",
+    "config/configuration.py",
+    "config/params.py",
+    "core/main_loop.py",
+    "core/spatial_risk.py",
+    "core/task.py",
+    "io_utils/post_process_results.py",
+    "io_utils/save_parameters_and_logs.py",
+    "tests/test_run_experiments.py",
+    "tools/run_experiments.py",
+    "agents/rasoul_delay_agent.py",
+    "tests/test_rasoul_delay.py"
+  ],
+  "review": {
+    "algorithm": "Delay adaptation defined by the task, not a claim of exact paper reproduction",
+    "queue_observation": false,
+    "negative_scores_clipped": false,
+    "single_replica_execution": true,
+    "feedback_only_after_completion": true,
+    "feedback_deduplicated": true,
+    "episode_statistics_reset": true,
+    "original_pair_algorithms_exactly_match": true,
+    "production_parameter_ranges_unchanged": true,
+    "no_commit_or_push": true,
+    "legacy_rsr_columns": "For RASOUL only, both legacy RSR flags alias the single marginal criterion; all pair reliability fields are empty."
+  }
+}

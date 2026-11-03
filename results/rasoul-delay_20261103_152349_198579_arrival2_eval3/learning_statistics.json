@@ -1,0 +1,34 @@
+{
+  "scope": "Final episode only; statistics reset at each episode start",
+  "decisions": 200,
+  "completed_counts": {
+    "1": 0,
+    "2": 200,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0
+  },
+  "discrepancy_sums": {
+    "1": 0.0,
+    "2": 23585.935832176612,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0,
+    "7": 0.0,
+    "8": 0.0
+  },
+  "mean_discrepancies": {
+    "1": null,
+    "2": 117.92967916088305,
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null,
+    "8": null
+  }
+}

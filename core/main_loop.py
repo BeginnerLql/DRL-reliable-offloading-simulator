@@ -32,6 +32,7 @@ class MainLoop:
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
+        self.is_rasoul = self.model_name == "rasoul-delay"
         if self.model_name == "corr-delaygreedy" and not params.SPATIAL_RISK_ENABLED:
             raise ValueError("Corr-delayGreedy requires SPATIAL_RISK_ENABLED=True.")
 
@@ -39,7 +40,10 @@ class MainLoop:
 
         self.G_state = []
         self.G_action = None  # DDPG: list of floats | other agents: int action index
-        self.index_of_actions = self.generate_combinations()
+        self.index_of_actions = (sorted(self.server_profiles) if self.is_rasoul
+                                 else self.generate_combinations())
+        if self.is_rasoul:
+            self.num_actions = len(self.index_of_actions)
 
         self.episodic_reward = 0
         self.episodic_delay = 0
@@ -58,6 +62,7 @@ class MainLoop:
         )
         self.pair_risk_correlations = None
         self.pair_reliability_cache = {}  # Fixed profiles and CPU-only exposures.
+        self.marginal_reliability_cache = {}
         self.log_data = []
         self.task_results = []
 
@@ -123,12 +128,14 @@ class MainLoop:
             self.ppo_last_decision_time = None
             self.ppo_last_decision_action_mask = None
             self.ppo_last_resolved_outcome_time = None
+            if self.is_rasoul:
+                self.model.reset()
 
             self.env = simpy.Environment()
             self.env_state = EnvironmentState()
 
             self.setServers()
-            if self.pair_risk_correlations is None:
+            if not self.is_rasoul and self.pair_risk_correlations is None:
                 self._initialize_spatial_correlations()
             self.env.process(self.Iteration())
             self.env.run()
@@ -219,6 +226,48 @@ class MainLoop:
             self.arrival_rng.exponential(scale=1.0 / arrival_rate)
         )
 
+    def _select_rasoul_server(self, task):
+        """Build a marginal safe set using static profiles only, without queues."""
+        reliabilities, base_delays = {}, {}
+        for server_id in self.index_of_actions:
+            server = self.env_state.get_server_by_id(server_id)
+            key = (task.computation_demand, server_id)
+            if key not in self.marginal_reliability_cache:
+                self.marginal_reliability_cache[key] = self.reliability_integrator.compute_marginal(
+                    server.base_failure_rate * task.computation_demand / server.processing_frequency,
+                )
+            reliabilities[server_id] = self.marginal_reliability_cache[key]
+            base_delays[server_id] = (task.task_size / server.transmission_rate
+                                      + task.computation_demand / server.processing_frequency)
+        allowed = [server for server in self.index_of_actions
+                   if reliabilities[server] >= task.reliability_requirement]
+        task.feasible_action_count = len(allowed)
+        task.mask_fallback_used = not allowed
+        if task.mask_fallback_used:
+            maximum = max(reliabilities.values())
+            allowed = [server for server in self.index_of_actions if reliabilities[server] == maximum]
+        server_id = self.model.select_action(base_delays, allowed, fallback=task.mask_fallback_used)
+        task.replica_A_reliability = reliabilities[server_id]
+        task.base_delay_at_decision = base_delays[server_id]
+        task.observations_at_decision = self.model.completed_counts[server_id]
+        # Unobserved servers and Fallback have no finite LCB used for selection.
+        if not task.mask_fallback_used and task.observations_at_decision:
+            task.predicted_delay_at_decision = self.model.predict_delay(server_id, base_delays[server_id])
+        return self.env_state.get_server_by_id(server_id)
+
+    def _update_rasoul_feedback(self, task):
+        """Completion watcher and arrival collector may both visit the same task."""
+        if not task.task_completion_event.triggered or task.rasoul_feedback_processed:
+            return
+        self.model.observe(task.replica_A["server_id"],
+                           task.task_completion_time - task.arrival_time,
+                           task.base_delay_at_decision)
+        task.rasoul_feedback_processed = True
+
+    def _observe_rasoul_completion(self, task):
+        yield task.task_completion_event
+        self._update_rasoul_feedback(task)
+
     # epsilon schedule (DQN only; PPO ignores epsilon in its select_action signature)
 
     def get_epsilon(self, episode):
@@ -238,14 +287,15 @@ class MainLoop:
             # PPO closes the previous arrival-to-arrival interval before
             # observing the new task. DQN/DDPG use
             # task-centric bookkeeping below.
-            if self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
+            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
 
             task_id = self.taskCounter
             task_profile = self.task_profiles[task_id]
             task = Task(self.env, self.env_state, task_id, task_profile)
             self.env_state.add_task(task)
-            self.G_state = self.env_state.get_state(task)
+            if not self.is_rasoul:
+                self.G_state = self.env_state.get_state(task)
 
             if self.model_name == "ppo":
                 if self.ppo_last_decision_state is not None:
@@ -267,7 +317,11 @@ class MainLoop:
                 self.tempbuffer[self.taskCounter - 1] = tuple(prev)
                 self.add_train()
 
-            if self.model_name == "ddpg":
+            if self.is_rasoul:
+                server_A = self._select_rasoul_server(task)
+                server_B = None
+                self.G_action = server_A.server_id
+            elif self.model_name == "ddpg":
                 action_scores = self.model.policy(self.G_state)
                 self.G_action = action_scores.numpy().tolist()
                 self.G_action = self.model.addNoise(
@@ -290,7 +344,8 @@ class MainLoop:
                 self.G_action = int(action_index)
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
 
-            self._set_task_reliabilities(task, server_A, server_B)
+            if not self.is_rasoul:
+                self._set_task_reliabilities(task, server_A, server_B)
 
             if self.model_name == "ppo":
                 self.ppo_last_decision_state = self.G_state
@@ -302,6 +357,8 @@ class MainLoop:
                 self.tempbuffer[self.taskCounter] = (self.G_state, self.G_action, None, [])
 
             self.env.process(task.execute_task(server_A, server_B))
+            if self.is_rasoul:
+                self.env.process(self._observe_rasoul_completion(task))
             self.pendingList.append(self.taskCounter)
             self.taskCounter += 1
 
@@ -340,11 +397,13 @@ class MainLoop:
 
         task_avg_delay = self.episodic_delay / self.maxTask
         episode_rsr_correlated = sum(
-            task.pair_reliability_correlated >= task.reliability_requirement
+            (task.replica_A_reliability if self.is_rasoul else task.pair_reliability_correlated)
+            >= task.reliability_requirement
             for task in self.env_state.tasks.values()
         ) / self.maxTask
         episode_rsr_independent = sum(
-            task.pair_reliability_independent >= task.reliability_requirement
+            (task.replica_A_reliability if self.is_rasoul else task.pair_reliability_independent)
+            >= task.reliability_requirement
             for task in self.env_state.tasks.values()
         ) / self.maxTask
         mask_fallback_rate = sum(
@@ -359,19 +418,23 @@ class MainLoop:
             mask_fallback_rate,
         ))
 
+        reliability_log = (
+            f"RSR (single): {episode_rsr_correlated:.2%} | " if self.is_rasoul else
+            f"RSR (correlated): {episode_rsr_correlated:.2%} | "
+            f"RSR (independent): {episode_rsr_independent:.2%} | "
+        )
         print(
             f"Episode {self.this_episode} | "
             f"Episode Reward: {self.episodic_reward:.3f} | "
             f"task_Avg_Delay: {task_avg_delay:.3f} s | "
-            f"RSR (correlated): {episode_rsr_correlated:.2%} | "
-            f"RSR (independent): {episode_rsr_independent:.2%} | "
+            f"{reliability_log}"
             f"Mask Fallback: {mask_fallback_rate:.2%}"
         )
 
     def _drain_pending_tasks(self):
         """Wait for pending tasks' first-replica completion events."""
         while len(self.pendingList) > 0:
-            if self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
+            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
             else:
                 self.add_train()
@@ -394,7 +457,7 @@ class MainLoop:
     def get_task_outcome_info(self, task):
         """Build task-level outcome data from its lifecycle and saved snapshot."""
         first = task.first_completed_replica
-        return {
+        outcome = {
             "episode": self.this_episode,
             "task_id": task.id,
             "task_size": task.task_size,
@@ -421,12 +484,28 @@ class MainLoop:
             "pair_reliability_correlated": task.pair_reliability_correlated,
             "pair_reliability_independent": task.pair_reliability_independent,
             "requirement_satisfied_correlated": bool(
-                task.pair_reliability_correlated >= task.reliability_requirement
+                (task.replica_A_reliability if self.is_rasoul else task.pair_reliability_correlated)
+                >= task.reliability_requirement
             ),
             "requirement_satisfied_independent": bool(
-                task.pair_reliability_independent >= task.reliability_requirement
+                (task.replica_A_reliability if self.is_rasoul else task.pair_reliability_independent)
+                >= task.reliability_requirement
             ),
         }
+        if self.is_rasoul:
+            # Legacy RSR flags above both alias this single-replica comparison;
+            # pair reliability fields remain empty, never a two-replica result.
+            outcome.update(
+                replica_count=1,
+                task_reliability=task.replica_A_reliability,
+                requirement_satisfied=bool(task.replica_A_reliability >= task.reliability_requirement),
+                base_delay_at_decision=task.base_delay_at_decision,
+                predicted_delay_at_decision=task.predicted_delay_at_decision,
+                observations_at_decision=task.observations_at_decision,
+                delay_discrepancy=(task.task_completion_time - task.arrival_time
+                                   - task.base_delay_at_decision),
+            )
+        return outcome
 
     def compute_reward(self, outcome_info):
         return -float(outcome_info["task_delay"])
@@ -445,6 +524,8 @@ class MainLoop:
             if not task.task_completion_event.triggered:
                 continue
 
+            if self.is_rasoul:
+                self._update_rasoul_feedback(task)
             outcome_info = self.get_task_outcome_info(task)
             task_reward = self.compute_reward(outcome_info)
             task_outcome_time = task.task_completion_time

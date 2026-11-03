@@ -17,6 +17,12 @@ def build_model(*, device="cuda"):
     """Build the configured learning agent or delay-greedy baseline."""
     model_name = str(params.model_summary).strip().lower()
 
+    if model_name == "rasoul-delay":
+        from agents.rasoul_delay_agent import RasoulDelayAgent
+
+        print("RASOUL-Delay agent is set.")
+        return RasoulDelayAgent(range(1, params.NUM_SERVERS + 1), params.RASOUL_DELAY_EXPLORATION_C)
+
     if model_name in ("corr-delaygreedy", "indep-delaygreedy"):
         from agents.corr_delay_greedy_agent import CorrDelayGreedyAgent
 
@@ -86,7 +92,7 @@ def build_model(*, device="cuda"):
 
     raise ValueError(
         f"Unsupported params.model_summary='{params.model_summary}'. "
-        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy', 'Indep-delayGreedy'."
+        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
     )
 
 
