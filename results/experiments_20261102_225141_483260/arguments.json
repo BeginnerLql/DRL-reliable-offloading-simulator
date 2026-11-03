@@ -1,0 +1,19 @@
+{
+  "mode": "greedy",
+  "rates": [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0
+  ],
+  "episodes": 500,
+  "seed": 2027,
+  "checkpoint": null,
+  "ppo_runs": "results/ppo_evaluation_runs.json",
+  "greedy_agent": "indep-delaygreedy",
+  "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx",
+  "device": "cpu",
+  "merge": []
+}

@@ -188,9 +188,15 @@ def compare_runs(ppo_dir, baseline_dir, *, rate, episodes, report_dir):
     for key in ("episode", "task_id", "task_size", "computation_demand",
                 "reliability_requirement", "arrival_time"):
         np.testing.assert_allclose(baseline[key], ppo[key], rtol=1e-12, atol=1e-12)
-    for key in ("feasible_action_count", "mask_fallback_used", "requirement_satisfied_correlated"):
-        np.testing.assert_array_equal(baseline[key], ppo[key])
-    assert ((baseline.feasible_action_count > 0) == baseline.requirement_satisfied_correlated).all()
+    independent_baseline = str(settings["model_summary"]).lower() == "indep-delaygreedy"
+    if not independent_baseline:
+        for key in ("feasible_action_count", "mask_fallback_used", "requirement_satisfied_correlated"):
+            np.testing.assert_array_equal(baseline[key], ppo[key])
+    satisfied = baseline[
+        "requirement_satisfied_independent" if independent_baseline else "requirement_satisfied_correlated"
+    ]
+    assert ((baseline.feasible_action_count > 0) == satisfied).all()
+    np.testing.assert_array_equal(baseline.mask_fallback_used, baseline.feasible_action_count == 0)
     paired = pd.DataFrame({
         "baseline_mean_delay_seconds": baseline.groupby("episode").task_delay.mean(),
         "ppo_mean_delay_seconds": ppo.groupby("episode").task_delay.mean(),
@@ -202,10 +208,12 @@ def compare_runs(ppo_dir, baseline_dir, *, rate, episodes, report_dir):
     baseline_mean, ppo_mean = baseline.task_delay.mean(), ppo.task_delay.mean()
     return {
         "arrival_rate": rate, "baseline_episodes": episodes, "baseline_tasks": len(baseline),
+        "baseline_model": settings["model_summary"],
         "baseline_mean_delay_seconds": float(baseline_mean),
         "baseline_p95_delay_seconds": float(baseline.task_delay.quantile(.95)),
         "baseline_mean_queue_delay_seconds": float(baseline.task_queue_delay.mean()),
         "baseline_rsr_correlated": float(baseline.requirement_satisfied_correlated.mean()),
+        "baseline_rsr_independent": float(baseline.requirement_satisfied_independent.mean()),
         "baseline_fallback_rate": float(baseline.mask_fallback_used.mean()),
         "ppo_mean_delay_seconds": float(ppo_mean),
         "paired_mean_baseline_minus_ppo_seconds": float(paired.baseline_minus_ppo_seconds.mean()),
@@ -236,6 +244,8 @@ def parse_args(argv=None):
     parser.add_argument("--seed", type=int, default=2027, help="evaluation seed, not a training seed")
     parser.add_argument("--checkpoint", type=Path, help="PPO checkpoint for ppo/compare")
     parser.add_argument("--ppo-runs", type=Path, help="greedy mode: JSON mapping rates to existing PPO directories")
+    parser.add_argument("--greedy-agent", choices=("corr-delaygreedy", "indep-delaygreedy"),
+                        default="corr-delaygreedy", help="greedy/compare baseline reliability model")
     parser.add_argument("--task-path", type=Path, default=Path(EVALUATION_TASK_PATH))
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--merge", type=Path, nargs="*", default=[], help="existing comparison CSVs to merge")
@@ -254,7 +264,8 @@ def parse_args(argv=None):
         parser.error("evaluation task file does not exist")
     if args.mode in ("greedy", "compare") and not params.RELIABILITY_ACTION_MASK_ENABLED:
         parser.error("paired comparison requires PPO reliability masking enabled")
-    if args.mode in ("greedy", "compare") and not params.SPATIAL_RISK_ENABLED:
+    if (args.mode in ("greedy", "compare") and args.greedy_agent == "corr-delaygreedy"
+            and not params.SPATIAL_RISK_ENABLED):
         parser.error("Corr-delayGreedy requires SPATIAL_RISK_ENABLED=True")
     if args.merge and args.mode not in ("greedy", "compare"):
         parser.error("--merge requires greedy/compare mode")
@@ -312,7 +323,7 @@ def main(argv=None):
             if args.mode in ("greedy", "compare"):
                 state.update(phase="greedy_evaluation", current_arrival_rate=rate)
                 write_json(report_dir / "status.json", state)
-                baseline = evaluate("corr-delaygreedy", rate, episodes=args.episodes, seed=args.seed,
+                baseline = evaluate(args.greedy_agent, rate, episodes=args.episodes, seed=args.seed,
                                     device=device, checkpoint=None, task_path=args.task_path, run_id=run_id)
                 comparisons.append(compare_runs(ppo_runs[rate], baseline, rate=rate,
                                                 episodes=args.episodes, report_dir=report_dir))

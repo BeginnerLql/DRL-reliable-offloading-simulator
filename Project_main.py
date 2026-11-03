@@ -14,13 +14,14 @@ from core.main_loop import MainLoop
 
 
 def build_model(*, device="cuda"):
-    """Build the configured learning agent or Corr-delayGreedy baseline."""
+    """Build the configured learning agent or delay-greedy baseline."""
     model_name = str(params.model_summary).strip().lower()
 
-    if model_name == "corr-delaygreedy":
+    if model_name in ("corr-delaygreedy", "indep-delaygreedy"):
         from agents.corr_delay_greedy_agent import CorrDelayGreedyAgent
 
-        print("Corr-delayGreedyAgent is set.")
+        print(f"{params.model_summary} agent is set.")
+        # Both variants use the same delay ranking; MainLoop supplies the mask.
         return CorrDelayGreedyAgent()
 
     if model_name == "ddpg":
@@ -85,7 +86,7 @@ def build_model(*, device="cuda"):
 
     raise ValueError(
         f"Unsupported params.model_summary='{params.model_summary}'. "
-        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy'."
+        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy', 'Indep-delayGreedy'."
     )
 
 

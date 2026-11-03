@@ -109,6 +109,84 @@ class CorrDelayGreedyTests(unittest.TestCase):
                 self.assertAlmostEqual(delay, -reward / 200)
                 self.assertAlmostEqual(rsr + fallback, 1)
 
+    def test_independent_safe_set_and_fallback_use_independent_reliability(self):
+        with patch.object(params, "model_summary", "Indep-delayGreedy"), \
+                patch.object(params, "RELIABILITY_ACTION_MASK_ENABLED", False):
+            from Project_main import build_model
+
+            loop = MainLoop(build_model(), 1, 1, params.num_states, 3)
+            # Independent reliability can admit a faster pair excluded by Corr.
+            correlated = [0.90, 0.96, 0.91]
+            independent = [0.97, 0.98, 0.98]
+            loop.extract_parameters_from_index = lambda index: (index, None)
+            loop._get_pair_reliability = lambda task, index, unused: SimpleNamespace(
+                correlated=correlated[index], independent=independent[index],
+            )
+            task = SimpleNamespace(reliability_requirement=0.95)
+            np.testing.assert_array_equal(loop._get_reliability_action_mask(task), [True] * 3)
+            self.assertEqual(task.feasible_action_count, 3)
+            self.assertFalse(task.mask_fallback_used)
+            loop.model_name = "corr-delaygreedy"
+            np.testing.assert_array_equal(loop._get_reliability_action_mask(task), [False, True, False])
+
+            # No feasible pair: preserve all independent maxima, including ties.
+            loop.model_name = "indep-delaygreedy"
+            task.reliability_requirement = 0.99
+            np.testing.assert_array_equal(loop._get_reliability_action_mask(task), [False, True, True])
+            self.assertEqual(task.feasible_action_count, 0)
+            self.assertTrue(task.mask_fallback_used)
+
+            task.reliability_requirement = 0.98  # Equality satisfies the requirement.
+            np.testing.assert_array_equal(loop._get_reliability_action_mask(task), [False, True, True])
+            self.assertEqual(task.feasible_action_count, 2)
+            self.assertFalse(task.mask_fallback_used)
+
+    def test_independent_simulation_keeps_correlated_evaluation_and_paired_arrivals(self):
+        loops = []
+        with patch.object(params, "SPATIAL_RISK_ENABLED", True), \
+                patch.object(params, "RELIABILITY_ACTION_MASK_ENABLED", False), \
+                redirect_stdout(io.StringIO()):
+            from Project_main import build_model
+
+            for name in ("Corr-delayGreedy", "Indep-delayGreedy"):
+                with patch.object(params, "model_summary", name):
+                    loop = MainLoop(build_model(), 2, 200, params.num_states, params.num_actions,
+                                    task_parameters_path=EVALUATION_TASK_PATH)
+                    loop.EP()
+                    loops.append(loop)
+        correlated, independent = loops
+        self.assertEqual(len(independent.task_results), 400)
+        self.assertEqual(independent.tempbuffer, {})
+        self.assertEqual(independent.pendingList, [])
+        for corr_row, row in zip(correlated.task_results, independent.task_results):
+            self.assertEqual(row["arrival_time"], corr_row["arrival_time"])
+            self.assertEqual(row["mask_fallback_used"], row["feasible_action_count"] == 0)
+            self.assertEqual(row["requirement_satisfied_independent"], row["feasible_action_count"] > 0)
+            self.assertAlmostEqual(row["pair_reliability_independent"],
+                                   1 - (1 - row["replica_A_reliability"]) * (1 - row["replica_B_reliability"]))
+            self.assertEqual(row["task_completion_time"],
+                             min(row["replica_A_finish_time"], row["replica_B_finish_time"]))
+        self.assertTrue(any(row["requirement_satisfied_independent"]
+                            and not row["requirement_satisfied_correlated"]
+                            for row in independent.task_results))
+        for episode, reward, delay, _, rsr_independent, fallback in independent.log_data:
+            rows = [row for row in independent.task_results if row["episode"] == episode]
+            self.assertAlmostEqual(reward, -sum(row["task_delay"] for row in rows))
+            self.assertAlmostEqual(delay, -reward / 200)
+            self.assertAlmostEqual(rsr_independent + fallback, 1)
+
+    def test_independent_agent_supports_spatial_risk_disabled(self):
+        with patch.object(params, "model_summary", "Indep-delayGreedy"), \
+                patch.object(params, "SPATIAL_RISK_ENABLED", False), \
+                redirect_stdout(io.StringIO()):
+            from Project_main import build_model
+
+            loop = MainLoop(build_model(), 1, 12, params.num_states, params.num_actions,
+                            task_parameters_path=EVALUATION_TASK_PATH)
+            loop.EP()
+        for row in loop.task_results:
+            self.assertEqual(row["pair_reliability_correlated"], row["pair_reliability_independent"])
+
 
 if __name__ == "__main__":
     unittest.main()

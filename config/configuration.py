@@ -5,7 +5,7 @@ class parameters:
     # Change experiment settings here before running comparisons; do not override
     # them in runner scripts. Regenerate workbooks after changing profile ranges.
     # Experiment
-    model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg", "Corr-delayGreedy"
+    model_summary = "ppo"  # Options: "dqn", "ppo", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy"
     total_episodes = 8000
     EXPERIMENT_TAG = "baseline"
 
@@ -61,7 +61,7 @@ class parameters:
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
     # PPO
-    RELIABILITY_ACTION_MASK_ENABLED = True  # PPO switch; Corr-delayGreedy always masks.
+    RELIABILITY_ACTION_MASK_ENABLED = True  # PPO switch; both delay-greedy variants always mask.
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4

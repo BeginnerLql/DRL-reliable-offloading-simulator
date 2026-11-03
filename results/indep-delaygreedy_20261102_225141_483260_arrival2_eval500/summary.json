@@ -1,0 +1,15 @@
+{
+  "arrival_rate": 2.0,
+  "episodes": 500,
+  "task_executions": 100000,
+  "mean_delay_seconds": 11.225157288904741,
+  "episode_mean_delay_std_seconds": 2.544851858505255,
+  "p95_task_delay_seconds": 22.989596368243326,
+  "mean_upload_delay_seconds": 0.9238139990982499,
+  "mean_queue_delay_seconds": 7.852196870687307,
+  "mean_execution_delay_seconds": 2.4491464191191854,
+  "rsr_correlated": 0.66347,
+  "rsr_independent": 0.93,
+  "mask_fallback_rate": 0.07,
+  "inference_device": "cpu"
+}

@@ -178,17 +178,24 @@ class MainLoop:
     def _get_reliability_action_mask(self, task):
         """Keep feasible pairs; if none qualify, keep all exact reliability maxima.
 
-        Correlations already reflect SPATIAL_RISK_ENABLED. Corr-delayGreedy
-        always masks; PPO follows RELIABILITY_ACTION_MASK_ENABLED.
+        Indep-delayGreedy uses independent reliability with the same marginals.
+        Other methods use correlations reflecting SPATIAL_RISK_ENABLED. Both
+        greedy variants always mask; PPO follows RELIABILITY_ACTION_MASK_ENABLED.
         """
+        reliability_field = (
+            "independent" if self.model_name == "indep-delaygreedy" else "correlated"
+        )
         reliabilities = np.array([
-            self._get_pair_reliability(task, *self.extract_parameters_from_index(index)).correlated
+            getattr(self._get_pair_reliability(
+                task, *self.extract_parameters_from_index(index),
+            ), reliability_field)
             for index in range(self.num_actions)
         ])
         mask = reliabilities >= task.reliability_requirement
         task.feasible_action_count = int(mask.sum())
         mask_enabled = (
-            params.RELIABILITY_ACTION_MASK_ENABLED or self.model_name == "corr-delaygreedy"
+            params.RELIABILITY_ACTION_MASK_ENABLED
+            or self.model_name in ("corr-delaygreedy", "indep-delaygreedy")
         )
         task.mask_fallback_used = mask_enabled and task.feasible_action_count == 0
         if not mask_enabled:
@@ -231,7 +238,7 @@ class MainLoop:
             # PPO closes the previous arrival-to-arrival interval before
             # observing the new task. DQN/DDPG use
             # task-centric bookkeeping below.
-            if self.model_name in ("ppo", "corr-delaygreedy"):
+            if self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
 
             task_id = self.taskCounter
@@ -267,7 +274,7 @@ class MainLoop:
                     self.G_action, self.this_episode, self.total_episodes
                 )
                 server_A, server_B = self.extract_parameters_from_action(self.G_action)
-            elif self.model_name == "corr-delaygreedy":
+            elif self.model_name in ("corr-delaygreedy", "indep-delaygreedy"):
                 action_mask = self._get_reliability_action_mask(task)
                 self.G_action = self.model.select_action(
                     task, self.env_state, self.index_of_actions, action_mask=action_mask,
@@ -364,7 +371,7 @@ class MainLoop:
     def _drain_pending_tasks(self):
         """Wait for pending tasks' first-replica completion events."""
         while len(self.pendingList) > 0:
-            if self.model_name in ("ppo", "corr-delaygreedy"):
+            if self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
             else:
                 self.add_train()

@@ -1,11 +1,11 @@
-"""Corr-delayGreedy: minimize predicted first completion within a safe set."""
+"""Shared delay ranking for Corr-delayGreedy and Indep-delayGreedy."""
 
 
 class CorrDelayGreedyAgent:
     def select_action(self, task, env_state, action_pairs, *, action_mask):
         """Use current CPU backlog only; uploads in flight are not observed.
 
-        The caller supplies the correlated safe set, or maximum-reliability
+        The caller supplies the chosen reliability model's safe set, or maximum-reliability
         pairs when no pair satisfies the requirement. Upload overlaps existing
         CPU work. Ties prefer earlier second completion, then server IDs.
         """

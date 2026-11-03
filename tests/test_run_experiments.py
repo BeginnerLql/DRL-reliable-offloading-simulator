@@ -89,6 +89,25 @@ class ExperimentRunnerTests(unittest.TestCase):
             self.assertEqual(len(loop.task_results), 24)
             self.assertFalse(model.states)
 
+    def test_independent_greedy_comparison_and_reuse(self):
+        report = runner.main(self.args("compare", "--checkpoint", str(self.checkpoint),
+                                       "--greedy-agent", "indep-delaygreedy"))
+        comparison = pd.read_csv(report / "comparison.csv")
+        self.assertEqual(comparison.baseline_model.tolist(), ["indep-delaygreedy"])
+        self.assertTrue(comparison.paired_arrivals_verified.all())
+        baseline_dir = Path(comparison.baseline_directory.iloc[0])
+        baseline = pd.read_csv(baseline_dir / "task_results.csv")
+        np.testing.assert_array_equal(baseline.feasible_action_count > 0,
+                                      baseline.requirement_satisfied_independent)
+        self.assertAlmostEqual(comparison.baseline_rsr_independent.iloc[0],
+                               baseline.requirement_satisfied_independent.mean())
+        reuse = runner.main(self.args("greedy", "--ppo-runs", str(report / "ppo_runs.json"),
+                                      "--greedy-agent", "indep-delaygreedy"))
+        repeated = pd.read_csv(reuse / "comparison.csv")
+        self.assertEqual(repeated.baseline_model.tolist(), ["indep-delaygreedy"])
+        self.assertEqual(repeated.baseline_mean_delay_seconds.iloc[0],
+                         comparison.baseline_mean_delay_seconds.iloc[0])
+
     def test_training_then_evaluation_in_temporary_directory(self):
         with runner.temporary_params(model_summary="ppo", total_episodes=1, taskno=12):
             report = runner.main(self.args("train-eval"))

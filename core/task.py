@@ -13,7 +13,7 @@ class Task:
         self.replica_B_reliability = None
         self.pair_reliability_correlated = None
         self.pair_reliability_independent = None
-        self.feasible_action_count = None  # Before fallback; evaluated for PPO.
+        self.feasible_action_count = None  # Before fallback, under the agent's reliability model.
         self.mask_fallback_used = False
 
         self.arrival_time = float(self.env.now)

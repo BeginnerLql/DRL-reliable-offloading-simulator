@@ -5,7 +5,7 @@ from config.configuration import parameters
 
 class params:
     # Experiment
-    model_summary = parameters.model_summary  # Options include "Corr-delayGreedy".
+    model_summary = parameters.model_summary  # Greedy: "Corr-delayGreedy" / "Indep-delayGreedy".
     total_episodes = parameters.total_episodes
     EXPERIMENT_TAG = parameters.EXPERIMENT_TAG
 
