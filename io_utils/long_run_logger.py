@@ -66,7 +66,7 @@ class LongRunLogger:
         self.log_writer.writerow(loop.log_data[-1])
         self.log_output.flush()
         self.last_completed_episode = loop.this_episode
-        if str(self.params.model_summary).strip().lower() == "ppo" and (
+        if self.model_name in ("ppo", "ind-ppo") and (
             loop.this_episode % self.CHECKPOINT_INTERVAL == 0
             or loop.this_episode == loop.total_episodes
         ):

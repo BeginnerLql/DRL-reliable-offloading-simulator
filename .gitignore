@@ -17,8 +17,19 @@ venv/
 Thumbs.db
 
 # Generated data and results
-# Keep the full 1.6-million-task training trace local; commit its summaries.
+# Keep large task traces local; commit their summaries.
 /results/ppo_20261031_180331_baseline/task_results.csv
+/results/ind_ppo_train_eval_20261103_165626_760475/*/task_results.csv
+/results/ind_ppo_arrival_sweep_20261103_172204_042407/*/task_results.csv
+/results/five_method_sensitivity_20261104_073956_983864/training/*/task_results.csv
+/results/five_method_sensitivity_20261104_073956_983864/evaluations/*/*/*/task_results.csv
+/results/reliability_distribution_20261104_082959_793544/groups/*/training/*/task_results.csv
+/results/reliability_distribution_20261104_082959_793544/groups/*/evaluations/*/*/*/task_results.csv
+
+# LaTeX build intermediates
+/paper/*.aux
+/paper/*.out
+/paper/*.synctex.gz
 
 # Logs
 *.log

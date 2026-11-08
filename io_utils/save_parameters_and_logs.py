@@ -24,8 +24,9 @@ def save_params_and_logs(
 
     task_df = pd.read_excel(task_parameters_path)
 
+    parameter_family = "ppo" if model_name == "ind-ppo" else model_name
     other_model_suffixes = tuple(
-        f"_{name}" for name in ("ppo", "dqn", "ddpg") if name != model_name
+        f"_{name}" for name in ("ppo", "dqn", "ddpg") if name != parameter_family
     )
     params_data = {
         attr: [value]

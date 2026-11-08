@@ -5,7 +5,7 @@ class parameters:
     # Change experiment settings here before running comparisons; do not override
     # them in runner scripts. Regenerate workbooks after changing profile ranges.
     # Experiment
-    model_summary = "ppo"  # Also: "dqn", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy", "RASOUL-Delay"
+    model_summary = "ppo"  # Also: "ind-ppo", "dqn", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy", "RASOUL-Delay"
     total_episodes = 8000
     EXPERIMENT_TAG = "baseline"
 
@@ -15,7 +15,7 @@ class parameters:
     # Workload
     TASK_ARRIVAL_RATE = 2.0  # Poisson task-arrival rate, unit: tasks/s
     TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
-    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)  # Continuous uniform.
+    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.92, 0.999)  # Continuous uniform.
     TASK_DEMAND_RANGE = (4.0e9, 8.0e9)  # CPU cycles, continuous uniform; 2x original demand.
     taskno = 200
 
@@ -34,7 +34,7 @@ class parameters:
     SPATIAL_RISK_BETA_P = 0.5
     SPATIAL_RISK_GH_ORDER = 32  # Quadrature nodes per dimension.
     # SeedSequence derives independent server/train/evaluation profile streams.
-    PROFILE_SEED = 2028
+    PROFILE_SEED = 2029
     # Runtime seed for task arrivals and agents; GH reliability is deterministic.
     EXPERIMENT_SEED = 2026
 
@@ -64,7 +64,7 @@ class parameters:
     epsilon_end_dqn = 0.01
     epsilon_decay_dqn = 300
     # PPO
-    RELIABILITY_ACTION_MASK_ENABLED = True  # PPO switch; both delay-greedy variants always mask.
+    RELIABILITY_ACTION_MASK_ENABLED = True  # Both PPO variants; delay-greedy always masks.
     hidden_layers_ppo = [64, 32]
     af_ppo = "tanh"
     actor_lr_ppo = 1e-4

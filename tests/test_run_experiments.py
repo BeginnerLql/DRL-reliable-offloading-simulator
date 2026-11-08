@@ -122,6 +122,30 @@ class ExperimentRunnerTests(unittest.TestCase):
         self.assertTrue(Path(saved["SOURCE_CHECKPOINT"]).is_file())
         self.assertEqual(len(pd.read_csv(evaluation / "task_results.csv")), 24)
 
+    def test_independent_ppo_training_frozen_evaluation_and_reference_reuse(self):
+        with runner.temporary_params(total_episodes=2, taskno=12):
+            report = runner.main(self.args("train-eval", "--ppo-agent", "ind-ppo"))
+        state = json.loads((report / "status.json").read_text())
+        self.assertEqual(state["status"], "completed")
+        directory = Path(state["ppo_runs"]["1.5"])
+        saved = json.loads((directory / "parameters.json").read_text())
+        self.assertEqual(saved["model_summary"], "ind-ppo")
+        self.assertTrue(Path(saved["SOURCE_CHECKPOINT"]).name.startswith("ind-ppo_"))
+        summary = json.loads((directory / "summary.json").read_text())
+        self.assertTrue(summary["weights_and_optimizer_unchanged"])
+        workbook_params = pd.read_excel(str(directory) + ".xlsx", sheet_name="Params")
+        self.assertIn("actor_lr_ppo", workbook_params.Parameter.tolist())
+        self.assertIn("hidden_layers_ppo", workbook_params.Parameter.tolist())
+        reuse = runner.main(self.args("greedy", "--ppo-agent", "ind-ppo",
+                                      "--greedy-agent", "indep-delaygreedy",
+                                      "--ppo-runs", str(report / "ppo_runs.json")))
+        comparison = pd.read_csv(reuse / "comparison.csv")
+        self.assertEqual(comparison.ppo_model.tolist(), ["ind-ppo"])
+        self.assertTrue(comparison.paired_arrivals_verified.all())
+        # Its own logged checkpoint and frozen state are both preserved.
+        runner.assert_identical(torch.load(saved["SOURCE_CHECKPOINT"], map_location="cpu", weights_only=True),
+                                torch.load(directory / "checkpoint_latest.pt", map_location="cpu", weights_only=True))
+
     def test_rasoul_cli_logs_and_single_dual_post_processing(self):
         from io_utils.post_process_results import process_all_results
 

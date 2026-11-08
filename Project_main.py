@@ -66,7 +66,7 @@ def build_model(*, device="cuda"):
         print("DQNAgent is set.")
         return model
 
-    if model_name == "ppo":
+    if model_name in ("ppo", "ind-ppo"):
         from agents.ppo_agent import PPOAgent
 
         model = PPOAgent(
@@ -92,7 +92,7 @@ def build_model(*, device="cuda"):
 
     raise ValueError(
         f"Unsupported params.model_summary='{params.model_summary}'. "
-        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
+        "Use one of: 'ddpg', 'dqn', 'ppo', 'ind-ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
     )
 
 
@@ -114,8 +114,9 @@ def run_simulation(*, device="cuda"):
 
         # Persist the trained model before producing the final Excel report.
         checkpoint_path = None
-        if str(params.model_summary).strip().lower() == "ppo":
-            checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
+        model_name = str(params.model_summary).strip().lower()
+        if model_name in ("ppo", "ind-ppo"):
+            checkpoint_path = Path(RESULTS_DIR) / f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.pt"
             model.save_model(checkpoint_path)
             print(f"Saved PPO checkpoint: {checkpoint_path}")
         save_params_and_logs(

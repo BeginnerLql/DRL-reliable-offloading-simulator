@@ -104,6 +104,7 @@ def frozen_evaluation(model, episodes, *, seed, task_path, callback=None):
 
 def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_id):
     agent = str(agent).strip().lower()
+    is_ppo = agent in ("ppo", "ind-ppo")
     task_path = Path(task_path).resolve()
     task_count = len(pd.read_excel(task_path))
     if not task_count:
@@ -117,12 +118,12 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
         model = build_model(device=device)
         recorded = {key: value for key, value in vars(params).items() if not key.startswith("_")}
         recorded.update(EVALUATION_ONLY=True, INFERENCE_DEVICE=device,
-                        ACTION_SELECTION=("sample masked categorical policy" if agent == "ppo"
+                        ACTION_SELECTION=("sample masked categorical policy" if is_ppo
                                           else "deterministic safe-set greedy"))
         if agent == "rasoul-delay":
             recorded.update(REPLICA_COUNT=1, RELIABILITY_SEMANTICS="GH single-server marginal",
                             ACTION_SELECTION="single-replica delay LCB with completed feedback")
-        if agent == "ppo":
+        if is_ppo:
             checkpoint = Path(checkpoint).resolve()
             source_hash = digest(checkpoint)
             model.load_model(checkpoint)
@@ -133,7 +134,7 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
             shutil.copy2(task_path, logger.run_dir / "task_parameters.xlsx")
             if task_path.name != "task_parameters.xlsx":
                 shutil.copy2(task_path, logger.run_dir / task_path.name)
-            if agent == "ppo":
+            if is_ppo:
                 loop = frozen_evaluation(model, episodes, seed=seed, task_path=task_path,
                                          callback=logger)
             else:
@@ -160,7 +161,7 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
             "mask_fallback_rate": float(tasks.mask_fallback_used.mean()),
             "inference_device": device,
         }
-        if agent == "ppo":
+        if is_ppo:
             assert digest(checkpoint) == source_hash
             assert_identical(torch.load(checkpoint, map_location="cpu", weights_only=True),
                              torch.load(logger.run_dir / "checkpoint_latest.pt",
@@ -180,14 +181,14 @@ def evaluate(agent, rate, *, episodes, seed, device, checkpoint, task_path, run_
         return logger.run_dir
 
 
-def validate_reference(directory, rate, *, episodes, seed, task_path):
+def validate_reference(directory, rate, *, episodes, seed, task_path, agent="ppo"):
     saved = json.loads((directory / "parameters.json").read_text())
     status = json.loads((directory / "status.json").read_text())
     if status["status"] != "completed" or status["last_completed_episode"] < episodes:
         raise ValueError(f"PPO evaluation is incomplete or too short: {directory}")
     if len(pd.read_excel(task_path)) != saved["taskno"]:
         raise ValueError(f"PPO reference uses a different task count: {directory}")
-    expected = dict(model_summary="ppo", TASK_ARRIVAL_RATE=rate, EXPERIMENT_SEED=seed)
+    expected = dict(model_summary=agent, TASK_ARRIVAL_RATE=rate, EXPERIMENT_SEED=seed)
     for key in ("NUM_SERVERS", "SPATIAL_RISK_ENABLED", "SPATIAL_RISK_BETA_P",
                 "SPATIAL_RISK_GH_ORDER", "RELIABILITY_ACTION_MASK_ENABLED"):
         expected[key] = getattr(params, key)
@@ -202,6 +203,7 @@ def validate_reference(directory, rate, *, episodes, seed, task_path):
 
 def compare_runs(ppo_dir, baseline_dir, *, rate, episodes, report_dir):
     settings = json.loads((baseline_dir / "parameters.json").read_text())
+    reference_settings = json.loads((ppo_dir / "parameters.json").read_text())
     baseline = pd.read_csv(baseline_dir / "task_results.csv")
     ppo = pd.read_csv(ppo_dir / "task_results.csv", nrows=len(baseline))
     assert len(ppo) == len(baseline)
@@ -209,8 +211,10 @@ def compare_runs(ppo_dir, baseline_dir, *, rate, episodes, report_dir):
                 "reliability_requirement", "arrival_time"):
         np.testing.assert_allclose(baseline[key], ppo[key], rtol=1e-12, atol=1e-12)
     independent_baseline = str(settings["model_summary"]).lower() == "indep-delaygreedy"
-    if not independent_baseline:
-        for key in ("feasible_action_count", "mask_fallback_used", "requirement_satisfied_correlated"):
+    independent_reference = reference_settings["model_summary"] == "ind-ppo"
+    if independent_baseline == independent_reference:
+        satisfied_field = "requirement_satisfied_independent" if independent_baseline else "requirement_satisfied_correlated"
+        for key in ("feasible_action_count", "mask_fallback_used", satisfied_field):
             np.testing.assert_array_equal(baseline[key], ppo[key])
     satisfied = baseline[
         "requirement_satisfied_independent" if independent_baseline else "requirement_satisfied_correlated"
@@ -229,6 +233,7 @@ def compare_runs(ppo_dir, baseline_dir, *, rate, episodes, report_dir):
     return {
         "arrival_rate": rate, "baseline_episodes": episodes, "baseline_tasks": len(baseline),
         "baseline_model": settings["model_summary"],
+        "ppo_model": reference_settings["model_summary"],
         "baseline_mean_delay_seconds": float(baseline_mean),
         "baseline_p95_delay_seconds": float(baseline.task_delay.quantile(.95)),
         "baseline_mean_queue_delay_seconds": float(baseline.task_queue_delay.mean()),
@@ -259,6 +264,8 @@ def positive_float(value):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("train-eval", "ppo", "greedy", "compare", "rasoul"))
+    parser.add_argument("--ppo-agent", choices=("ppo", "ind-ppo"),
+                        help="PPO reliability model; defaults to the configured PPO variant")
     parser.add_argument("--rates", nargs="+", type=positive_float, default=[params.TASK_ARRIVAL_RATE])
     parser.add_argument("--episodes", type=int, default=500, help="evaluation episodes per arrival rate")
     parser.add_argument("--seed", type=int, default=2027, help="evaluation seed, not a training seed")
@@ -270,14 +277,15 @@ def parse_args(argv=None):
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--merge", type=Path, nargs="*", default=[], help="existing comparison CSVs to merge")
     args = parser.parse_args(argv)
+    args.ppo_agent = args.ppo_agent or (params.model_summary if params.model_summary in ("ppo", "ind-ppo") else "ppo")
     if args.episodes <= 0 or args.seed < 0 or len(set(args.rates)) != len(args.rates):
         parser.error("episodes must be positive, seed nonnegative, and rates unique")
     if args.mode in ("ppo", "compare") and (args.checkpoint is None or not args.checkpoint.is_file()):
         parser.error("ppo/compare requires --checkpoint pointing to an existing file")
     if args.mode == "greedy" and (args.ppo_runs is None or not args.ppo_runs.is_file()):
         parser.error("greedy requires --ppo-runs pointing to an existing JSON file")
-    if args.mode == "train-eval" and str(params.model_summary).lower() != "ppo":
-        parser.error("train-eval requires model_summary='ppo' in configuration.py")
+    if args.mode == "train-eval" and params.model_summary not in ("ppo", "ind-ppo"):
+        parser.error("train-eval requires model_summary='ppo' or 'ind-ppo' in configuration.py")
     if args.device == "cuda" and not torch.cuda.is_available():
         parser.error("CUDA is unavailable; use --device cpu or auto")
     if not args.task_path.is_file():
@@ -306,7 +314,8 @@ def main(argv=None):
             directory = registry[rate]
             if not directory.is_absolute():
                 directory = ROOT / directory
-            validate_reference(directory, rate, episodes=args.episodes, seed=args.seed, task_path=args.task_path)
+            validate_reference(directory, rate, episodes=args.episodes, seed=args.seed,
+                               task_path=args.task_path, agent=args.ppo_agent)
             ppo_runs[rate] = directory
         hashes = {json.loads((path / "summary.json").read_text())["source_checkpoint_sha256"]
                   for path in ppo_runs.values()}
@@ -329,7 +338,8 @@ def main(argv=None):
         if args.mode == "train-eval":
             state.update(phase="training")
             write_json(report_dir / "status.json", state)
-            checkpoint = run_simulation(device=device)
+            with temporary_params(model_summary=args.ppo_agent):
+                checkpoint = run_simulation(device=device)
         comparisons = []
         for rate in args.rates:
             if args.mode == "rasoul":
@@ -342,7 +352,7 @@ def main(argv=None):
             if args.mode != "greedy":
                 state.update(phase="ppo_evaluation", current_arrival_rate=rate)
                 write_json(report_dir / "status.json", state)
-                ppo_runs[rate] = evaluate("ppo", rate, episodes=args.episodes, seed=args.seed,
+                ppo_runs[rate] = evaluate(args.ppo_agent, rate, episodes=args.episodes, seed=args.seed,
                                           device=device, checkpoint=checkpoint,
                                           task_path=args.task_path, run_id=run_id)
             state["ppo_runs"][rate] = str(ppo_runs[rate])

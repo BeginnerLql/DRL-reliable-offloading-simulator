@@ -32,6 +32,7 @@ class MainLoop:
         self.server_profiles, self.task_profiles = self._load_run_profiles()
 
         self.model_name = str(params.model_summary).strip().lower()
+        self.is_ppo = self.model_name in ("ppo", "ind-ppo")
         self.is_rasoul = self.model_name == "rasoul-delay"
         if self.model_name == "corr-delaygreedy" and not params.SPATIAL_RISK_ENABLED:
             raise ValueError("Corr-delayGreedy requires SPATIAL_RISK_ENABLED=True.")
@@ -185,12 +186,12 @@ class MainLoop:
     def _get_reliability_action_mask(self, task):
         """Keep feasible pairs; if none qualify, keep all exact reliability maxima.
 
-        Indep-delayGreedy uses independent reliability with the same marginals.
+        Indep-delayGreedy and Ind-PPO use independent reliability with the same marginals.
         Other methods use correlations reflecting SPATIAL_RISK_ENABLED. Both
         greedy variants always mask; PPO follows RELIABILITY_ACTION_MASK_ENABLED.
         """
         reliability_field = (
-            "independent" if self.model_name == "indep-delaygreedy" else "correlated"
+            "independent" if self.model_name in ("indep-delaygreedy", "ind-ppo") else "correlated"
         )
         reliabilities = np.array([
             getattr(self._get_pair_reliability(
@@ -287,7 +288,7 @@ class MainLoop:
             # PPO closes the previous arrival-to-arrival interval before
             # observing the new task. DQN/DDPG use
             # task-centric bookkeeping below.
-            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
+            if self.is_rasoul or self.is_ppo or self.model_name in ("corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
 
             task_id = self.taskCounter
@@ -297,7 +298,7 @@ class MainLoop:
             if not self.is_rasoul:
                 self.G_state = self.env_state.get_state(task)
 
-            if self.model_name == "ppo":
+            if self.is_ppo:
                 if self.ppo_last_decision_state is not None:
                     delta_t = current_time - self.ppo_last_decision_time
                     self.model.store_transition(
@@ -336,7 +337,7 @@ class MainLoop:
                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
             else:
                 eps = self.get_epsilon(self.this_episode)
-                if self.model_name == "ppo":
+                if self.is_ppo:
                     action_mask = self._get_reliability_action_mask(task)
                     action_index = self.model.select_action(self.G_state, eps, action_mask=action_mask)
                 else:
@@ -347,7 +348,7 @@ class MainLoop:
             if not self.is_rasoul:
                 self._set_task_reliabilities(task, server_A, server_B)
 
-            if self.model_name == "ppo":
+            if self.is_ppo:
                 self.ppo_last_decision_state = self.G_state
                 self.ppo_last_decision_action = self.G_action
                 self.ppo_last_decision_time = current_time
@@ -372,7 +373,7 @@ class MainLoop:
         # Drain pending tasks by waiting for first-replica task completion events.
         yield from self._drain_pending_tasks()
 
-        if self.model_name == "ppo":
+        if self.is_ppo:
             # Close the final arrival-to-terminal interval explicitly.
             if self.ppo_last_decision_state is not None:
                 terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
@@ -434,7 +435,7 @@ class MainLoop:
     def _drain_pending_tasks(self):
         """Wait for pending tasks' first-replica completion events."""
         while len(self.pendingList) > 0:
-            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
+            if self.is_rasoul or self.is_ppo or self.model_name in ("corr-delaygreedy", "indep-delaygreedy"):
                 self._collect_resolved_task_outcomes()
             else:
                 self.add_train()
