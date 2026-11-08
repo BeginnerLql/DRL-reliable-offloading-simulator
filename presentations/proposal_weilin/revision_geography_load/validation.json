@@ -1,0 +1,11 @@
+{
+  "file": "卫琳-开题报告（空间相关与负载动态故障·含实验）.pptx",
+  "slides": 26,
+  "experiment_figures": 9,
+  "source_image_hashes_match": true,
+  "source_statistics_hashes_match": true,
+  "system_model_body_slides": 0,
+  "dynamic_hazard_status": "proposed, not validated by current figures",
+  "issues": [],
+  "verification": "OOXML引用、字体覆盖、图源字节哈希、关键数值和版面校样已核验；未进行Office实际渲染。"
+}

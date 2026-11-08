@@ -1,0 +1,273 @@
+% UTF-8 独立文档，使用 XeLaTeX 编译（需安装 ctex 中文支持）。
+% 并入论文主文档时，复制首个 \section 到 \end{document} 之前的正文。
+\documentclass[UTF8,fontset=fandol]{ctexart}
+\usepackage{amsmath,amssymb}
+\usepackage[unicode,hidelinks]{hyperref}
+
+\begin{document}
+
+% 独立编译时沿用论文中的章节编号。
+\setcounter{section}{2}
+
+\section{系统模型与问题定义}
+\label{sec:system-model}
+
+本文研究异构边缘服务器上的双副本卸载。服务器对的选择同时影响任务的响应时延和两个副本的共同失效概率。
+
+\subsection{系统架构与卸载决策}
+\label{sec:system-architecture}
+
+设边缘服务器集合为 \(\mathcal{S}=\{1,2,\ldots,M\}\)，其中 \(M\geq 2\)。
+服务器 \(j\) 的计算速率为 \(f_j\)（CPU 周期/s），有效上传速率为 \(v_j\)（MB/s），
+基础故障强度为 \(\lambda_{0j}\)（\(\mathrm{s}^{-1}\)），地理位置以经纬度表示。
+每台服务器设有一个 CPU 服务台，对上传完成的副本按入队顺序提供非抢占式服务。
+
+任务按速率为 \(\nu\)（任务/s）的泊松过程到达。
+任务 \(i\) 记为 \((t_i,D_i,C_i,r_i)\)，其中 \(t_i\) 为到达时刻，
+\(D_i\) 为输入数据量（MB），\(C_i\) 为所需 CPU 周期数，
+\(r_i\in(0,1)\) 为最低执行可靠性要求。
+
+任务到达时，调度器根据任务属性、服务器参数和 CPU 队列观测，
+从无序服务器对集合 \(\mathcal{A}=\{\{j,k\}\mid j,k\in\mathcal{S},\ j<k\}\)
+中选择动作 \(a_i\)。两个副本同时开始上传，各自传输完整的 \(D_i\) 并执行全部 \(C_i\)。
+
+\subsection{双副本执行与任务时延}
+\label{sec:replica-delay}
+
+任务 \(i\) 在服务器 \(j\) 上的副本依次经历上传、排队和执行。
+记 \(U_{ij}\)、\(W_{ij}\) 和 \(E_{ij}\) 分别为上传、等待和执行时长，
+\(L_{ij}\) 为从任务到达到该副本完成的时延。
+上传过程采用固定有效速率 \(v_j\)，CPU 执行采用固定计算速率 \(f_j\)，因此有
+\begin{equation}
+  U_{ij}=\frac{D_i}{v_j},\qquad
+  E_{ij}=\frac{C_i}{f_j},\qquad
+  L_{ij}=U_{ij}+W_{ij}+E_{ij}.
+  \label{eq:replica-delay}
+\end{equation}
+
+调度器在 \(t_i\) 观测各服务器正在执行副本的剩余服务时间和已排队副本的总服务时间。
+副本在 \(t_i+U_{ij}\) 入队，其等待时长 \(W_{ij}\) 由入队时排在它前面的 CPU 工作决定，
+等于在执行副本的剩余服务时间与先入队副本的待执行时间之和。
+
+仿真在无故障执行流程下记录响应时延，并忽略结果回传时延。
+对服务器对 \(a_i=\{j,k\}\)，响应时延取任务到达至首个副本完成的时间间隔
+\begin{equation}
+  T_i=\min\{L_{ij},L_{ik}\}.
+  \label{eq:task-response-delay}
+\end{equation}
+
+首个副本完成后，另一副本继续处理直至完成。
+两个副本都占用所选服务器的 CPU 服务时间，进而影响后续任务的排队时延。
+
+\subsection{空间相关故障模型}
+\label{sec:spatial-failure-model}
+
+共用供电或网络基础设施的服务器可能受到同一故障源影响
+（\href{https://doi.org/10.1109/TPDS.2020.3046188}{Aral 和 Brandić，2021，第 2.2 节}）。
+本文以服务器间的地理距离表征共同环境暴露的相关程度。
+令 \(d_{jk}\) 为根据经纬度计算的大圆距离（km），
+\(\boldsymbol{Z}=(Z_1,\ldots,Z_M)^{\mathsf{T}}\) 为联合高斯环境风险向量，
+其中 \(Z_j\sim\mathcal{N}(0,1)\)。潜在风险的相关系数由指数距离核给出
+\begin{equation}
+  \rho_{jk}=\operatorname{Corr}(Z_j,Z_k)
+  =\exp\!\left(-\frac{d_{jk}}{\ell}\right),
+  \qquad \ell>0.
+  \label{eq:spatial-correlation}
+\end{equation}
+
+相关长度 \(\ell\)（km）对应潜在风险相关系数降至 \(\mathrm{e}^{-1}\) 的距离。
+对同一任务，\(Z_j\) 和 \(Z_k\) 在各自的副本执行窗口内取定值，
+二者的相关性由服务器间距决定，与窗口间隔无关。
+联合失效概率按单个任务的副本对计算。
+
+给定潜在风险 \(Z_j=z\)，服务器 \(j\) 在副本执行期间的条件故障强度定义为
+\begin{equation}
+  \lambda_j(z)=\lambda_{0j}\exp\!\left(\beta z-\frac{\beta^2}{2}\right),
+  \qquad \beta\geq 0.
+  \label{eq:conditional-failure-intensity}
+\end{equation}
+
+其中，\(\beta\) 控制环境风险对故障强度的影响幅度。
+修正项 \(-\beta^2/2\) 使条件故障强度的期望 \(\mathbb{E}[\lambda_j(Z_j)]\)
+等于固定的基础强度 \(\lambda_{0j}\)。
+
+故障暴露窗口为 CPU 执行阶段。给定 \(Z_j=z\)，副本在执行时长 \(E_{ij}\) 内
+承受恒定的故障强度 \(\lambda_j(z)\)。副本无故障完成的条件概率由指数生存模型给出
+（\href{https://doi.org/10.1109/JIOT.2025.3592330}{Rasouli 等，2025，第 III-G 节式（14）}）。
+\begin{equation}
+  p_{ij}(z)=\exp\!\left[-\lambda_j(z)E_{ij}\right].
+  \label{eq:conditional-replica-survival}
+\end{equation}
+
+\subsection{双副本执行可靠性}
+\label{sec:dual-replica-reliability}
+
+记 \(F_{ij}\) 为任务 \(i\) 在服务器 \(j\) 上的副本发生执行故障的事件，
+其条件概率为 \(q_{ij}(z)=1-p_{ij}(z)\)。
+任务失败事件为 \(F_{ij}\cap F_{ik}\)。
+给定潜在风险向量 \(\boldsymbol{Z}\)，假设两个副本的故障事件条件独立。
+对共同失效的条件概率取期望，得到任务的执行可靠性
+\begin{equation}
+  R_i(j,k)=1-\Pr(F_{ij}\cap F_{ik})
+  =1-\mathbb{E}\!\left[q_{ij}(Z_j)q_{ik}(Z_k)\right].
+  \label{eq:correlated-pair-reliability}
+\end{equation}
+
+式\eqref{eq:correlated-pair-reliability}采用 Gauss--Hermite 求积对
+\((Z_j,Z_k)\) 的联合分布积分。独立对照令 \(\rho_{jk}=0\)，
+并保持各副本的边缘失效概率 \(\bar{q}_{ij}=\mathbb{E}[q_{ij}(Z_j)]\)，得到
+\begin{equation}
+  R_i^{\mathrm{ind}}(j,k)=1-\bar{q}_{ij}\bar{q}_{ik}.
+  \label{eq:independent-pair-reliability}
+\end{equation}
+
+由式\eqref{eq:correlated-pair-reliability}和式\eqref{eq:independent-pair-reliability}，
+两种可靠性估计的差值为
+\begin{equation}
+  R_i^{\mathrm{ind}}(j,k)-R_i(j,k)
+  =\operatorname{Cov}\!\left(q_{ij}(Z_j),q_{ik}(Z_k)\right).
+  \label{eq:reliability-difference}
+\end{equation}
+
+当 \(\rho_{jk}\geq 0\) 时，\(Z_k\) 的条件均值 \(\rho_{jk}Z_j\) 随 \(Z_j\) 非减，
+条件方差固定。因此，\(\mathbb{E}[q_{ik}(Z_k)\mid Z_j]\) 和 \(q_{ij}(Z_j)\)
+均为 \(Z_j\) 的非减函数，式\eqref{eq:reliability-difference}中的协方差非负。
+在单副本边缘失效概率相同的条件下，独立模型给出双副本可靠性的上界。
+
+\subsection{问题定义}
+\label{sec:offloading-problem}
+
+设每轮有 \(N\) 个任务，按到达顺序编号。在线策略 \(\pi\) 在任务 \(i\) 到达时
+根据当时的观测选择服务器对 \(a_i=\{j,k\}\)，其执行可靠性
+\(R_i(a_i)=R_i(j,k)\) 由式\eqref{eq:correlated-pair-reliability}计算。
+两个副本都会占用 CPU 服务时间，因此当前的卸载决策也会影响后续任务的排队时延。
+以式\eqref{eq:task-response-delay}给出的 \(T_i\) 衡量任务响应时延。
+优化目标是在逐任务可靠性约束下最小化每轮的期望平均响应时延
+\begin{equation}
+  \begin{aligned}
+    \min_{\pi\in\Pi_{\mathrm{on}}}\quad
+      & \mathbb{E}_{\pi}\!\left[\frac{1}{N}\sum_{i=1}^{N}T_i\right] \\
+    \text{s.t.}\quad
+      & a_i\in\mathcal{A},\qquad R_i(a_i)\geq r_i,\quad i=1,\ldots,N .
+  \end{aligned}
+  \label{eq:offloading-problem}
+\end{equation}
+其中，\(\Pi_{\mathrm{on}}\) 为在线策略集合，期望涵盖任务到达和动作采样的随机性。
+
+\section{Corr-PPO 卸载方法}
+\label{sec:offloading-method}
+
+针对式\eqref{eq:offloading-problem}定义的在线卸载问题，Corr-PPO 按空间相关可靠性筛选服务器对，
+再用近端策略优化（PPO）学习基于队列观测的卸载策略。
+
+\subsection{可靠性动作筛选}
+\label{sec:reliability-action-mask}
+
+对到达的任务 \(i\)，根据其计算需求 \(C_i\) 和服务器参数计算各候选对的 \(R_i(a)\)。
+达到阈值 \(r_i\) 的服务器对构成可行集
+\begin{equation}
+  \mathcal{F}_i=\{a\in\mathcal{A}\mid R_i(a)\geq r_i\}.
+  \label{eq:feasible-server-pairs}
+\end{equation}
+策略从允许集合 \(\mathcal{B}_i\) 中选择动作
+\begin{equation}
+  \mathcal{B}_i=
+  \begin{cases}
+    \mathcal{F}_i, & \mathcal{F}_i\neq\varnothing,\\
+    \displaystyle\operatorname*{arg\,max}_{a\in\mathcal{A}} R_i(a),
+      & \mathcal{F}_i=\varnothing .
+  \end{cases}
+  \label{eq:allowed-server-pairs}
+\end{equation}
+可行集为空时，允许集合保留可靠性达到最大值的全部服务器对，该任务计为可靠性未达标。
+
+\subsection{队列观测与动作分布}
+\label{sec:queue-aware-policy}
+
+任务到达时，调度器读取各服务器正在执行的副本的剩余服务时间
+\(\boldsymbol{b}^{\mathrm{run}}_i\) 和排队副本的总待执行时间
+\(\boldsymbol{b}^{\mathrm{wait}}_i\)。两组观测以秒为单位，按服务器编号排列。
+策略网络将队列观测、服务器参数与任务属性拼接为输入向量
+\begin{equation}
+  \boldsymbol{o}_i=
+  \bigl(\boldsymbol{\lambda}_0,\widetilde{\boldsymbol{f}},
+    \widetilde{\boldsymbol{v}},\boldsymbol{b}^{\mathrm{run}}_i,
+    \boldsymbol{b}^{\mathrm{wait}}_i,\widetilde{D}_i,\widetilde{C}_i\bigr).
+  \label{eq:offloading-observation}
+\end{equation}
+其中，\(\boldsymbol{\lambda}_0\) 为各服务器的基础故障强度，
+带波浪号的计算速率、上传速率、任务数据量和计算需求采用极差归一化。
+任务的可靠性阈值 \(r_i\) 通过允许集合 \(\mathcal{B}_i\) 影响动作分布。
+
+策略网络为每个服务器对输出得分 \(u_{\theta}(\boldsymbol{o}_i,a)\)。
+动作掩码在允许集合内对得分进行 softmax 归一化，并将其余动作的概率置零
+（\href{https://doi.org/10.1109/LWC.2026.3718001}{Chen 等，2026，第 IV-A 节}）。
+\begin{equation}
+  \pi_{\theta}(a\mid\boldsymbol{o}_i,\mathcal{B}_i)
+  =
+  \frac{\mathbf{1}\{a\in\mathcal{B}_i\}\,
+        \exp\!\bigl(u_{\theta}(\boldsymbol{o}_i,a)\bigr)}
+       {\sum_{b\in\mathcal{B}_i}
+        \exp\!\bigl(u_{\theta}(\boldsymbol{o}_i,b)\bigr)} .
+  \label{eq:masked-offloading-policy}
+\end{equation}
+调度器从该分布采样 \(a_i\)，并将两个副本并行发往所选服务器。
+
+\subsection{到达事件驱动的策略更新}
+\label{sec:event-driven-ppo-update}
+
+任务到达触发策略决策，相邻决策之间的实际时长用于计算折扣
+（参见\href{https://doi.org/10.1109/TWC.2022.3152573}{Wei 等，2022，第 III-B 和 III-C 节}）。
+决策间隔为 \(\Delta t_i=t_{i+1}-t_i\)，其中 \(t_{N+1}=\max_{1\leq i\leq N}(t_i+T_i)\)
+为本轮最后一次任务响应的时刻。以任务的负响应时延为奖励，并将其归入该任务到达时的决策样本。
+奖励和逐步折扣系数为
+\begin{equation}
+  g_i=-T_i,\qquad
+  \gamma_i=\gamma^{\Delta t_i/(1\,\mathrm{s})},\qquad 0<\gamma\leq 1 .
+  \label{eq:offloading-reward-discount}
+\end{equation}
+其中，\(\gamma\) 为每秒折扣基数。训练回报按时间折扣，
+式\eqref{eq:offloading-problem}中的平均响应时延按任务等权计算。
+
+每轮采样使用固定的旧策略 \(\pi_{\theta_{\mathrm{old}}}\)。
+以 \(V_{\phi}(\boldsymbol{o}_i)\) 表示更新前的价值估计，
+以 \(h_i=\mathbf{1}\{i<N\}\) 标记非终止转移。广义优势估计按到达顺序逆向计算
+\begin{equation}
+  \begin{aligned}
+    \delta_i &=
+      g_i+h_i\gamma_i V_{\phi}(\boldsymbol{o}_{i+1})
+          -V_{\phi}(\boldsymbol{o}_i),\\
+    \widehat{A}_i &=
+      \delta_i+h_i\gamma_i\lambda_{\mathrm{GAE}}\widehat{A}_{i+1},
+      \qquad \widehat{A}_{N+1}=0 ,
+  \end{aligned}
+  \label{eq:time-discounted-gae}
+\end{equation}
+其中，\(\lambda_{\mathrm{GAE}}\) 为优势估计的衰减系数，终止转移的后继价值取零。
+
+新旧策略均按决策时的允许集合 \(\mathcal{B}_i\) 计算动作概率。
+令 \(\omega_i(\theta)=
+\pi_{\theta}(a_i\mid\boldsymbol{o}_i,\mathcal{B}_i)/
+\pi_{\theta_{\mathrm{old}}}(a_i\mid\boldsymbol{o}_i,\mathcal{B}_i)\)，
+\(\widetilde{A}_i\) 为归一化后的优势估计。
+策略网络最大化带熵正则项的 PPO 裁剪目标
+（\href{https://arxiv.org/abs/1707.06347}{Schulman 等，2017}）。
+\begin{equation}
+  \begin{aligned}
+    J(\theta)={}&\widehat{\mathbb{E}}_i
+      \Bigl[\min\!\bigl\{
+      \omega_i(\theta)\widetilde{A}_i,\,
+      \operatorname{clip}\bigl(\omega_i(\theta),1-\epsilon,1+\epsilon\bigr)
+        \widetilde{A}_i\bigr\}\\
+      &\hspace{4.6em}+\eta\,
+        \mathcal{H}\bigl(\pi_{\theta}(\cdot\mid\boldsymbol{o}_i,\mathcal{B}_i)\bigr)
+      \Bigr],
+  \end{aligned}
+  \label{eq:masked-ppo-objective}
+\end{equation}
+其中，\(\epsilon\) 为裁剪系数，\(\eta\) 为熵正则权重，
+\(\widehat{\mathbb{E}}_i\) 表示样本平均。价值网络以未归一化的优势估计
+与更新前的价值估计之和作为回归目标，最小化均方误差。
+每轮采样结束后，两个网络使用该轮样本分批更新。
+
+\end{document}

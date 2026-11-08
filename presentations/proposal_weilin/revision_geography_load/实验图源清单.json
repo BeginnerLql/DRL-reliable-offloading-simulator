@@ -1,0 +1,74 @@
+{
+  "figures": [
+    {
+      "slide": 13,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures/training_curves.png",
+      "sha256": "8e2f90dbe666d463c0f213091002289c68c4181e4eb8d70f4613e367689488ca",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 14,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/arrival_rate_mean_delay_seconds.png",
+      "sha256": "d20a5d6648fd77e23e28ff77fea0a3ca95309f0f0621ffcf7fa722d330d53147",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 14,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/arrival_rate_success_rate.png",
+      "sha256": "d3ccdbdf10284f1082c947f24e5f9d2347e8802100ae4a3d9f2822d0089ba211",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 15,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/demand_multiplier_mean_delay_seconds.png",
+      "sha256": "3f85efaefa230f2e63e5525b3db6bcb6b0680caaa3295eb1749ef32f69eede35",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 15,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/demand_multiplier_success_rate.png",
+      "sha256": "bfb85661c87af6b2f8187e29cf78728e18e31c54ec1fb79994c5599107788d9b",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 16,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/task_count_mean_delay_seconds.png",
+      "sha256": "4087ff6e6900609b91360aa5b95bbae9e064a6461dee732202f6b5be24214a82",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 16,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/figures_linear/task_count_success_rate.png",
+      "sha256": "7f6f5199c6c5ade12f78439ec8bfec626bf40934782f59bd19944527a449d860",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 17,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/figures/mean_delay_seconds_bar.png",
+      "sha256": "e351d278b99f00695cd3826deba48a25ec02f28f4ac7292ab0a5e3736cee15b7",
+      "embedded_unchanged": true
+    },
+    {
+      "slide": 18,
+      "source": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/figures/success_rate_bar.png",
+      "sha256": "6fc3a6f581dd4fe4b2cca44134d632247d7dde485549a3b5a22a0653ba6aa045",
+      "embedded_unchanged": true
+    }
+  ],
+  "source_summaries": [
+    {
+      "file": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/summary.csv",
+      "sha256": "f6849e6e05c973851d141d4284778c3283dd5058c416bcd884c54dca2e9fe3bf"
+    },
+    {
+      "file": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/training_summary.csv",
+      "sha256": "e8b65a97972f9bcd0ec7b29e02f84415c125603c70f67f56b3d35594f4f090d0"
+    },
+    {
+      "file": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/summary.csv",
+      "sha256": "6bd90d2c033d8d5833413264a85d6875517cdfba6070e3c69fc800ec29b257e3"
+    }
+  ],
+  "dynamic_failure_rate_status": "proposed; not implemented or validated by the included figures",
+  "validation_scope": "OOXML, measured layout proof; not an Office render"
+}
