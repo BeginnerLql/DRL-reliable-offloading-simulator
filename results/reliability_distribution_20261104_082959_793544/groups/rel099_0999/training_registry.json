@@ -1,0 +1,36 @@
+{
+  "ind-ppo": {
+    "group_id": "rel099_0999",
+    "method": "ind-ppo",
+    "smoke": false,
+    "training_episodes": 8000,
+    "training_tasks": 1600000,
+    "from_scratch": true,
+    "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/groups/rel099_0999/checkpoints/ind-ppo_train_rel099_0999_seed2026.pt",
+    "checkpoint_sha256": "1eed6438df9917c5732c33458e3bc1d1bd0188917fed3ae0fb77c27d8ccb3b02",
+    "initial_policy_sha256": "fdb5c7afcb4dfd566369458e39e8736e9c9f1cf094808baeb86d1e67cf5e191e",
+    "training_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/groups/rel099_0999/training/ind-ppo_train_rel099_0999_seed2026",
+    "training_task_sha256": "5ebd9c77e0b43d944e87ec0560f0995558b6aad00d787995e36cfd9433187ee9",
+    "server_sha256": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "actor_steps": 64000,
+    "critic_steps": 64000,
+    "elapsed_seconds": 872.3777879260015
+  },
+  "ppo": {
+    "group_id": "rel099_0999",
+    "method": "ppo",
+    "smoke": false,
+    "training_episodes": 8000,
+    "training_tasks": 1600000,
+    "from_scratch": true,
+    "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/groups/rel099_0999/checkpoints/ppo_train_rel099_0999_seed2026.pt",
+    "checkpoint_sha256": "4cfc96cccf41d2b1bb8599a488f322203799ab35da3a5abf097b22a2c83d096f",
+    "initial_policy_sha256": "fdb5c7afcb4dfd566369458e39e8736e9c9f1cf094808baeb86d1e67cf5e191e",
+    "training_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/groups/rel099_0999/training/ppo_train_rel099_0999_seed2026",
+    "training_task_sha256": "5ebd9c77e0b43d944e87ec0560f0995558b6aad00d787995e36cfd9433187ee9",
+    "server_sha256": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "actor_steps": 64000,
+    "critic_steps": 64000,
+    "elapsed_seconds": 892.0890055639902
+  }
+}

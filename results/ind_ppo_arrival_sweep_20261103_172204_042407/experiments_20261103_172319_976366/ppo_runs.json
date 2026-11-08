@@ -1,0 +1,7 @@
+{
+  "0.5": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival0.5_eval500",
+  "1.0": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival1_eval500",
+  "1.5": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival1.5_eval500",
+  "2.5": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival2.5_eval500",
+  "3.0": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival3_eval500"
+}

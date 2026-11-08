@@ -1,0 +1,134 @@
+from datetime import datetime
+from contextlib import nullcontext
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import numpy as np
+import torch
+
+from io_utils.save_parameters_and_logs import save_params_and_logs
+from io_utils.long_run_logger import LongRunLogger
+from config.params import params
+from config.paths import RESULTS_DIR
+from core.main_loop import MainLoop
+
+
+def build_model(*, device="cuda"):
+    """Build the configured learning agent or delay-greedy baseline."""
+    model_name = str(params.model_summary).strip().lower()
+
+    if model_name == "rasoul-delay":
+        from agents.rasoul_delay_agent import RasoulDelayAgent
+
+        print("RASOUL-Delay agent is set.")
+        return RasoulDelayAgent(range(1, params.NUM_SERVERS + 1), params.RASOUL_DELAY_EXPLORATION_C)
+
+    if model_name in ("corr-delaygreedy", "indep-delaygreedy"):
+        from agents.corr_delay_greedy_agent import CorrDelayGreedyAgent
+
+        print(f"{params.model_summary} agent is set.")
+        # Both variants use the same delay ranking; MainLoop supplies the mask.
+        return CorrDelayGreedyAgent()
+
+    if model_name == "ddpg":
+        from agents.ddpg_agent import ddpgModel
+
+        model = ddpgModel(
+            params.num_states,
+            params.num_actions,
+            params.std_dev_ddpg,
+            params.critic_lr_ddpg,
+            params.actor_lr_ddpg,
+            params.gamma_ddpg,
+            params.tau_ddpg,
+            params.activation_function_ddpg,
+            buffer_capacity=params.buffer_capacity_ddpg,
+            batch_size=params.batch_size_ddpg,
+        )
+        print("DDPGAgent is set.")
+        return model
+
+    if model_name == "dqn":
+        from agents.dqn_agent import DQNAgent
+
+        model = DQNAgent(
+            num_states=params.num_states,
+            num_actions=params.num_actions,
+            hidden_layers=params.hidden_layers_dqn,
+            device="cpu",
+            gamma=params.gamma_dqn,
+            lr=params.lr_dqn,
+            tau=params.tau_dqn,
+            buffer_size=params.buffer_capacity_dqn,
+            batch_size=params.batch_size_dqn,
+            activation=params.af_dqn,
+        )
+        print("DQNAgent is set.")
+        return model
+
+    if model_name in ("ppo", "ind-ppo"):
+        from agents.ppo_agent import PPOAgent
+
+        model = PPOAgent(
+            num_states=params.num_states,
+            num_actions=params.num_actions,
+            hidden_layers=params.hidden_layers_ppo,
+            device=device,
+            gamma=params.gamma_ppo,
+            actor_lr=params.actor_lr_ppo,
+            critic_lr=params.critic_lr_ppo,
+            clip_eps=params.clip_eps_ppo,
+            k_epochs=params.k_epochs_ppo,
+            batch_size=params.batch_size_ppo,
+            entropy_coef=params.entropy_coef_ppo,
+            reward_scale=params.reward_scale_ppo,
+            gae_lambda=params.gae_lambda_ppo,
+            value_loss_coef=params.value_loss_coef_ppo,
+            max_grad_norm=params.max_grad_norm_ppo,
+            activation=params.af_ppo,
+        )
+        print(f"PPOAgent is set. Device: {model.device}")
+        return model
+
+    raise ValueError(
+        f"Unsupported params.model_summary='{params.model_summary}'. "
+        "Use one of: 'ddpg', 'dqn', 'ppo', 'ind-ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
+    )
+
+
+def run_simulation(*, device="cuda"):
+    run_id = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
+    np.random.seed(params.EXPERIMENT_SEED)
+    torch.manual_seed(params.EXPERIMENT_SEED)
+    model = build_model(device=device)
+
+    # A worksheet can contain at most 1,048,575 data rows plus its header.
+    stream_results = params.total_episodes * params.taskno > 1_048_575
+    logger_context = LongRunLogger(params, model, run_id) if stream_results else nullcontext()
+    with logger_context as logger:
+        ml = MainLoop(
+            model, params.total_episodes, params.taskno, params.num_states, params.num_actions,
+            episode_end_callback=logger,
+        )
+        ml.EP()
+
+        # Persist the trained model before producing the final Excel report.
+        checkpoint_path = None
+        model_name = str(params.model_summary).strip().lower()
+        if model_name in ("ppo", "ind-ppo"):
+            checkpoint_path = Path(RESULTS_DIR) / f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.pt"
+            model.save_model(checkpoint_path)
+            print(f"Saved PPO checkpoint: {checkpoint_path}")
+        save_params_and_logs(
+            params, ml.log_data, ml.task_results,
+            run_id=run_id,
+            task_results_csv_path=logger.task_results_csv_path if logger else None,
+        )
+    return checkpoint_path
+
+
+def main():
+    run_simulation()
+
+if __name__ == "__main__":
+    main()

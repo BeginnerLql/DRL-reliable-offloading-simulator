@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "runs": 10,
+  "all_five_methods": true,
+  "arrival_prefix_matching": true
+}

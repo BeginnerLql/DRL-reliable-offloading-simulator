@@ -1,0 +1,7 @@
+group_id,dataset,single_ceiling,correlated_pair_ceiling,independent_pair_ceiling,mean_single_safe_count,mean_corr_pair_safe_count,mean_independent_pair_safe_count,single_K0,single_K1,single_K_ge2,corr_pair_K0,corr_pair_K1,corr_pair_K_ge2,ind_pair_K0,ind_pair_K1,ind_pair_K_ge2
+rel090_099,train,0.84,1.0,1.0,2.895,27.645,27.77,32,57,111,0,0,200,0,0,200
+rel099_0999,train,0.0,0.98,0.985,0.0,13.91,14.995,200,0,0,4,2,194,3,1,196
+rel0999_09999,train,0.0,0.065,0.14,0.0,0.185,0.29,200,0,0,187,2,11,172,15,13
+rel090_099,evaluation,0.795,1.0,1.0,2.675,27.46,27.62,41,50,109,0,0,200,0,0,200
+rel099_0999,evaluation,0.0,0.94,0.955,0.0,12.895,14.025,200,0,0,12,3,185,9,3,188
+rel0999_09999,evaluation,0.0,0.055,0.09,0.0,0.145,0.22,200,0,0,189,3,8,182,7,11

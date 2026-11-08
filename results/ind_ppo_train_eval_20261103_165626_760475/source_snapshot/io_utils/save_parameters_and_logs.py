@@ -1,0 +1,137 @@
+"""Write task outcomes after execution drains, with compatible episode logs."""
+
+import os
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.chart import LineChart, Reference
+
+from config.paths import SERVER_INFO_PATH, TRAIN_TASK_PATH, RESULTS_DIR, ensure_dirs
+
+
+def save_params_and_logs(
+    params, log_data, task_results, run_id, *, task_parameters_path=TRAIN_TASK_PATH,
+    task_results_csv_path=None,
+):
+    ensure_dirs()
+
+    model_name = str(params.model_summary).strip().lower()
+
+    filename = os.path.join(
+        RESULTS_DIR, f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.xlsx",
+    )
+
+    server_info = pd.read_excel(SERVER_INFO_PATH)
+
+    task_df = pd.read_excel(task_parameters_path)
+
+    parameter_family = "ppo" if model_name == "ind-ppo" else model_name
+    other_model_suffixes = tuple(
+        f"_{name}" for name in ("ppo", "dqn", "ddpg") if name != parameter_family
+    )
+    params_data = {
+        attr: [value]
+        for attr, value in vars(params).items()
+        if not attr.startswith("_") and not attr.endswith(other_model_suffixes)
+    }
+    params_data["model_summary"] = [model_name]
+    params_data["run_id"] = [run_id]
+    df_params = pd.DataFrame(params_data).transpose().reset_index()
+    df_params.columns = ["Parameter", "Value"]
+
+    # Report the correlated and independent reliability satisfaction rates.
+    df_logs = pd.DataFrame(
+        [
+            {
+                "Episode": episode,
+                "Episode Reward": episodic_reward,
+                "task_Avg_Delay": task_avg_delay,
+                "RSR_Correlated": episode_rsr_correlated,
+                "RSR_Independent": episode_rsr_independent,
+                "Mask_Fallback_Rate": mask_fallback_rate,
+            }
+            for (
+                episode, episodic_reward, task_avg_delay,
+                episode_rsr_correlated, episode_rsr_independent,
+                mask_fallback_rate,
+            ) in log_data
+        ],
+        columns=[
+            "Episode", "Episode Reward", "task_Avg_Delay",
+            "RSR_Correlated", "RSR_Independent", "Mask_Fallback_Rate",
+        ],
+    )
+
+    task_result_columns = [
+        "episode",
+        "task_id",
+        "task_size",
+        "computation_demand",
+        "reliability_requirement",
+        "feasible_action_count",
+        "mask_fallback_used",
+        "arrival_time",
+        "server_A_id",
+        "server_B_id",
+        "replica_A_queue_enter_time",
+        "replica_A_cpu_start_time",
+        "replica_A_finish_time",
+        "replica_B_queue_enter_time",
+        "replica_B_cpu_start_time",
+        "replica_B_finish_time",
+        "task_completion_time",
+        "task_delay",
+        "task_upload_delay",
+        "task_queue_delay",
+        "task_execution_delay",
+        "replica_A_reliability",
+        "replica_B_reliability",
+        "pair_reliability_correlated",
+        "pair_reliability_independent",
+        "requirement_satisfied_correlated",
+        "requirement_satisfied_independent",
+    ]
+    if model_name == "rasoul-delay":
+        task_result_columns.extend([
+            "replica_count", "task_reliability", "requirement_satisfied",
+            "base_delay_at_decision", "predicted_delay_at_decision",
+            "observations_at_decision", "delay_discrepancy",
+        ])
+    if task_results_csv_path is None:
+        df_task_results = pd.DataFrame(task_results, columns=task_result_columns)
+    else:
+        # Long runs exceed Excel's row limit; point to the complete CSV instead.
+        df_task_results = pd.DataFrame({
+            "TaskResults_CSV": [str(task_results_csv_path)],
+        })
+
+    # Exclusive creation preserves every existing experiment workbook.
+    with open(filename, "xb") as output:
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df_params.to_excel(writer, sheet_name="Params", index=False)
+            task_df.to_excel(writer, sheet_name="Tasks", index=False)
+            server_info.to_excel(writer, sheet_name="Servers", index=False)
+            df_logs.to_excel(writer, sheet_name="Logs", index=False)
+            df_task_results.to_excel(writer, sheet_name="TaskResults", index=False)
+
+    wb = load_workbook(filename)
+
+    ws_logs = wb["Logs"]
+    for column, title, axis_title, anchor in (
+        (2, "Rewards per Episode", "Reward", "G2"),
+        (3, "task_Avg_Delay per Episode", "task_Avg_Delay (s)", "G20"),
+    ):
+        chart = LineChart()
+        chart.title = title
+        chart.y_axis.title = axis_title
+        chart.x_axis.title = "Episode"
+        data = Reference(
+            ws_logs, min_col=column, min_row=1,
+            max_col=column, max_row=ws_logs.max_row,
+        )
+        categories = Reference(ws_logs, min_col=1, min_row=2, max_row=ws_logs.max_row)
+        chart.add_data(data, titles_from_data=True)
+        chart.set_categories(categories)
+        ws_logs.add_chart(chart, anchor)
+
+    wb.save(filename)
+    print("successfully saved logs !")

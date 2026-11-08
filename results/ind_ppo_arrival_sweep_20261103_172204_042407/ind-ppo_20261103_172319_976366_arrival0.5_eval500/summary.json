@@ -1,0 +1,17 @@
+{
+  "arrival_rate": 0.5,
+  "episodes": 500,
+  "task_executions": 100000,
+  "mean_delay_seconds": 2.7303607387833257,
+  "episode_mean_delay_std_seconds": 0.07725879540818079,
+  "p95_task_delay_seconds": 4.3034691330993535,
+  "mean_upload_delay_seconds": 0.6320756564549,
+  "mean_queue_delay_seconds": 0.24395793466312174,
+  "mean_execution_delay_seconds": 1.8543271476653032,
+  "rsr_correlated": 0.82013,
+  "rsr_independent": 0.93,
+  "mask_fallback_rate": 0.07,
+  "inference_device": "cpu",
+  "weights_and_optimizer_unchanged": true,
+  "source_checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a"
+}

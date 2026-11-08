@@ -1,0 +1,155 @@
+diff --git a/Project_main.py b/Project_main.py
+index 789fc16..10b9032 100644
+--- a/Project_main.py
++++ b/Project_main.py
+@@ -66,7 +66,7 @@ def build_model(*, device="cuda"):
+         print("DQNAgent is set.")
+         return model
+ 
+-    if model_name == "ppo":
++    if model_name in ("ppo", "ind-ppo"):
+         from agents.ppo_agent import PPOAgent
+ 
+         model = PPOAgent(
+@@ -92,7 +92,7 @@ def build_model(*, device="cuda"):
+ 
+     raise ValueError(
+         f"Unsupported params.model_summary='{params.model_summary}'. "
+-        "Use one of: 'ddpg', 'dqn', 'ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
++        "Use one of: 'ddpg', 'dqn', 'ppo', 'ind-ppo', 'Corr-delayGreedy', 'Indep-delayGreedy', 'RASOUL-Delay'."
+     )
+ 
+ 
+@@ -114,8 +114,9 @@ def run_simulation(*, device="cuda"):
+ 
+         # Persist the trained model before producing the final Excel report.
+         checkpoint_path = None
+-        if str(params.model_summary).strip().lower() == "ppo":
+-            checkpoint_path = Path(RESULTS_DIR) / f"ppo_{run_id}_{params.EXPERIMENT_TAG}.pt"
++        model_name = str(params.model_summary).strip().lower()
++        if model_name in ("ppo", "ind-ppo"):
++            checkpoint_path = Path(RESULTS_DIR) / f"{model_name}_{run_id}_{params.EXPERIMENT_TAG}.pt"
+             model.save_model(checkpoint_path)
+             print(f"Saved PPO checkpoint: {checkpoint_path}")
+         save_params_and_logs(
+diff --git a/config/configuration.py b/config/configuration.py
+index 3c34f63..6bd19dc 100644
+--- a/config/configuration.py
++++ b/config/configuration.py
+@@ -5,7 +5,7 @@ class parameters:
+     # Change experiment settings here before running comparisons; do not override
+     # them in runner scripts. Regenerate workbooks after changing profile ranges.
+     # Experiment
+-    model_summary = "ppo"  # Also: "dqn", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy", "RASOUL-Delay"
++    model_summary = "ppo"  # Also: "ind-ppo", "dqn", "ddpg", "Corr-delayGreedy", "Indep-delayGreedy", "RASOUL-Delay"
+     total_episodes = 8000
+     EXPERIMENT_TAG = "baseline"
+ 
+@@ -15,7 +15,7 @@ class parameters:
+     # Workload
+     TASK_ARRIVAL_RATE = 2.0  # Poisson task-arrival rate, unit: tasks/s
+     TASK_SIZE_RANGE = (5.0, 10.0)  # MB, continuous uniform
+-    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.99, 0.999)  # Continuous uniform.
++    TASK_RELIABILITY_REQUIREMENT_RANGE = (0.92, 0.999)  # Continuous uniform.
+     TASK_DEMAND_RANGE = (4.0e9, 8.0e9)  # CPU cycles, continuous uniform; 2x original demand.
+     taskno = 200
+ 
+@@ -34,7 +34,7 @@ class parameters:
+     SPATIAL_RISK_BETA_P = 0.5
+     SPATIAL_RISK_GH_ORDER = 32  # Quadrature nodes per dimension.
+     # SeedSequence derives independent server/train/evaluation profile streams.
+-    PROFILE_SEED = 2028
++    PROFILE_SEED = 2029
+     # Runtime seed for task arrivals and agents; GH reliability is deterministic.
+     EXPERIMENT_SEED = 2026
+ 
+@@ -64,7 +64,7 @@ class parameters:
+     epsilon_end_dqn = 0.01
+     epsilon_decay_dqn = 300
+     # PPO
+-    RELIABILITY_ACTION_MASK_ENABLED = True  # PPO switch; both delay-greedy variants always mask.
++    RELIABILITY_ACTION_MASK_ENABLED = True  # Both PPO variants; delay-greedy always masks.
+     hidden_layers_ppo = [64, 32]
+     af_ppo = "tanh"
+     actor_lr_ppo = 1e-4
+diff --git a/core/main_loop.py b/core/main_loop.py
+index bc8a69e..01a714e 100644
+--- a/core/main_loop.py
++++ b/core/main_loop.py
+@@ -32,6 +32,7 @@ class MainLoop:
+         self.server_profiles, self.task_profiles = self._load_run_profiles()
+ 
+         self.model_name = str(params.model_summary).strip().lower()
++        self.is_ppo = self.model_name in ("ppo", "ind-ppo")
+         self.is_rasoul = self.model_name == "rasoul-delay"
+         if self.model_name == "corr-delaygreedy" and not params.SPATIAL_RISK_ENABLED:
+             raise ValueError("Corr-delayGreedy requires SPATIAL_RISK_ENABLED=True.")
+@@ -185,12 +186,12 @@ class MainLoop:
+     def _get_reliability_action_mask(self, task):
+         """Keep feasible pairs; if none qualify, keep all exact reliability maxima.
+ 
+-        Indep-delayGreedy uses independent reliability with the same marginals.
++        Indep-delayGreedy and Ind-PPO use independent reliability with the same marginals.
+         Other methods use correlations reflecting SPATIAL_RISK_ENABLED. Both
+         greedy variants always mask; PPO follows RELIABILITY_ACTION_MASK_ENABLED.
+         """
+         reliability_field = (
+-            "independent" if self.model_name == "indep-delaygreedy" else "correlated"
++            "independent" if self.model_name in ("indep-delaygreedy", "ind-ppo") else "correlated"
+         )
+         reliabilities = np.array([
+             getattr(self._get_pair_reliability(
+@@ -287,7 +288,7 @@ class MainLoop:
+             # PPO closes the previous arrival-to-arrival interval before
+             # observing the new task. DQN/DDPG use
+             # task-centric bookkeeping below.
+-            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
++            if self.is_rasoul or self.is_ppo or self.model_name in ("corr-delaygreedy", "indep-delaygreedy"):
+                 self._collect_resolved_task_outcomes()
+ 
+             task_id = self.taskCounter
+@@ -297,7 +298,7 @@ class MainLoop:
+             if not self.is_rasoul:
+                 self.G_state = self.env_state.get_state(task)
+ 
+-            if self.model_name == "ppo":
++            if self.is_ppo:
+                 if self.ppo_last_decision_state is not None:
+                     delta_t = current_time - self.ppo_last_decision_time
+                     self.model.store_transition(
+@@ -336,7 +337,7 @@ class MainLoop:
+                 server_A, server_B = self.extract_parameters_from_index(self.G_action)
+             else:
+                 eps = self.get_epsilon(self.this_episode)
+-                if self.model_name == "ppo":
++                if self.is_ppo:
+                     action_mask = self._get_reliability_action_mask(task)
+                     action_index = self.model.select_action(self.G_state, eps, action_mask=action_mask)
+                 else:
+@@ -347,7 +348,7 @@ class MainLoop:
+             if not self.is_rasoul:
+                 self._set_task_reliabilities(task, server_A, server_B)
+ 
+-            if self.model_name == "ppo":
++            if self.is_ppo:
+                 self.ppo_last_decision_state = self.G_state
+                 self.ppo_last_decision_action = self.G_action
+                 self.ppo_last_decision_time = current_time
+@@ -372,7 +373,7 @@ class MainLoop:
+         # Drain pending tasks by waiting for first-replica task completion events.
+         yield from self._drain_pending_tasks()
+ 
+-        if self.model_name == "ppo":
++        if self.is_ppo:
+             # Close the final arrival-to-terminal interval explicitly.
+             if self.ppo_last_decision_state is not None:
+                 terminal_next_state = np.zeros_like(self.ppo_last_decision_state)
+@@ -434,7 +435,7 @@ class MainLoop:
+     def _drain_pending_tasks(self):
+         """Wait for pending tasks' first-replica completion events."""
+         while len(self.pendingList) > 0:
+-            if self.is_rasoul or self.model_name in ("ppo", "corr-delaygreedy", "indep-delaygreedy"):
++            if self.is_rasoul or self.is_ppo or self.model_name in ("corr-delaygreedy", "indep-delaygreedy"):
+                 self._collect_resolved_task_outcomes()
+             else:
+                 self.add_train()

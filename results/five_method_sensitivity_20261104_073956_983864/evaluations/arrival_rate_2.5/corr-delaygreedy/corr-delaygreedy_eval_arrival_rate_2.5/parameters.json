@@ -1,0 +1,93 @@
+{
+  "model_summary": "corr-delaygreedy",
+  "total_episodes": 500,
+  "EXPERIMENT_TAG": "arrival_rate_2.5",
+  "NUM_SERVERS": 8,
+  "TASK_SIZE_RANGE": [
+    5.0,
+    10.0
+  ],
+  "TASK_RELIABILITY_REQUIREMENT_RANGE": [
+    0.92,
+    0.999
+  ],
+  "TASK_DEMAND_RANGE": [
+    4000000000.0,
+    8000000000.0
+  ],
+  "taskno": 200,
+  "TASK_ARRIVAL_RATE": 2.5,
+  "SERVER_PROCESSING_FREQ_RANGE": [
+    1000000000.0,
+    4000000000.0
+  ],
+  "SERVER_TRANSMISSION_RATE_RANGE": [
+    5.0,
+    20.0
+  ],
+  "SERVER_FAILURE_RATE_RANGE": [
+    0.01,
+    0.05
+  ],
+  "SPATIAL_RISK_ENABLED": true,
+  "SPATIAL_RISK_BETA_P": 0.5,
+  "SPATIAL_RISK_GH_ORDER": 32,
+  "PROFILE_SEED": 2029,
+  "EXPERIMENT_SEED": 2027,
+  "RASOUL_DELAY_EXPLORATION_C": 0.5,
+  "num_states": 42,
+  "num_actions": 28,
+  "std_dev_ddpg": 0.25,
+  "critic_lr_ddpg": 0.001,
+  "actor_lr_ddpg": 0.0003,
+  "gamma_ddpg": 0.85,
+  "tau_ddpg": 0.005,
+  "buffer_capacity_ddpg": 100000,
+  "batch_size_ddpg": 256,
+  "activation_function_ddpg": "softmax",
+  "hidden_layers_dqn": [
+    128,
+    64
+  ],
+  "af_dqn": "relu",
+  "lr_dqn": 0.0005,
+  "gamma_dqn": 0.9,
+  "tau_dqn": 0.005,
+  "buffer_capacity_dqn": 200000,
+  "batch_size_dqn": 256,
+  "epsilon_start_dqn": 1.0,
+  "epsilon_end_dqn": 0.01,
+  "epsilon_decay_dqn": 300,
+  "RELIABILITY_ACTION_MASK_ENABLED": true,
+  "hidden_layers_ppo": [
+    64,
+    32
+  ],
+  "af_ppo": "tanh",
+  "actor_lr_ppo": 0.0001,
+  "critic_lr_ppo": 0.0005,
+  "gamma_ppo": 0.8,
+  "clip_eps_ppo": 0.2,
+  "k_epochs_ppo": 2,
+  "batch_size_ppo": 64,
+  "entropy_coef_ppo": 0.01,
+  "reward_scale_ppo": 1,
+  "gae_lambda_ppo": 0.95,
+  "value_loss_coef_ppo": 0.5,
+  "max_grad_norm_ppo": 0.5,
+  "EVALUATION_ONLY": true,
+  "SMOKE_ONLY": false,
+  "SCENARIO": {
+    "arrival_rate": 2.5,
+    "demand_multiplier": 1.0,
+    "task_count": 200,
+    "id": "arrival_rate_2.5",
+    "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_2.5.xlsx"
+  },
+  "TRAINING_DEMAND_NORMALIZATION_RANGE": [
+    4000000000.0,
+    8000000000.0
+  ],
+  "REPLICA_COUNT": 2,
+  "ARRIVAL_TEMPLATE_SHA256": "48928ea48b73524cefa8321ce599e9aa251b0e3c3135f058a2ca18ab5715b605"
+}

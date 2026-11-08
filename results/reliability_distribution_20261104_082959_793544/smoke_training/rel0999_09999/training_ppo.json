@@ -1,0 +1,17 @@
+{
+  "group_id": "rel0999_09999",
+  "method": "ppo",
+  "smoke": true,
+  "training_episodes": 2,
+  "training_tasks": 400,
+  "from_scratch": true,
+  "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/smoke_training/rel0999_09999/checkpoints/ppo_train_rel0999_09999_seed2026.pt",
+  "checkpoint_sha256": "e04dc6d2727b51ec2eeec7ddd0f0112a67a787a35c6faff520e70ac1ee4d3ed1",
+  "initial_policy_sha256": "fdb5c7afcb4dfd566369458e39e8736e9c9f1cf094808baeb86d1e67cf5e191e",
+  "training_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/reliability_distribution_20261104_082959_793544/smoke_training/rel0999_09999/training/ppo_train_rel0999_09999_seed2026",
+  "training_task_sha256": "1854553840d2d392da33421c041e2ebe9b9ddd923566b3212ab60f0f3dec148b",
+  "server_sha256": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+  "actor_steps": 16,
+  "critic_steps": 16,
+  "elapsed_seconds": 0.5889248019957449
+}

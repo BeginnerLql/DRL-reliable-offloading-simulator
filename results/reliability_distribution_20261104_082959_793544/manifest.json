@@ -1,0 +1,74 @@
+{
+  "groups": [
+    {
+      "id": "rel090_099",
+      "lower": 0.9,
+      "upper": 0.99,
+      "label": "U[0.9, 0.99]"
+    },
+    {
+      "id": "rel099_0999",
+      "lower": 0.99,
+      "upper": 0.999,
+      "label": "U[0.99, 0.999]"
+    },
+    {
+      "id": "rel0999_09999",
+      "lower": 0.999,
+      "upper": 0.9999,
+      "label": "U[0.999, 0.9999]"
+    }
+  ],
+  "methods": [
+    "ppo",
+    "ind-ppo",
+    "corr-delaygreedy",
+    "indep-delaygreedy",
+    "rasoul-delay"
+  ],
+  "train_episodes": 8000,
+  "evaluation_episodes": 500,
+  "task_count": 200,
+  "arrival_rate": 2.0,
+  "demand_multiplier": 1.0,
+  "profile_seed": 2029,
+  "training_seed": 2026,
+  "evaluation_seed": 2027,
+  "server_profiles_fixed": true,
+  "only_reliability_requirement_changes": true,
+  "shared_uniform_quantiles": true,
+  "training_and_evaluation_streams_independent": true,
+  "replicas": {
+    "ppo": 2,
+    "ind-ppo": 2,
+    "corr-delaygreedy": 2,
+    "indep-delaygreedy": 2,
+    "rasoul-delay": 1
+  },
+  "arrival_protocol": "Reuse previous baseline's PCG64(2027) 500x600 exponential samples, first 200 per episode / 2",
+  "input_sha256": {
+    "groups/rel090_099/inputs/evaluation_unit_interarrivals.npy": "9049f9965d2c4ee69d88cbcc6c694e8588a41495e071dd386ce63434fca14bba",
+    "groups/rel090_099/inputs/train200.xlsx": "25f00dcb4f250779a702cc882d6df7d4fd70c0f4befcb6dda376647b09817b44",
+    "groups/rel090_099/inputs/server_info.xlsx": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "groups/rel090_099/inputs/evaluation200.xlsx": "68fd118a2d8bc1c5e4e4d5da211b2bf0404e40bbd465f63ff88a7fb7767f1b11",
+    "groups/rel0999_09999/inputs/evaluation_unit_interarrivals.npy": "9049f9965d2c4ee69d88cbcc6c694e8588a41495e071dd386ce63434fca14bba",
+    "groups/rel0999_09999/inputs/train200.xlsx": "1854553840d2d392da33421c041e2ebe9b9ddd923566b3212ab60f0f3dec148b",
+    "groups/rel0999_09999/inputs/server_info.xlsx": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "groups/rel0999_09999/inputs/evaluation200.xlsx": "3d91d6e5a69e1a17ecf859d4920d0070ca505e20e5ea1d6d20adf67957e741ab",
+    "groups/rel099_0999/inputs/evaluation_unit_interarrivals.npy": "9049f9965d2c4ee69d88cbcc6c694e8588a41495e071dd386ce63434fca14bba",
+    "groups/rel099_0999/inputs/train200.xlsx": "5ebd9c77e0b43d944e87ec0560f0995558b6aad00d787995e36cfd9433187ee9",
+    "groups/rel099_0999/inputs/server_info.xlsx": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "groups/rel099_0999/inputs/evaluation200.xlsx": "c3f7b842de43ff2e0dbf4133980a970dd87966902e1f902611f2d0654a18eefc"
+  },
+  "shared_input_sha256": {
+    "shared_inputs/evaluation_unit_interarrivals.npy": "9049f9965d2c4ee69d88cbcc6c694e8588a41495e071dd386ce63434fca14bba",
+    "shared_inputs/baseline_train.xlsx": "30c692d646a78f777c63affc46fe5fb60afa502e71ccee07d6a42860c6f12ba9",
+    "shared_inputs/evaluation_reliability_quantiles.npy": "282e05e947cd67be4da7a8e3d116ccf6089fcbc9b90177ed9e0f2984caf155f7",
+    "shared_inputs/train_reliability_quantiles.npy": "b3a2f51fda9b670e6ad81eac984bf9b3575f858c254736abbc249d657ab6c7b6",
+    "shared_inputs/server_info.xlsx": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "shared_inputs/baseline_evaluation.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa"
+  },
+  "algorithm_changed": false,
+  "hyperparameters_changed": false,
+  "official_workbooks_overwritten": false
+}

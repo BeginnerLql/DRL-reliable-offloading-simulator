@@ -1,0 +1,15 @@
+{
+  "mode": "train-eval",
+  "ppo_agent": "ind-ppo",
+  "rates": [
+    2.0
+  ],
+  "episodes": 500,
+  "seed": 2027,
+  "checkpoint": null,
+  "ppo_runs": null,
+  "greedy_agent": "corr-delaygreedy",
+  "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx",
+  "device": "cpu",
+  "merge": []
+}

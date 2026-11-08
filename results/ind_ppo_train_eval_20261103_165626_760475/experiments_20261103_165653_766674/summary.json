@@ -1,0 +1,16 @@
+{
+  "status": "completed",
+  "mode": "train-eval",
+  "episodes_per_rate": 500,
+  "evaluation_seed": 2027,
+  "rates": [
+    2.0
+  ],
+  "device": "cpu",
+  "ppo_runs": {
+    "2.0": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_766674_arrival2_eval500"
+  },
+  "phase": "completed",
+  "current_arrival_rate": 2.0,
+  "comparisons": []
+}

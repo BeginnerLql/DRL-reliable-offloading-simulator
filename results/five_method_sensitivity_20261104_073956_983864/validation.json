@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "scenarios": 15,
+  "formal_evaluations": 75,
+  "episodes_per_evaluation": 500,
+  "total_evaluation_tasks": 10000000,
+  "training_tasks": 3200000,
+  "paired_task_and_arrival_hashes": true,
+  "all_input_and_trace_hashes_verified": true,
+  "all_safe_counts_match_independent_GH_scan": true,
+  "all_episode_aggregates_match_task_results": true,
+  "all_PPO_weights_and_optimizers_frozen": true,
+  "both_training_runs_completed_8000_episodes": true,
+  "all_RASOUL_feedback_complete": true,
+  "success_definition": "correlated pair threshold satisfaction, or marginal single threshold satisfaction",
+  "CI_scope": "500 arrival episodes, conditional on fixed task/server profiles and one trained policy per PPO method",
+  "no_commit_or_push": true
+}

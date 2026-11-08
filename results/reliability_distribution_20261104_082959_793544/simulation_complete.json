@@ -1,0 +1,10 @@
+{
+  "completed": true,
+  "training_runs": 6,
+  "evaluation_runs": 15,
+  "training_episodes_per_run": 8000,
+  "evaluation_episodes_per_run": 500,
+  "total_training_tasks": 9600000,
+  "total_evaluation_tasks": 1500000,
+  "repository_inputs_and_algorithm_unchanged": true
+}

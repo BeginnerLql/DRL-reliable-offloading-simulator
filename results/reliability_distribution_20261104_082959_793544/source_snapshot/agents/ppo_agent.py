@@ -1,0 +1,332 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+from torch.distributions import Categorical
+
+
+class PPOPolicyNetwork(nn.Module):
+    def __init__(self, input_dim, output_dim, hidden_layers, activation="tanh"):
+        super(PPOPolicyNetwork, self).__init__()
+        layers = []
+        prev_dim = input_dim
+
+        for h in hidden_layers:
+            layers.append(nn.Linear(prev_dim, h))
+
+            if activation == "relu":
+                layers.append(nn.ReLU())
+            elif activation == "leaky_relu":
+                layers.append(nn.LeakyReLU())
+            elif activation == "tanh":
+                layers.append(nn.Tanh())
+            else:
+                raise ValueError(f"Unsupported activation function: {activation}")
+
+            prev_dim = h
+
+        self.hidden_layers = nn.Sequential(*layers)
+        self.output_layer = nn.Linear(prev_dim, output_dim)
+
+    def forward(self, x):
+        x = self.hidden_layers(x)
+        return self.output_layer(x)
+
+
+class PPOValueNetwork(nn.Module):
+    def __init__(self, input_dim, hidden_layers, activation="tanh"):
+        super(PPOValueNetwork, self).__init__()
+        layers = []
+        prev_dim = input_dim
+
+        for h in hidden_layers:
+            layers.append(nn.Linear(prev_dim, h))
+
+            if activation == "relu":
+                layers.append(nn.ReLU())
+            elif activation == "leaky_relu":
+                layers.append(nn.LeakyReLU())
+            elif activation == "tanh":
+                layers.append(nn.Tanh())
+            else:
+                raise ValueError(f"Unsupported activation function: {activation}")
+
+            prev_dim = h
+
+        self.hidden_layers = nn.Sequential(*layers)
+        self.output_layer = nn.Linear(prev_dim, 1)
+
+    def forward(self, x):
+        x = self.hidden_layers(x)
+        return self.output_layer(x).squeeze(-1)
+
+
+class PPOAgent:
+    """On-policy PPO collected and trained once per episode."""
+
+    def __init__(
+        self,
+        num_states,
+        num_actions,
+        hidden_layers,
+        device="cpu",
+        gamma=0.99,
+        actor_lr=3e-4,
+        critic_lr=1e-3,
+        clip_eps=0.2,
+        k_epochs=2,
+        batch_size=64,
+        entropy_coef=0.01,
+        reward_scale=1.0,
+        gae_lambda=0.95,  # GAE for the ordered event-driven rollout
+        value_loss_coef=0.5,
+        max_grad_norm=0.5,
+        activation="tanh",
+        min_rollout=8,  # Minimum transitions per update
+    ):
+        self.device = torch.device(device)
+        self.num_actions = num_actions
+
+        self.gamma = gamma
+        self.clip_eps = clip_eps
+        self.k_epochs = k_epochs
+        self.batch_size = batch_size
+        self.entropy_coef = entropy_coef
+        self.reward_scale = reward_scale
+        self.gae_lambda = gae_lambda
+        self.value_loss_coef = value_loss_coef
+        self.max_grad_norm = max_grad_norm
+        self.min_rollout = int(min_rollout)
+
+        # policy_old is frozen during rollout sampling and log-prob computation.
+        self.policy_net = PPOPolicyNetwork(
+            num_states, num_actions, hidden_layers, activation
+        ).to(self.device)
+
+        self.policy_old = PPOPolicyNetwork(
+            num_states, num_actions, hidden_layers, activation
+        ).to(self.device)
+        self.policy_old.load_state_dict(self.policy_net.state_dict())
+
+        self.value_net = PPOValueNetwork(
+            num_states, hidden_layers, activation
+        ).to(self.device)
+
+        self.optimizer_policy = optim.Adam(self.policy_net.parameters(), lr=actor_lr)
+        self.optimizer_value = optim.Adam(self.value_net.parameters(), lr=critic_lr)
+
+        # Episode rollout buffer (cleared after train_step)
+        self.states = []
+        self.actions = []
+        self.rewards = []
+        self.next_states = []
+        self.dones = []
+        self.old_log_probs = []
+        self.delta_times = []
+        self.action_masks = []
+
+    def _to_tensor(self, x):
+        return torch.tensor(np.array(x), dtype=torch.float32, device=self.device)
+
+    def _action_distribution(self, logits, action_mask=None):
+        """Use the same masked distribution for sampling, ratios and entropy."""
+        if action_mask is not None:
+            mask = torch.as_tensor(action_mask, dtype=torch.bool, device=self.device)
+            if mask.shape != logits.shape and mask.shape != (self.num_actions,):
+                raise ValueError("Action mask shape must match the action logits")
+            if not mask.any(dim=-1).all():
+                raise ValueError("Action mask must allow at least one action per state")
+            logits = logits.masked_fill(~mask, float("-inf"))
+        return Categorical(logits=logits)
+
+    def select_action(self, state, epsilon, *, action_mask=None):
+        """Sample from policy_old; epsilon is unused by PPO."""
+        state_tensor = self._to_tensor(state).unsqueeze(0)
+        with torch.no_grad():
+            # Sample from policy_old for more stable on-policy behavior
+            logits = self.policy_old(state_tensor)
+            dist = self._action_distribution(logits, action_mask)
+            action = dist.sample()
+        return int(action.item())
+
+    def store_transition(self, s, a, r, s_next, delta_t, done=False, *, action_mask=None):
+        """Store one arrival-ordered SMDP transition.
+
+        ``delta_t`` is the elapsed simulation time to the next decision
+        epoch (or terminal drain), measured in seconds.
+        """
+        delta_t = float(delta_t)
+        mask = (
+            np.ones(self.num_actions, dtype=bool)
+            if action_mask is None else np.array(action_mask, dtype=bool, copy=True)
+        )
+        if mask.shape != (self.num_actions,):
+            raise ValueError("Transition action mask must have one entry per action")
+        if not 0 <= int(a) < self.num_actions or not mask[int(a)]:
+            raise ValueError("Stored action must be allowed by its action mask")
+
+        # Recompute with the decision-time mask, before policy_old is updated.
+        with torch.no_grad():
+            s_tensor = self._to_tensor(s).unsqueeze(0)
+            dist = self._action_distribution(self.policy_old(s_tensor), mask)
+            a_tensor = torch.tensor(int(a), dtype=torch.int64, device=self.device)
+            old_log_prob = float(dist.log_prob(a_tensor).item())
+
+        self.states.append(np.array(s, copy=True))
+        self.actions.append(int(a))
+        self.rewards.append(float(r))
+        self.next_states.append(np.array(s_next, copy=True))
+        self.dones.append(bool(done))
+        self.delta_times.append(delta_t)
+        self.action_masks.append(mask)
+        self.old_log_probs.append(old_log_prob)
+
+    def train_step(self):
+        """Optimize the arrival-ordered event-driven PPO rollout."""
+        N = len(self.states)
+        if N == 0:
+            return
+
+        if N < self.min_rollout:
+            self.clear_rollout()
+            return
+
+        states = self._to_tensor(self.states)
+        next_states = self._to_tensor(self.next_states)
+        actions = torch.tensor(self.actions, dtype=torch.int64, device=self.device)
+        rewards = torch.tensor(
+            self.rewards, dtype=torch.float32, device=self.device
+        ) * float(self.reward_scale)
+        dones = torch.tensor(self.dones, dtype=torch.float32, device=self.device)
+        delta_times = torch.tensor(
+            self.delta_times, dtype=torch.float32, device=self.device
+        )
+        old_log_probs = torch.tensor(
+            self.old_log_probs, dtype=torch.float32, device=self.device
+        )
+        action_masks = torch.tensor(
+            np.array(self.action_masks), dtype=torch.bool, device=self.device,
+        )
+
+        values = self.value_net(states)
+
+        with torch.no_grad():
+            next_values = self.value_net(next_states)
+            # gamma_ppo is interpreted as a per-second discount base.
+            gamma_k = torch.pow(
+                torch.full_like(delta_times, float(self.gamma)), delta_times
+            )
+            nonterminal = 1.0 - dones
+
+            # Ordered, variable-discount GAE. The reverse pass must happen
+            # before any minibatch shuffling.
+            deltas = (
+                rewards
+                + gamma_k * next_values * nonterminal
+                - values.detach()
+            )
+            advantages = torch.zeros_like(rewards)
+            gae = torch.tensor(0.0, dtype=torch.float32, device=self.device)
+            for k in reversed(range(N)):
+                gae = (
+                    deltas[k]
+                    + gamma_k[k] * self.gae_lambda * nonterminal[k] * gae
+                )
+                advantages[k] = gae
+
+            returns = advantages + values.detach()
+
+            adv_mean = advantages.mean()
+            adv_std = advantages.std(unbiased=False)
+            if adv_std.item() < 1e-8:
+                advantages = advantages - adv_mean
+            else:
+                advantages = (advantages - adv_mean) / (adv_std + 1e-8)
+
+        batch_size = min(int(self.batch_size), N)
+
+        for _ in range(int(self.k_epochs)):
+            # Minibatch shuffling is safe only after ordered GAE is complete.
+            idx = np.arange(N)
+            np.random.shuffle(idx)
+
+            for start in range(0, N, batch_size):
+                end = start + batch_size
+                batch_idx = idx[start:end]
+
+                b_states = states[batch_idx]
+                b_actions = actions[batch_idx]
+                b_advantages = advantages[batch_idx]
+                b_returns = returns[batch_idx].detach()
+                b_old_log_probs = old_log_probs[batch_idx]
+
+                logits = self.policy_net(b_states)
+                dist = self._action_distribution(logits, action_masks[batch_idx])
+                log_probs = dist.log_prob(b_actions)
+                entropy = dist.entropy().mean()
+
+                log_ratio = torch.clamp(log_probs - b_old_log_probs, -20.0, 20.0)
+                ratios = torch.exp(log_ratio)
+                surr1 = ratios * b_advantages
+                surr2 = torch.clamp(
+                    ratios, 1.0 - self.clip_eps, 1.0 + self.clip_eps
+                ) * b_advantages
+                policy_loss = (
+                    -torch.min(surr1, surr2).mean()
+                    - self.entropy_coef * entropy
+                )
+
+                new_values = self.value_net(b_states)
+                value_loss = self.value_loss_coef * nn.MSELoss()(new_values, b_returns)
+                total_loss = policy_loss + value_loss
+
+                if not torch.isfinite(total_loss):
+                    raise FloatingPointError("Non-finite PPO loss")
+
+                self.optimizer_policy.zero_grad(set_to_none=True)
+                self.optimizer_value.zero_grad(set_to_none=True)
+                total_loss.backward()
+                nn.utils.clip_grad_norm_(
+                    list(self.policy_net.parameters()) + list(self.value_net.parameters()),
+                    self.max_grad_norm,
+                )
+                self.optimizer_policy.step()
+                self.optimizer_value.step()
+
+        self.policy_old.load_state_dict(self.policy_net.state_dict())
+        self.clear_rollout()
+
+    def save_model(self, path):
+        torch.save(
+            {
+                "policy_net": self.policy_net.state_dict(),
+                "policy_old": self.policy_old.state_dict(),
+                "value_net": self.value_net.state_dict(),
+                "opt_policy": self.optimizer_policy.state_dict(),
+                "opt_value": self.optimizer_value.state_dict(),
+            },
+            path,
+        )
+
+    def load_model(self, path):
+        checkpoint = torch.load(path, map_location=self.device)
+        self.policy_net.load_state_dict(checkpoint["policy_net"])
+        if "policy_old" in checkpoint:
+            self.policy_old.load_state_dict(checkpoint["policy_old"])
+        else:
+            self.policy_old.load_state_dict(checkpoint["policy_net"])
+        self.value_net.load_state_dict(checkpoint["value_net"])
+        if "opt_policy" in checkpoint:
+            self.optimizer_policy.load_state_dict(checkpoint["opt_policy"])
+        if "opt_value" in checkpoint:
+            self.optimizer_value.load_state_dict(checkpoint["opt_value"])
+
+    def clear_rollout(self):
+        self.states.clear()
+        self.actions.clear()
+        self.rewards.clear()
+        self.next_states.clear()
+        self.dones.clear()
+        self.old_log_probs.clear()
+        self.delta_times.clear()
+        self.action_masks.clear()

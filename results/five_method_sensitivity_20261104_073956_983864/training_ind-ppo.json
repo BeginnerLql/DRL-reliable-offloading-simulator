@@ -1,0 +1,13 @@
+{
+  "method": "ind-ppo",
+  "status": "completed",
+  "training_episodes": 8000,
+  "training_tasks": 1600000,
+  "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/checkpoints/ind-ppo_20261104_074232_profile2029_rel092_099.pt",
+  "checkpoint_sha256": "6f8127890f3df38bf2594ee5da96ddd424fb54e2dc745222886e16c7e8e472e4",
+  "training_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/training/ind-ppo_20261104_074232_profile2029_rel092_099",
+  "elapsed_seconds": 749.8707420309947,
+  "from_scratch": true,
+  "actor_steps": 64000,
+  "critic_steps": 64000
+}

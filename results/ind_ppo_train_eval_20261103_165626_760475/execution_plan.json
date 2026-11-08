@@ -1,0 +1,43 @@
+{
+  "head": "a6e5aafb534ddb98cc80a8be215b01b510bf981b",
+  "method": "ind-ppo",
+  "train_episodes": 8000,
+  "tasks_per_episode": 200,
+  "train_seed": 2026,
+  "train_arrival_rate": 2.0,
+  "evaluation_episodes": 500,
+  "evaluation_seed": 2027,
+  "evaluation_arrival_rate": 2.0,
+  "evaluation_task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx",
+  "training_task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters.xlsx",
+  "independent_training_from_scratch": true,
+  "prior_checkpoint_loaded": false,
+  "spatial_risk_enabled": true,
+  "reliability_action_mask_enabled": true,
+  "hyperparameters": {
+    "hidden_layers_ppo": [
+      64,
+      32
+    ],
+    "af_ppo": "tanh",
+    "actor_lr_ppo": 0.0001,
+    "critic_lr_ppo": 0.0005,
+    "gamma_ppo": 0.8,
+    "clip_eps_ppo": 0.2,
+    "k_epochs_ppo": 2,
+    "batch_size_ppo": 64,
+    "entropy_coef_ppo": 0.01,
+    "reward_scale_ppo": 1,
+    "gae_lambda_ppo": 0.95,
+    "value_loss_coef_ppo": 0.5,
+    "max_grad_norm_ppo": 0.5
+  },
+  "protected_sha256": {
+    "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+    "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters.xlsx": "77b0ce9ab94e56140652808ba6a23d1d0d7686e0e943424c4d5b54782871aa20",
+    "/home/user/workplaces/DRL-reliable-offloading-simulator/data/server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+    "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261031_180331_baseline.pt": "570240a1cf33568785e2fb648cc839a7fbf637d368abdbfd1f503a06f8bcb9d3",
+    "/home/user/workplaces/DRL-reliable-offloading-simulator/config/configuration.py": "6ec845b3e3e7b85aa24fce5115a3f79275e045f15477c1ea3f879939340ed831"
+  },
+  "unit_tests_passed": 33
+}

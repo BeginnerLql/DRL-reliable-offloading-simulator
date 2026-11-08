@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "training_runs": 6,
+  "evaluation_runs": 15,
+  "training_episodes_each": 8000,
+  "evaluation_episodes_each": 500,
+  "training_tasks": 9600000,
+  "evaluation_tasks": 1500000,
+  "all_rows_verified": true,
+  "unchanged_task_fields_and_arrival_times_across_all_groups": true,
+  "same_initial_networks_for_all_training": true,
+  "all_safe_counts_match_GH_scan": true,
+  "all_source_checkpoints_and_frozen_states_verified": true,
+  "all_RASOUL_feedback_complete": true,
+  "repository_inputs_and_algorithms_unchanged": true,
+  "success_definition": "correlated pair / marginal single reliability threshold satisfaction",
+  "latency_includes_fallback_tasks": true,
+  "no_commit_or_push": true
+}

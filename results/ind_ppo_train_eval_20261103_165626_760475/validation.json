@@ -1,0 +1,39 @@
+{
+  "training_episodes": 8000,
+  "training_tasks": 1600000,
+  "evaluation_episodes": 500,
+  "evaluation_tasks": 100000,
+  "training_configuration_matches_corr_ppo_except_mask": true,
+  "actor_optimizer_steps": 64000,
+  "critic_optimizer_steps": 64000,
+  "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+  "no_prior_checkpoint_used_for_training": true,
+  "existing_inputs_and_checkpoint_unchanged": true,
+  "evaluation_frozen": true,
+  "original_method_regression_exact": true,
+  "unit_tests_passed": 33,
+  "audits": [
+    {
+      "method": "Corr-PPO",
+      "task_results_sha256": "b85cf09d0b41094f559715657dc8cf822aa3182a3e4ae8c666e9d26bd8e8a144",
+      "paired_arrivals_and_profiles_verified": true
+    },
+    {
+      "method": "Corr-delayGreedy",
+      "task_results_sha256": "7d42e628545e6bbef5daed79be3220e46d375f279f7fefc7a7342cf9f4936c5c",
+      "paired_arrivals_and_profiles_verified": true
+    },
+    {
+      "method": "Indep-delayGreedy",
+      "task_results_sha256": "7d6ed42f09f89ed12c727b10da894db56313633cbcddc344962771835e2eae6a",
+      "paired_arrivals_and_profiles_verified": true
+    },
+    {
+      "method": "Ind-PPO",
+      "task_results_sha256": "ba4fc3fdc6e722c608ea3deb517be6e48806136d1903b3a1a407921b7d301cab",
+      "paired_arrivals_and_profiles_verified": true
+    }
+  ],
+  "training_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_baseline",
+  "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_baseline.pt"
+}

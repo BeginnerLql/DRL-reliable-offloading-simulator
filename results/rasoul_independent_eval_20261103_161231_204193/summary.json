@@ -1,0 +1,35 @@
+{
+  "episodes": 20,
+  "tasks_per_episode": 200,
+  "measured_task_executions": 4000,
+  "arrival_rate": 2.0,
+  "exploration_c_seconds": 0.5,
+  "requirement_range": [
+    0.9,
+    0.99
+  ],
+  "requirement_generation_seed": 2029,
+  "arrival_seed": 2027,
+  "mean_task_delay_seconds": 14.27175654565716,
+  "p95_task_delay_seconds": 42.70981258166978,
+  "mean_upload_delay_seconds": 0.6300715241065118,
+  "mean_queue_delay_seconds": 11.80841163446279,
+  "mean_execution_delay_seconds": 1.8332733870878604,
+  "episode_mean_delay_std_seconds": 2.360159688841106,
+  "theoretical_rsr": 0.73,
+  "fallback_rate": 0.27,
+  "mean_single_reliability": 0.951684260207291,
+  "completion_feedback_count": 4000,
+  "decision_branches": {
+    "lcb": 2083,
+    "fallback": 1080,
+    "single_safe": 460,
+    "unobserved_exploration": 377
+  },
+  "lcb_decisions": 2083,
+  "discrepancy_changed_choice_decisions": 1952,
+  "discrepancy_changed_choice_fraction_of_lcb": 0.9371099375900144,
+  "lcb_differs_from_basic_delay_decisions": 1981,
+  "negative_candidate_lcb_scores": 0,
+  "final_episode_learning_scope": "Counters reset every episode; aggregate sums are reporting only"
+}

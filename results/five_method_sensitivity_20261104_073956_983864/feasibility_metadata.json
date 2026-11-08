@@ -1,0 +1,8 @@
+{
+  "beta": 0.5,
+  "gh_order": 32,
+  "correlation_length_km": 0.9975446668395274,
+  "unique_demands": 1600,
+  "reliability_exposure": "base_failure_rate * CPU_cycles / CPU_frequency; CPU only",
+  "taskwise_safety_is_static": true
+}

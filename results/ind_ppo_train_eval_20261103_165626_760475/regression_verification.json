@@ -1,0 +1,20 @@
+{
+  "Corr-delayGreedy": {
+    "tasks": 400,
+    "episodes": 2,
+    "exact_match": true,
+    "sha256": "f5870b810ad2063a15b38b9db40124406630991897de73d7cfb3a69c6db6ef3f"
+  },
+  "Indep-delayGreedy": {
+    "tasks": 400,
+    "episodes": 2,
+    "exact_match": true,
+    "sha256": "c41d8229e1b68f4361172382c02c98685c490cd609eb124bddbe1dedc90eafe4"
+  },
+  "ppo": {
+    "tasks": 400,
+    "episodes": 2,
+    "exact_match": true,
+    "sha256": "2193482cb1177712be5d3b9c594deac605897c4e497a416c262609cf9f31d867"
+  }
+}

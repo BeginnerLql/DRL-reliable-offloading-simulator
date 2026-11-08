@@ -1,0 +1,19 @@
+{
+  "mode": "ppo",
+  "ppo_agent": "ind-ppo",
+  "rates": [
+    0.5,
+    1.0,
+    1.5,
+    2.5,
+    3.0
+  ],
+  "episodes": 500,
+  "seed": 2027,
+  "checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_baseline.pt",
+  "ppo_runs": null,
+  "greedy_agent": "corr-delaygreedy",
+  "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx",
+  "device": "cpu",
+  "merge": []
+}

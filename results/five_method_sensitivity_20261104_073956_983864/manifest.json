@@ -1,0 +1,223 @@
+{
+  "profile_seed": 2029,
+  "reliability_requirement_range": [
+    0.92,
+    0.999
+  ],
+  "server_count": 8,
+  "topology": "Existing eight EUA sites, new hardware and failure-rate samples",
+  "training_episodes": 8000,
+  "training_tasks_per_episode": 200,
+  "training_arrival_rate": 2.0,
+  "training_seed": 2026,
+  "evaluation_episodes": 500,
+  "evaluation_seed": 2027,
+  "arrival_protocol": "PCG64(seed=2027) exponential(1), shape=(500,600); prefix N per episode divided by arrival rate",
+  "frozen_observation_normalization": "Retain baseline size, demand and server feature normalization at every sweep point",
+  "groups": {
+    "arrival_rate": [
+      {
+        "value": 0.5,
+        "scenario_id": "arrival_rate_0.5"
+      },
+      {
+        "value": 1.0,
+        "scenario_id": "arrival_rate_1"
+      },
+      {
+        "value": 1.5,
+        "scenario_id": "arrival_rate_1.5"
+      },
+      {
+        "value": 2.0,
+        "scenario_id": "baseline"
+      },
+      {
+        "value": 2.5,
+        "scenario_id": "arrival_rate_2.5"
+      },
+      {
+        "value": 3.0,
+        "scenario_id": "arrival_rate_3"
+      }
+    ],
+    "demand_multiplier": [
+      {
+        "value": 0.5,
+        "scenario_id": "demand_multiplier_0.5"
+      },
+      {
+        "value": 1.0,
+        "scenario_id": "baseline"
+      },
+      {
+        "value": 1.5,
+        "scenario_id": "demand_multiplier_1.5"
+      },
+      {
+        "value": 2.0,
+        "scenario_id": "demand_multiplier_2"
+      },
+      {
+        "value": 2.5,
+        "scenario_id": "demand_multiplier_2.5"
+      },
+      {
+        "value": 3.0,
+        "scenario_id": "demand_multiplier_3"
+      }
+    ],
+    "task_count": [
+      {
+        "value": 200,
+        "scenario_id": "baseline"
+      },
+      {
+        "value": 300,
+        "scenario_id": "task_count_300"
+      },
+      {
+        "value": 400,
+        "scenario_id": "task_count_400"
+      },
+      {
+        "value": 500,
+        "scenario_id": "task_count_500"
+      },
+      {
+        "value": 600,
+        "scenario_id": "task_count_600"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "baseline",
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/evaluation200.xlsx"
+    },
+    {
+      "arrival_rate": 0.5,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "id": "arrival_rate_0.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_0.5.xlsx"
+    },
+    {
+      "arrival_rate": 1.0,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "id": "arrival_rate_1",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_1.xlsx"
+    },
+    {
+      "arrival_rate": 1.5,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "id": "arrival_rate_1.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_1.5.xlsx"
+    },
+    {
+      "arrival_rate": 2.5,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "id": "arrival_rate_2.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_2.5.xlsx"
+    },
+    {
+      "arrival_rate": 3.0,
+      "demand_multiplier": 1.0,
+      "task_count": 200,
+      "id": "arrival_rate_3",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/arrival_rate_3.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 0.5,
+      "task_count": 200,
+      "id": "demand_multiplier_0.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/demand_multiplier_0.5.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.5,
+      "task_count": 200,
+      "id": "demand_multiplier_1.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/demand_multiplier_1.5.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 2.0,
+      "task_count": 200,
+      "id": "demand_multiplier_2",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/demand_multiplier_2.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 2.5,
+      "task_count": 200,
+      "id": "demand_multiplier_2.5",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/demand_multiplier_2.5.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 3.0,
+      "task_count": 200,
+      "id": "demand_multiplier_3",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/demand_multiplier_3.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.0,
+      "task_count": 300,
+      "id": "task_count_300",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/task_count_300.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.0,
+      "task_count": 400,
+      "id": "task_count_400",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/task_count_400.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.0,
+      "task_count": 500,
+      "id": "task_count_500",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/task_count_500.xlsx"
+    },
+    {
+      "arrival_rate": 2.0,
+      "demand_multiplier": 1.0,
+      "task_count": 600,
+      "id": "task_count_600",
+      "task_path": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/five_method_sensitivity_20261104_073956_983864/inputs/task_count_600.xlsx"
+    }
+  ],
+  "input_sha256": {
+    "inputs/demand_multiplier_2.5.xlsx": "a29fc1c0596d3416951e06c27b863b053f5033213ece9e92498b0d65d2c62890",
+    "inputs/arrival_rate_1.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/demand_multiplier_2.xlsx": "351013e39d77ccc7a715abeb7abbe78c28a8bd6ed24f011be185ac999ad84dcf",
+    "inputs/evaluation_unit_interarrivals.npy": "48928ea48b73524cefa8321ce599e9aa251b0e3c3135f058a2ca18ab5715b605",
+    "inputs/arrival_rate_0.5.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/train200.xlsx": "30c692d646a78f777c63affc46fe5fb60afa502e71ccee07d6a42860c6f12ba9",
+    "inputs/task_count_400.xlsx": "4774a9417fa0c37d4cd46aa67f682d58d9b2fbe7c006bbd2d53ec633a2cf1e5f",
+    "inputs/evaluation_pool600.xlsx": "32703cc035e327bab58b67f42a856d85ea33e3c826991ec50ee8e3605d72bb5c",
+    "inputs/arrival_rate_3.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/arrival_rate_2.5.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/demand_multiplier_1.5.xlsx": "97b5cbbf6963ab31a3497170ee382df5d60781b7e577792527f9cc90661269b3",
+    "inputs/task_count_500.xlsx": "431a20b2dfcb2945ed362f9656c95ca02bc0ce9ec12da9dedaf5f042490e6189",
+    "inputs/arrival_rate_1.5.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/demand_multiplier_0.5.xlsx": "537e53211e6a062dd2fe616d8a42239f1c73ce99d0f0428a4cee08f90ec4e214",
+    "inputs/server_info.xlsx": "4bf2907d658f7075c8d4a9d799dd3b3643960bf571ccfd700c77dd81a0f5400b",
+    "inputs/demand_multiplier_3.xlsx": "5346181fd74b3a3e101f62454da9220e3684596d69a54b5352ecb5216a89c5d1",
+    "inputs/task_count_300.xlsx": "3f8fb7b6db0f0f8fad5a5870dc9ae4471579fcfd7e8d8af80689e8cf0910d6e9",
+    "inputs/evaluation200.xlsx": "ec464d57665be3e35968eb5ebee25967f880728185fda76928a1785a87d447aa",
+    "inputs/task_count_600.xlsx": "32703cc035e327bab58b67f42a856d85ea33e3c826991ec50ee8e3605d72bb5c"
+  },
+  "all_task_prefixes_verified": true,
+  "unchanged_input_columns_verified": true
+}

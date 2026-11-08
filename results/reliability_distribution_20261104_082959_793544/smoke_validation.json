@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "fresh_training_checks": 6,
+  "evaluations": 15,
+  "all_three_distributions": true,
+  "all_five_methods": true,
+  "paired_inputs_verified": true,
+  "same_initial_networks": true
+}

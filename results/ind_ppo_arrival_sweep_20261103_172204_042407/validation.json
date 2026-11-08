@@ -1,0 +1,552 @@
+{
+  "runs": [
+    {
+      "arrival_rate": 0.5,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_163748_arrival0.5_frozen_eval500",
+      "task_results_sha256": "b9bf799f7184be1b8260142f58907e6d59a3cd355828c9100dd0dcd9a7604de9",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 0.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 0.5,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival0.5_eval500",
+      "task_results_sha256": "9dcbce01d4cf5ce107eb06550e6ad616c98f3cedab4b00de3daac21ebe223c52",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 0.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 0.5,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_194643_arrival0.5_eval500",
+      "task_results_sha256": "9b2678b272b594da9f3d046e67952f126e3e7a40c0ced280b90f712962ae12aa",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 0.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 0.5,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival0.5_eval500",
+      "task_results_sha256": "ddd7d51d36f1bd8a6efb306e0ed0d532311ca3c70074d46f1e8132965c8a4f04",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 0.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_164009_arrival1_frozen_eval500",
+      "task_results_sha256": "ad63a8f07c06bdd69b882d58e6390b48b52dbb4b28a63d96553d32dc730f458d",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival1_eval500",
+      "task_results_sha256": "429526542928fee388d24af0d00b52ad1d5ad38fe1378c9cf041bd3caa9680bf",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 1,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_194643_arrival1_eval500",
+      "task_results_sha256": "441d1f3b66b8a1511ef9078d8fd63ed317aa616d4d8c12547808be9a9f90672b",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival1_eval500",
+      "task_results_sha256": "9df53c7da9886dbe306eb8335f7bf6ebde923d43c4bf9c146c1f96bb2767025c",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1.5,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_195828_arrival1.5_frozen_eval500",
+      "task_results_sha256": "d698b09b20ee0c2e3aa7a5ef38713c3ab4bea932ebcacb65a7bc6c1d73572578",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1.5,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival1.5_eval500",
+      "task_results_sha256": "d4b4142d5b63fcaeaf9c660bea7b7a46daf5e0371c558f2576363a1f8c6969ce",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 1.5,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_200000_arrival1.5_eval500",
+      "task_results_sha256": "c56c3fd3b6736b20f5f62452a721cfcf2ca6efa8d7c11dd113d9360440f89e09",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 1.5,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival1.5_eval500",
+      "task_results_sha256": "da6bceda404face741f8e15c6f2c270b5e76062834a88cf6c15ccd182ba9a431",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 1.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261031_184407_arrival2_frozen_eval500",
+      "task_results_sha256": "b85cf09d0b41094f559715657dc8cf822aa3182a3e4ae8c666e9d26bd8e8a144",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_766674_arrival2_eval500",
+      "task_results_sha256": "ba4fc3fdc6e722c608ea3deb517be6e48806136d1903b3a1a407921b7d301cab",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 2,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_194643_arrival2_eval500",
+      "task_results_sha256": "7d42e628545e6bbef5daed79be3220e46d375f279f7fefc7a7342cf9f4936c5c",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival2_eval500",
+      "task_results_sha256": "7d6ed42f09f89ed12c727b10da894db56313633cbcddc344962771835e2eae6a",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2.5,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_195828_arrival2.5_frozen_eval500",
+      "task_results_sha256": "c10c9bd0c323ded98fafa1b0cda395877bc25ef50e5c8990d2c444be92d0cf22",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2.5,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival2.5_eval500",
+      "task_results_sha256": "f95c1ba7d15be74f39f7100820391f488bad8e89b675910b40f35c87cef8e681",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 2.5,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_200000_arrival2.5_eval500",
+      "task_results_sha256": "5699d997ebedb3aa5fa817871d0ba3beacc1913ed88b90f983c2822445c7b659",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 2.5,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival2.5_eval500",
+      "task_results_sha256": "09dbffd5fea42305b800bbfef027d264a7873037c2dde53c548a4e7ecd139b95",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 2.5,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 3,
+      "method": "Corr-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ppo_20261101_195828_arrival3_frozen_eval500",
+      "task_results_sha256": "cf09266fc8209e9c307699bd7fcf12853209ea2e2dbc4527450d7583185083a9",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 3.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 3,
+      "method": "Ind-PPO",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_arrival_sweep_20261103_172204_042407/ind-ppo_20261103_172319_976366_arrival3_eval500",
+      "task_results_sha256": "4ded0229a5fc40dbbda482e1406613bc5c8ef4b78bd50c687057e1030e419d24",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 3.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true,
+      "checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+      "frozen_verified": true
+    },
+    {
+      "arrival_rate": 3,
+      "method": "Corr-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/corr-delaygreedy_20261101_200000_arrival3_eval500",
+      "task_results_sha256": "c934f1f9b1b0b1f1cae42e475ecc6d6919cb1e30745ad49b35882654fb6d2032",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 3.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    },
+    {
+      "arrival_rate": 3,
+      "method": "Indep-delayGreedy",
+      "source_directory": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/indep-delaygreedy_20261102_225141_483260_arrival3_eval500",
+      "task_results_sha256": "1306e85e66bcf6bb79dd69afc08cc4cf12e01f6e539d834c8c5f9dcddc42c2f7",
+      "input_sha256": {
+        "server_info.xlsx": "e9045d8b89bf1ef47aeafdd13e66a7e6224c11944e48f9e7edf7ec4f6ac72ba9",
+        "task_parameters.xlsx": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c"
+      },
+      "matched_settings": {
+        "total_episodes": 500,
+        "taskno": 200,
+        "TASK_ARRIVAL_RATE": 3.0,
+        "EXPERIMENT_SEED": 2027,
+        "NUM_SERVERS": 8,
+        "SPATIAL_RISK_ENABLED": true,
+        "SPATIAL_RISK_BETA_P": 0.5,
+        "SPATIAL_RISK_GH_ORDER": 32,
+        "RELIABILITY_ACTION_MASK_ENABLED": true
+      },
+      "paired_arrivals_verified": true
+    }
+  ],
+  "all_24_runs_verified": true,
+  "total_compared_task_rows": 2400000,
+  "independent_ppo_checkpoint": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/ind_ppo_train_eval_20261103_165626_760475/ind-ppo_20261103_165653_baseline.pt",
+  "independent_ppo_checkpoint_sha256": "1d6ceafee40af79fe824f4a8ba70fdf263a1be19f2d737dd1c343136dec2fb6a",
+  "same_ind_ppo_checkpoint_at_all_rates": true,
+  "evaluation_only": true,
+  "reliability_metric": "Fraction whose computed reliability meets its task requirement, not sampled successes",
+  "interval_scope": "Paired Student-t 95% intervals over 500 episodes; fixed profiles and one checkpoint per PPO variant"
+}

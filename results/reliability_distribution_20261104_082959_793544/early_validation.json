@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "training_prefix_episodes_each": 100,
+  "training_prefix_runs": 6,
+  "completed_nonPPO_evaluations": 9,
+  "train_and_eval_workload_matching": true,
+  "strict_RASOUL_delays_identical": true
+}

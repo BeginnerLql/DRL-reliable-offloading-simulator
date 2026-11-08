@@ -1,0 +1,7 @@
+{
+  "beta": 0.5,
+  "gh_order": 32,
+  "correlation_length_km": 0.9975446668395274,
+  "unique_demands": 400,
+  "failure_exposure": "CPU only: base_failure_rate * demand / frequency"
+}

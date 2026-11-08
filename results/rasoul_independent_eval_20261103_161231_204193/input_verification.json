@@ -1,0 +1,17 @@
+{
+  "original": "/home/user/workplaces/DRL-reliable-offloading-simulator/data/task_parameters_evaluation.xlsx",
+  "original_sha256": "72f7883cf0219b9ec433c528e937702710f826bde34fdd9c7937bc475415263c",
+  "generated": "/home/user/workplaces/DRL-reliable-offloading-simulator/results/rasoul_independent_eval_20261103_161231_204193/inputs/task_parameters_evaluation_rel090_099_seed2029.xlsx",
+  "generated_sha256": "04ad24df8a507b4ecb75ae54a6687a3718575eb80968edaa019576c8b1c6a6bf",
+  "rows": 200,
+  "unchanged_columns": [
+    "Task_ID",
+    "Task_Size",
+    "Computation_Demand"
+  ],
+  "non_target_cells_checked": 604,
+  "all_non_target_values_types_formats_equal": true,
+  "rng": "numpy.random.default_rng / PCG64",
+  "seed": 2029,
+  "distribution": "U[0.9, 0.99]"
+}

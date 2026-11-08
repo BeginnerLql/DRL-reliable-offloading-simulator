@@ -1,0 +1,20 @@
+{
+  "python": "3.10.19 (main, Oct 21 2025, 16:43:05) [GCC 11.2.0]",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "packages": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "torch": "2.10.0+cu130",
+    "simpy": "4.1.1",
+    "matplotlib": "3.10.8"
+  },
+  "git_head": "a6e5aafb534ddb98cc80a8be215b01b510bf981b",
+  "device": "cpu",
+  "threads_per_worker": 1,
+  "train_workers": 6,
+  "evaluation_workers": 3,
+  "initialization_seed": 2026,
+  "input_profile_seed": 2029,
+  "evaluation_seed": 2027,
+  "task_and_server_inputs_not_overwritten": true
+}

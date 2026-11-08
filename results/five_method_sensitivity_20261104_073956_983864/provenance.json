@@ -1,0 +1,28 @@
+{
+  "git_head": "a6e5aafb534ddb98cc80a8be215b01b510bf981b",
+  "python": "3.10.19 (main, Oct 21 2025, 16:43:05) [GCC 11.2.0]",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "packages": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "torch": "2.10.0+cu130",
+    "simpy": "4.1.1",
+    "matplotlib": "3.10.8"
+  },
+  "source_sha256": {
+    "Project_main.py": "f6ee330458f74e9a71a003ffe8f0d68a820f0b5e1591be9b9e7f36fd4d496f91",
+    "config/configuration.py": "8b3d49ebf786de9c61ab1caa717701f54615b5dede0a642d619aa783e8de2e55",
+    "config/params.py": "f986a45e489e7cc8659ad86b75760cb82578c94e78d64b8fc8d71088c804cc78",
+    "core/main_loop.py": "884fda872992b3a83d7d4fa2d5de22db4d0aeed4851a1e88c02e0c43aa8b1f31",
+    "core/spatial_risk.py": "2c7018249cb24a9c0acba6add4da673ca56bf0f2ff58d417e24c7b4d77939cab",
+    "core/env_state.py": "b805ff6d76bb9dae1fccdc5fe6c4613ffeee3d1e6cf6d91ada015339f15c766e",
+    "agents/ppo_agent.py": "3791efd56770d36d4c857e542844a39f4f5117a0b5eb889a757b75aa65829a8a",
+    "agents/corr_delay_greedy_agent.py": "3d3e844ed059f6dbfdcac37b8477d3be065eac31af83e95185526d3f60c77e7b",
+    "agents/rasoul_delay_agent.py": "cec6315b941a6b58c1331d528ce19ac2e3e519f04636409698b693c6cc730348",
+    "tools/generate_server_and_task_parameters.py": "f6ecf22ca072b9f860ef6b3ade3018788c30b4b527d05dee8371dbef2e872569"
+  },
+  "device": "cpu",
+  "torch_threads_per_worker": 1,
+  "server_topology_regenerated": false,
+  "server_hardware_and_failure_profiles_regenerated": true
+}
